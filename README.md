@@ -30,19 +30,20 @@ await foreach (string chunk in _client.StreamChatCompletions(new UserMessage(tex
 }
 ```
 
-## Continue dialog with ChatGPT (send messages history)
-Use `ThenAssistant` (means ChatGPT) and `ThenUser` (means human) methods to create a dialog:
+## Continue dialog with ChatGPT (message history)
+Use `ThenAssistant` and `ThenUser` methods to create a dialog:
 ```csharp
 ChatCompletionDialog dialog = 
-    new UserMessage("How many meters are in a kilometer? Write just the number.")
-    .ThenAssistant("1000")
-    .ThenUser("Convert it to hex. Write just the number.");
+    new UserMessage("How many meters are in a kilometer? Write just the number.") //the message from user
+    .ThenAssistant("1000") // response from the assistant
+    .ThenUser("Convert it to hex. Write just the number."); // the next message from user
 
 await foreach (var chunk in _client.StreamChatCompletions(dialog, maxTokens: 80))
 {
     Console.Write(chunk);
 }
 ```
+Or just send message history as a collection.
 
 ## OpenAI Images API (text-to-image)
 ### Generate image bytes

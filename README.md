@@ -1,5 +1,5 @@
 # OpenAI Chat Completions (ChatGPT) client for .NET
-This is a .NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. The client supports both synchronous and asynchronous operations. It also supports streaming responses (like ChatGPT) via async streams.
+This is a .NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.
 
 ## Preparation
 First, you need to create an OpenAI account and get an API key. You can do this at https://platform.openai.com/account/api-keys.

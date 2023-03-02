@@ -1,3 +1,20 @@
-﻿namespace OpenAI.Models.Images;
+﻿using System.Text.Json.Serialization;
 
-public record ImageGenerationRequest(string prompt, string size, int n, string response_format, string user);
+namespace OpenAI.Models.Images;
+
+internal record ImageGenerationRequest(
+    string Prompt,
+    string Size,
+    [property: JsonPropertyName("n")] int N,
+    string ResponseFormat,
+    [property: JsonPropertyName("user")] string? User)
+{
+    [JsonPropertyName("prompt")]
+    public string Prompt { get; init; } = Prompt ?? throw new ArgumentNullException(nameof(Prompt));
+
+    [JsonPropertyName("size")]
+    public string Size { get; init; } = Size ?? throw new ArgumentNullException(nameof(Size));
+
+    [JsonPropertyName("response_format")]
+    public string ResponseFormat { get; init; } = ResponseFormat ?? throw new ArgumentNullException(nameof(ResponseFormat));
+}

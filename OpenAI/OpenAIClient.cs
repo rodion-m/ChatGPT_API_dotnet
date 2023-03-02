@@ -14,8 +14,9 @@ public class OpenAiClient : IDisposable
     private const string DefaultHost = "https://api.openai.com/v1/";
     private const string ImagesEndpoint = "images/generations";
     private const string ChatCompletionsEndpoint = "chat/completions";
-    
+
     private readonly HttpClient _httpClient;
+
     private readonly JsonSerializerOptions _nullIgnoreSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
@@ -50,7 +51,7 @@ public class OpenAiClient : IDisposable
         }, cancellationToken);
         return res.Choices[0].Message!.Content;
     }
-    
+
     public async Task<string> GetChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
@@ -67,7 +68,7 @@ public class OpenAiClient : IDisposable
         }, cancellationToken);
         return res.Choices[0].Message!.Content;
     }
-    
+
     public async Task<ChatCompletionResponse> GetChatCompletions(
         ChatCompletionRequest request,
         CancellationToken cancellationToken = default)
@@ -99,7 +100,7 @@ public class OpenAiClient : IDisposable
         throw new Exception($"Failed to generate chat response *{statusCode}:" +
                             $" {responseContent}");
     }
-    
+
     /// <summary>
     /// Start streaming chat completions like ChatGPT
     /// </summary>
@@ -187,7 +188,7 @@ public class OpenAiClient : IDisposable
 
             var res = JsonSerializer.Deserialize<ChatCompletionResponse>(line);
             var content = res!.Choices[0].Delta?.Content;
-            if(content is not null)
+            if (content is not null)
                 yield return content;
         }
     }
@@ -233,7 +234,9 @@ public class OpenAiClient : IDisposable
         var response = await _httpClient.PostAsJsonAsync(
             ImagesEndpoint,
             request,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+            options: _nullIgnoreSerializerOptions,
+            cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
         var responseContent = await response.Content.ReadAsStringAsync(cancellationToken)
             .ConfigureAwait(false);
 

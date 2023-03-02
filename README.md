@@ -1,16 +1,16 @@
 # OpenAI Chat Completions (ChatGPT) client for .NET
 ## Preparation
-First, you need to create an OpenAI account and get an API key. You can do this at https://beta.openai.com/account/api-keys.
+First, you need to create an OpenAI account and get an API key. You can do this at https://platform.openai.com/account/api-keys.
 ## Installation
 You can install the package via NuGet:
 ```
 Install-Package OpenAI.ChatGPT
 ```
-Create an instance of `OpenAIClient`:
+Then create an instance of `OpenAIClient`:
 ```csharp
 _client = new OpenAiClient("{YOUR_OPENAI_API_KEY}");
 ```
-```
+
 ## Simple usage of the Chat Completions API
 ```csharp
 string text = "Who are you?";
@@ -28,7 +28,7 @@ await foreach (string chunk in _client.StreamChatCompletions(new UserMessage(tex
 ```
 
 ## Continue dialog with ChatGPT (send messages history)
-Simply do that using `ThenAssistant` and `ThenUser` methods:
+Use `ThenAssistant` (means ChatGPT) and `ThenUser` (means human) methods to create a dialog:
 ```csharp
 ChatCompletionDialog dialog = 
     new UserMessage("How many meters are in a kilometer? Write just the number.")
@@ -44,7 +44,7 @@ await foreach (var chunk in _client.StreamChatCompletions(dialog, 80))
 ## OpenAI Images API (text-to-image)
 ### Generate image bytes
 ```csharp
-
+byte[] image = await _client.GenerateImageBytes("bicycle", "test", OpenAiImageSize._256);
 ```
 ### Generate images uris
 ```csharp

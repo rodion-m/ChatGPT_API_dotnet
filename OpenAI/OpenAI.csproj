@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>11</LangVersion>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <Authors>Rodion Mostovoi</Authors>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>OpenAI.ChatGPT</PackageId>
+        <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
+        <Product>OpenAI API</Product>
+        <Version>0.0.1</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Text.Json" Version="7.0.2" />
+    </ItemGroup>
+
+</Project>

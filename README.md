@@ -1,6 +1,9 @@
 # OpenAI Chat Completions (ChatGPT) client for .NET
+This is a .NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. The client supports both synchronous and asynchronous operations. It also supports streaming responses (like ChatGPT) via async streams.
+
 ## Preparation
 First, you need to create an OpenAI account and get an API key. You can do this at https://platform.openai.com/account/api-keys.
+
 ## Installation
 You can install the package via NuGet:
 ```
@@ -14,14 +17,14 @@ _client = new OpenAiClient("{YOUR_OPENAI_API_KEY}");
 ## Simple usage of the Chat Completions API
 ```csharp
 string text = "Who are you?";
-string response = await _client.GetChatCompletions(new UserMessage(text), 80);
+string response = await _client.GetChatCompletions(new UserMessage(text), maxTokens: 80);
 Console.WriteLine(response);
 ```
 
 ## Streaming response with async streams (like ChatGPT)
 ```csharp
 var text = "Write the world top 3 songs of Soul genre";
-await foreach (string chunk in _client.StreamChatCompletions(new UserMessage(text), 80))
+await foreach (string chunk in _client.StreamChatCompletions(new UserMessage(text), maxTokens: 80))
 {
     Console.Write(chunk);
 }
@@ -35,7 +38,7 @@ ChatCompletionDialog dialog =
     .ThenAssistant("1000")
     .ThenUser("Convert it to hex. Write just the number.");
 
-await foreach (var chunk in _client.StreamChatCompletions(dialog, 80))
+await foreach (var chunk in _client.StreamChatCompletions(dialog, maxTokens: 80))
 {
     Console.Write(chunk);
 }

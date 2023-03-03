@@ -93,6 +93,27 @@ public class AssistantMessage : ChatCompletionMessage
     }
 }
 
+/// <summary> A message from the assistant (ChatGPT) </summary>
+public class SystemMessage : ChatCompletionMessage
+{
+    /// <summary> A message from the assistant (ChatGPT) </summary>
+    /// <param name="content">The message text</param>
+    public SystemMessage(string content) : base(ChatCompletionRoles.System, content)
+    {
+    }
+    
+    internal SystemMessage(List<ChatCompletionMessage> messages, string content) 
+        : base(messages, ChatCompletionRoles.Assistant, content)
+    {
+    }
+
+    public ChatCompletionDialog ThenUser(string userMessage)
+    {
+        if (userMessage == null) throw new ArgumentNullException(nameof(userMessage));
+        return new ChatCompletionDialog(Dialog, userMessage);
+    }
+}
+
 public class ChatCompletionDialog : UserMessage
 {
     public ChatCompletionDialog(string userMessage) : base(userMessage)

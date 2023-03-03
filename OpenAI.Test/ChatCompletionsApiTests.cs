@@ -6,12 +6,13 @@ using Xunit.Abstractions;
 
 namespace OpenAI.Test;
 
-public class OpenAiClientTests
+[Collection("OpenAiTestCollection")]
+public class ChatCompletionsApiTests
 {
     private readonly ITestOutputHelper _outputHelper;
     private readonly OpenAiClient _client;
 
-    public OpenAiClientTests(ITestOutputHelper outputHelper)
+    public ChatCompletionsApiTests(ITestOutputHelper outputHelper)
     {
         _outputHelper = outputHelper;
         _client = new OpenAiClient(Helpers.GetKeyFromEnvironment("openai_api_key_paid"));
@@ -22,8 +23,19 @@ public class OpenAiClientTests
     {
         string text = "Who are you?";
         string response = await _client.GetChatCompletions(new UserMessage(text), 80);
-        response.Should().NotBeNullOrEmpty();
         _outputHelper.WriteLine(response);
+        response.Should().NotBeNullOrEmpty();
+    }
+    
+    [Fact]
+    public async void Get_chatgpt_response_for_one_message_including_system_works()
+    {
+        ChatCompletionDialog messages = 
+            new SystemMessage("You are a helpful assistant that translates English to French.")
+                .ThenUser("Translate 'Hello'. Write just one word.");
+        string response = await _client.GetChatCompletions(messages, 80);
+        _outputHelper.WriteLine(response);
+        response.Should().StartWith("Bonjour");
     }
     
     [Fact]
@@ -44,8 +56,8 @@ public class OpenAiClientTests
     {
         ChatCompletionDialog messages = 
             new UserMessage("How many meters are in a kilometer? Write just the number.")
-            .ThenAssistant("1000")
-            .ThenUser("Convert it to hex. Write just the number.");
+                .ThenAssistant("1000")
+                .ThenUser("Convert it to hex. Write just the number.");
 
         var sb = new StringBuilder();
         await foreach (var chunk in _client.StreamChatCompletions(messages, 80))
@@ -55,19 +67,5 @@ public class OpenAiClientTests
         var answer = sb.ToString();
         _outputHelper.WriteLine(answer);
         answer.ToUpper().Should().Contain("3E8");
-    }
-
-    [Fact]
-    public async void Generate_image_bytes_works()
-    {
-        byte[] image = await _client.GenerateImageBytes("bicycle", "test", OpenAiImageSize._256);
-        image.Should().NotBeEmpty();
-    }
-    
-    [Fact]
-    public async void Generate_two_images_uri_works()
-    {
-        Uri[] uris = await _client.GenerateImagesUris("bicycle", "test", OpenAiImageSize._256, count: 2);
-        uris.Should().HaveCount(2);
     }
 }

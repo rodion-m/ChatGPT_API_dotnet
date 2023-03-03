@@ -1,6 +1,4 @@
-﻿using System.Text;
-using FluentAssertions;
-using OpenAI.Models.ChatCompletion;
+﻿using FluentAssertions;
 using OpenAI.Models.Images;
 using Xunit.Abstractions;
 

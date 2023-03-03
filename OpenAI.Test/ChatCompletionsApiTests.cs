@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using FluentAssertions;
 using OpenAI.Models.ChatCompletion;
-using OpenAI.Models.Images;
 using Xunit.Abstractions;
 
 namespace OpenAI.Test;

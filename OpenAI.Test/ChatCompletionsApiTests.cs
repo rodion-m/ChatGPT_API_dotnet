@@ -29,12 +29,23 @@ public class ChatCompletionsApiTests
     [Fact]
     public async void Get_chatgpt_response_for_one_message_including_system_works()
     {
-        ChatCompletionDialog messages = 
-            new SystemMessage("You are a helpful assistant that translates English to French.")
+        var message = 
+            Dialog.StartAsSystem("You are a helpful assistant that translates English to French.")
                 .ThenUser("Translate 'Hello'. Write just one word.");
-        string response = await _client.GetChatCompletions(messages, 80);
+        string response = await _client.GetChatCompletions(message, 80);
         _outputHelper.WriteLine(response);
         response.Should().StartWith("Bonjour");
+    }
+    
+    [Fact]
+    public async void Dialog_started_from_assistant_works()
+    {
+        var message = 
+            new AssistantMessage("How are your today?")
+                .ThenUser("I'm fine, thanks.");
+        string response = await _client.GetChatCompletions(message, 80);
+        _outputHelper.WriteLine(response);
+        response.Should().NotBeEmpty();
     }
     
     [Fact]
@@ -53,13 +64,13 @@ public class ChatCompletionsApiTests
     [Fact]
     public async void Stream_chatgpt_response_for_dialog_works()
     {
-        ChatCompletionDialog messages = 
-            new UserMessage("How many meters are in a kilometer? Write just the number.")
+        ChatCompletionDialog dialog = 
+            Dialog.StartAsUser("How many meters are in a kilometer? Write just the number.")
                 .ThenAssistant("1000")
                 .ThenUser("Convert it to hex. Write just the number.");
 
         var sb = new StringBuilder();
-        await foreach (var chunk in _client.StreamChatCompletions(messages, 80))
+        await foreach (var chunk in _client.StreamChatCompletions(dialog, 80))
         {
             sb.Append(chunk);
         }

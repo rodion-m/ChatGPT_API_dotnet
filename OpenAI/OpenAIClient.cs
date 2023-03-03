@@ -36,18 +36,18 @@ public class OpenAiClient : IDisposable
     public void Dispose() => _httpClient.Dispose();
 
     public async Task<string> GetChatCompletions(
-        UserMessage messages,
+        UserMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Gpt35Turbo,
         CancellationToken cancellationToken = default)
     {
-        if (messages == null) throw new ArgumentNullException(nameof(messages));
+        if (dialog == null) throw new ArgumentNullException(nameof(dialog));
         if (model == null) throw new ArgumentNullException(nameof(model));
         var res = await GetChatCompletions(new ChatCompletionRequest()
         {
             Model = model,
             MaxTokens = maxTokens,
-            Messages = messages.GetMessages()
+            Messages = dialog.GetMessages()
         }, cancellationToken);
         return res.Choices[0].Message!.Content;
     }

@@ -34,9 +34,9 @@ await foreach (string chunk in _client.StreamChatCompletions(new UserMessage(tex
 Use `ThenAssistant` and `ThenUser` methods to create a dialog:
 ```csharp
 ChatCompletionDialog dialog = 
-    new UserMessage("How many meters are in a kilometer? Write just the number.") //the message from user
-    .ThenAssistant("1000") // response from the assistant
-    .ThenUser("Convert it to hex. Write just the number."); // the next message from user
+    Dialog.StartAsUser("How many meters are in a kilometer? Write just the number.") //the message from user
+          .ThenAssistant("1000") // response from the assistant
+          .ThenUser("Convert it to hex. Write just the number."); // the next message from user
 
 await foreach (var chunk in _client.StreamChatCompletions(dialog, maxTokens: 80))
 {

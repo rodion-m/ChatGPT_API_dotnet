@@ -105,7 +105,7 @@ public class SystemMessage : ChatCompletionMessage
     {
     }
 
-    public ChatCompletionDialog ThenUser(string userMessage)
+    public UserMessage ThenUser(string userMessage)
     {
         if (string.IsNullOrWhiteSpace(userMessage))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(userMessage));

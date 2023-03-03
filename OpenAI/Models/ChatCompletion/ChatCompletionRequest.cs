@@ -8,6 +8,7 @@ namespace OpenAI.Models.ChatCompletion;
 /// </summary>
 public class ChatCompletionRequest
 {
+    public const int MaxTokensLimit = 4096;
     public const int MaxTokensDefault = 32;
     
     private int _maxTokens = MaxTokensDefault;
@@ -64,7 +65,7 @@ public class ChatCompletionRequest
         get => _maxTokens;
         internal set
         {
-            if (value > 4096)
+            if (value > MaxTokensLimit)
             {
                 throw new ArgumentOutOfRangeException(nameof(MaxTokens),
                     "The maximum number of tokens allowed for the generated answer is 4096.");

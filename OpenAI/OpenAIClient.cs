@@ -47,7 +47,7 @@ public class OpenAiClient : IDisposable
         {
             Model = model,
             MaxTokens = maxTokens,
-            Messages = messages.GetDialog()
+            Messages = messages.GetMessages()
         }, cancellationToken);
         return res.Choices[0].Message!.Content;
     }
@@ -146,7 +146,7 @@ public class OpenAiClient : IDisposable
         {
             Model = model,
             MaxTokens = maxTokens,
-            Messages = messages.GetDialog(),
+            Messages = messages.GetMessages(),
             Stream = true
         }, cancellationToken);
     }

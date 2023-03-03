@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace OpenAI.Test;
 
-[Collection("OpenAiTestCollection")]
+[Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ImagesApiTest
 {
     private readonly OpenAiClient _client;

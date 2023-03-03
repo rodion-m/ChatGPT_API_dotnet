@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace OpenAI.Test;
 
-[Collection("OpenAiTestCollection")]
+[Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ChatCompletionsApiTests
 {
     private readonly ITestOutputHelper _outputHelper;

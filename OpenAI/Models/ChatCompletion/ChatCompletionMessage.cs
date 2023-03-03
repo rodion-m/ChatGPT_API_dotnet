@@ -57,7 +57,9 @@ public class UserMessage : ChatCompletionMessage
 
     public AssistantMessage ThenAssistant(string assistantMessage)
     {
-        if (assistantMessage == null) throw new ArgumentNullException(nameof(assistantMessage));
+        if (string.IsNullOrWhiteSpace(assistantMessage))
+            throw new ArgumentException("Value cannot be null or whitespace.",
+                nameof(assistantMessage));
         return new AssistantMessage(Messages, assistantMessage);
     }
     
@@ -83,7 +85,8 @@ public class AssistantMessage : ChatCompletionMessage
 
     public ChatCompletionDialog ThenUser(string userMessage)
     {
-        if (userMessage == null) throw new ArgumentNullException(nameof(userMessage));
+        if (string.IsNullOrWhiteSpace(userMessage))
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(userMessage));
         return new ChatCompletionDialog(Messages, userMessage);
     }
 }
@@ -104,7 +107,8 @@ public class SystemMessage : ChatCompletionMessage
 
     public ChatCompletionDialog ThenUser(string userMessage)
     {
-        if (userMessage == null) throw new ArgumentNullException(nameof(userMessage));
+        if (string.IsNullOrWhiteSpace(userMessage))
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(userMessage));
         return new ChatCompletionDialog(Messages, userMessage);
     }
 }

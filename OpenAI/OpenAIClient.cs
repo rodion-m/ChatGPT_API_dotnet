@@ -26,7 +26,7 @@ public class OpenAiClient : IDisposable
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
-    
+
     public OpenAiClient(string apiKey)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -181,8 +181,9 @@ public class OpenAiClient : IDisposable
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken)
             .ConfigureAwait(false);
         using var reader = new StreamReader(stream);
-        while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
+        while (await ReadLineAsync(reader, cancellationToken).ConfigureAwait(false) is { } line)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (line.StartsWith("data: "))
                 line = line.Substring("data: ".Length);
 
@@ -265,5 +266,16 @@ public class OpenAiClient : IDisposable
             OpenAiImageSize._1024 => "1024x1024",
             _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
         };
+    }
+    
+    private static ValueTask<string?> ReadLineAsync(
+        TextReader reader,
+        CancellationToken cancellationToken)
+    {
+#if NET7_0_OR_GREATER
+        return reader.ReadLineAsync(cancellationToken);
+#else
+        return new ValueTask<string?>(reader.ReadLineAsync());
+#endif
     }
 }

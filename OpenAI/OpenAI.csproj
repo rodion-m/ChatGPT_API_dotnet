@@ -4,7 +4,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>11</LangVersion>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <Authors>Rodion Mostovoi</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>OpenAI.ChatGPT</PackageId>
@@ -13,6 +12,7 @@
         <Version>1.1.0</Version>
         <Description>.NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

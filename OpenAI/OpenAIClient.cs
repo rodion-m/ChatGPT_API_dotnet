@@ -22,14 +22,20 @@ public class OpenAiClient : IDisposable
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
+    public OpenAiClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+    }
+    
     public OpenAiClient(string apiKey)
     {
-        var apiKey1 = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+        if (string.IsNullOrWhiteSpace(apiKey))
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(apiKey));
         _httpClient = new HttpClient()
         {
             BaseAddress = new Uri(DefaultHost)
         };
-        var header = new AuthenticationHeaderValue("Bearer", apiKey1);
+        var header = new AuthenticationHeaderValue("Bearer", apiKey);
         _httpClient.DefaultRequestHeaders.Authorization = header;
     }
 

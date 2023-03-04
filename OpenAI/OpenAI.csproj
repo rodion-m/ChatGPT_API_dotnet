@@ -15,4 +15,19 @@
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Update="Models\ChatCompletion\UserMessage.cs">
+        <DependentUpon>ChatCompletionMessage.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Models\ChatCompletion\AssistantMessage.cs">
+        <DependentUpon>ChatCompletionMessage.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Models\ChatCompletion\SystemMessage.cs">
+        <DependentUpon>ChatCompletionMessage.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Models\ChatCompletion\ChatCompletionDialog.cs">
+        <DependentUpon>ChatCompletionMessage.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

@@ -1,5 +1,4 @@
 ﻿using OpenAI.ChatCompletions.Chat.Models;
-using OpenAI.Models.ChatCompletion;
 
 namespace OpenAI.ChatCompletions.Chat;
 
@@ -7,7 +6,7 @@ public class ChatGPT : IDisposable
 {
     private readonly string _userId;
     private readonly IMessageStore _messageStore;
-    private readonly ChatCompletionsConfig _config;
+    private readonly ChatCompletionsConfig? _config;
     private readonly OpenAiClient _client;
     private Chat? _currentChat;
 
@@ -15,12 +14,12 @@ public class ChatGPT : IDisposable
         OpenAiClient client,
         string userId, 
         IMessageStore messageStore, 
-        ChatCompletionsConfig config)
+        ChatCompletionsConfig? config)
     {
         _client = client;
         _userId = userId ?? throw new ArgumentNullException(nameof(userId));
         _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
-        _config = config ?? throw new ArgumentNullException(nameof(config));
+        _config = config;
     }
     
     /// <summary>
@@ -46,16 +45,17 @@ public class ChatGPT : IDisposable
     //         : CreateChat(id.Value, false, null);
     // }
     
-    public async Task<Chat> StartNewChat(
+    public Task<Chat> StartNewChat(
         string? name = null,
         ChatCompletionsConfig? config = null,
         DateTimeOffset? createdAt = null,
         CancellationToken cancellationToken = default)
     {
-        var chatInfo = new ChatInfo(Guid.NewGuid(), _userId, name, createdAt ?? DateTimeOffset.Now, config ?? _config);
+        var chatInfo = new ChatInfo(Guid.NewGuid(), _userId, name, createdAt ?? DateTimeOffset.Now, 
+            ChatCompletionsConfig.Combine(_config, config) ?? ChatCompletionsConfig.Default);
         //await _messageStore.SetCurrentChatId(_userId, chatId, cancellationToken);
         _currentChat = CreateChat(chatInfo, true);
-        return _currentChat;
+        return Task.FromResult(_currentChat);
     }
     
     public async Task<Chat> SetChat(
@@ -134,39 +134,4 @@ public class ChatGPT : IDisposable
     {
         _currentChat?.Dispose();
     }
-}
-
-public interface IMessageStore
-{
-    Task SaveMessages(string userId, Guid chatId, IEnumerable<ChatCompletionMessage> messages, CancellationToken cancellationToken);
-    Task<IEnumerable<ChatCompletionMessage>> GetMessages(string userId, Guid chatId, CancellationToken cancellationToken);
-    
-    Task<IEnumerable<ChatInfo>> GetChats(string userId, CancellationToken cancellationToken);
-
-    Task SaveMessages(
-        string userId, Guid chatId, 
-        string userMessage, string assistantMessage, CancellationToken cancellationToken)
-    {
-        if (userId == null) throw new ArgumentNullException(nameof(userId));
-        if (userMessage == null) throw new ArgumentNullException(nameof(userMessage));
-        if (assistantMessage == null) throw new ArgumentNullException(nameof(assistantMessage));
-        var enumerable =  new ChatCompletionMessage[]
-        {
-            new UserMessage(userMessage),
-            new AssistantMessage(assistantMessage)
-        };
-        return SaveMessages(userId, chatId, enumerable, cancellationToken);
-    }
-    
-    Task<ChatInfo> GetChatInfo(string userId, Guid chatId, CancellationToken cancellationToken);
-    Task AddChatInfo(string userId, ChatInfo chatInfo, CancellationToken cancellationToken);
-    
-    //Task SetCurrentChatId(string userId, Guid chatId, CancellationToken cancellationToken);
-// #pragma warning disable CA1822
-//     internal Task<Guid?> GetLastChatIdOrNull(string userId, CancellationToken cancellationToken)
-// #pragma warning restore CA1822
-//     {
-//         throw new NotImplementedException("This method is reserved to the future");
-//     }
-
 }

@@ -1,4 +1,4 @@
-﻿namespace ChatGPT.Console;
+﻿namespace ChatGPT_Console;
 
 public static class Helpers
 {

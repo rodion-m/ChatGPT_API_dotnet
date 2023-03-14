@@ -46,7 +46,7 @@ public class Chat : IDisposable
         var sb = new StringBuilder();
         var stream = _client.StreamChatCompletions(
             messages,
-            user: ChatInfo.Config.PassUserIdToOpenAiRequests ? UserId : null,
+            user: ChatInfo.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
             requestModifier: ChatInfo.Config.ModifyRequest,
             cancellationToken: _cts.Token
         );

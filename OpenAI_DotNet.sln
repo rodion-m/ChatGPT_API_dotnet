@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGPTLib", "OpenAI
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{80DB142C-5A1B-431C-BD85-19C83C6FC0A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGPT.Console", "samples\ChatGPT.Console\ChatGPT.Console.csproj", "{E43C67EE-337F-47EA-B41A-269DBFFC3F95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGPT_Console", "samples\ChatGPT_Console\ChatGPT_Console.csproj", "{E43C67EE-337F-47EA-B41A-269DBFFC3F95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

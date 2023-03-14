@@ -6,26 +6,37 @@ namespace OpenAI.Models.ChatCompletion;
 /// <summary>
 /// Represents the API request body for generating chat completions.
 /// </summary>
+/// <remarks>
+/// See: https://platform.openai.com/docs/api-reference/chat/create
+/// </remarks>
 public class ChatCompletionRequest
 {
-    public const float TemperatureDefault = 1f;
-    public const int MaxTokensLimit = 4096;
-    public const int MaxTokensDefault = 32;
+    public const int MaxTokensDefault = 64;
     
     private int _maxTokens = MaxTokensDefault;
+    private string _model = ChatCompletionModels.Default;
+    private float _temperature = ChatCompletionTemperatures.Default;
+    private IEnumerable<ChatCompletionMessage> _messages;
 
     /// <summary>
-    /// ID of the model to use. Currently, only gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
-    /// <see cref="ChatCompletionModels"/>
+    /// ID of the model to use. One of: <see cref="ChatCompletionModels"/>
     /// </summary>
     [JsonPropertyName("model")]
-    public string Model { get; set; }
+    public string Model
+    {
+        get => _model;
+        set => _model = ChatCompletionModels.FromString(value);
+    }
 
     /// <summary>
     /// The messages to generate chat completions for, in the chat format.
     /// </summary>
     [JsonPropertyName("messages")]
-    public IEnumerable<ChatCompletionMessage> Messages { get; set; }
+    public IEnumerable<ChatCompletionMessage> Messages
+    {
+        get => _messages;
+        set => _messages = value ?? throw new ArgumentNullException(nameof(value));
+    }
 
     /// <summary>
     /// What sampling temperature to use, between 0 and 2.
@@ -33,19 +44,25 @@ public class ChatCompletionRequest
     /// while lower values like 0.2 will make it more focused and deterministic.
     /// </summary>
     [JsonPropertyName("temperature")]
-    public float Temperature { get; set; } = TemperatureDefault;
-    
+    public float Temperature
+    {
+        get => _temperature;
+        set => _temperature = ChatCompletionTemperatures.VaidateTemperature(value);
+    }
+
     /// <summary>
-    /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.
+    /// An alternative to sampling with temperature, called nucleus sampling,
+    /// where the model considers the results of the tokens with top_p probability mass.
+    /// So 0.1 means only the tokens comprising the top 10% probability mass are considered.
     /// </summary>
     [JsonPropertyName("top_p")]
-    public double TopP { get; set; } = 1;
+    public double? TopP { get; set; }
 
     /// <summary>
     /// How many chat completion choices to generate for each input message.
     /// </summary>
     [JsonPropertyName("n")]
-    public int N { get; set; } = 1;
+    public int? N { get; set; } = 1;
 
     /// <summary>
     /// If set, partial message deltas will be sent, like in ChatGPT. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message.
@@ -57,7 +74,7 @@ public class ChatCompletionRequest
     /// Up to 4 sequences where the API will stop generating further tokens.
     /// </summary>
     [JsonPropertyName("stop")]
-    public List<string> Stop { get; set; }
+    public List<string>? Stop { get; set; }
 
     /// <summary>
     /// The maximum number of tokens allowed for the generated answer. By default,
@@ -69,37 +86,41 @@ public class ChatCompletionRequest
         get => _maxTokens;
         set
         {
-            if (value > MaxTokensLimit)
-            {
-                throw new ArgumentOutOfRangeException(nameof(MaxTokens),
-                    "The maximum number of tokens allowed for the generated answer is 4096.");
-            }
+            ChatCompletionModels.EnsureMaxTokensIsSupported(Model, value);
             _maxTokens = value;
         }
     }
 
     /// <summary>
-    /// Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
+    /// Number between -2.0 and 2.0.
+    /// Positive values penalize new tokens based on whether they appear in the text so far,
+    /// increasing the model's likelihood to talk about new topics.
     /// </summary>
     [JsonPropertyName("presence_penalty")]
-    public double PresencePenalty { get; set; }
+    public double? PresencePenalty { get; set; }
 
     /// <summary>
-    /// Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+    /// Number between -2.0 and 2.0.
+    /// Positive values penalize new tokens based on their existing frequency in the text so far,
+    /// decreasing the model's likelihood to repeat the same line verbatim.
     /// </summary>
     [JsonPropertyName("frequency_penalty")]
-    public double FrequencyPenalty { get; set; }
+    public double? FrequencyPenalty { get; set; }
 
     /// <summary>
     /// Modify the likelihood of specified tokens appearing in the completion.
     /// </summary>
     [JsonPropertyName("logit_bias")]
-    public Dictionary<string, int> LogitBias { get; set; }
+    public Dictionary<string, int>? LogitBias { get; set; }
 
     /// <summary>
-    /// A unique identifier representing your end-user, which can help OpenAI to monitor
+    /// A unique identifier representing your end-user,
+    /// which can help OpenAI to monitor
     /// and detect abuse.
     /// </summary>
+    /// <remarks>
+    /// See: https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids
+    /// </remarks>
     [JsonPropertyName("user")]
     public string? User { get; set; }
 }

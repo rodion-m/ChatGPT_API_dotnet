@@ -38,12 +38,22 @@ public class ChatGPTFactory : IDisposable
     public ChatGPT Create(string userId, ChatCompletionsConfig? config = null)
     {
         if (userId == null) throw new ArgumentNullException(nameof(userId));
-        return new ChatGPT(_client, userId, _messageStore, config ?? _config);
+        // one of config or _config must be not null:
+        return new ChatGPT(
+            _client, 
+            userId, 
+            _messageStore, 
+            ChatCompletionsConfig.Combine(_config, config) ?? ChatCompletionsConfig.Default
+        );
     }
     
     public ChatGPT Create(ChatCompletionsConfig? config = null)
     {
-        return new ChatGPT(_client, _messageStore, config ?? _config);
+        return new ChatGPT(
+            _client, 
+            _messageStore, 
+            ChatCompletionsConfig.Combine(_config, config) ?? ChatCompletionsConfig.Default
+        );
     }
 
     public void Dispose()

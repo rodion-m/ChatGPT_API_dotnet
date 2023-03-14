@@ -9,7 +9,7 @@
         <PackageId>OpenAI.ChatGPT</PackageId>
         <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
         <Product>OpenAI API</Product>
-        <Version>1.1.0</Version>
+        <Version>1.2.0</Version>
         <Description>.NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
@@ -28,6 +28,10 @@
       <Compile Update="Models\ChatCompletion\ChatCompletionDialog.cs">
         <DependentUpon>ChatCompletionMessage.cs</DependentUpon>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
     </ItemGroup>
 
 </Project>

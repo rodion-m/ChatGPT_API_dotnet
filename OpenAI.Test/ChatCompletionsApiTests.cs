@@ -67,7 +67,8 @@ public class ChatCompletionsApiTests
         ChatCompletionDialog dialog = 
             Dialog.StartAsUser("How many meters are in a kilometer? Write just the number.")
                 .ThenAssistant("1000")
-                .ThenUser("Convert it to hex. Write just the number.");
+                .ThenUser("Convert it to hex. Write just the number.")
+            ;
 
         var sb = new StringBuilder();
         await foreach (var chunk in _client.StreamChatCompletions(dialog, 80))

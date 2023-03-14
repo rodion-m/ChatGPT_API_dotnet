@@ -130,7 +130,7 @@ public class OpenAiClient : IDisposable
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
-        float temperature = ChatCompletionRequest.TemperatureDefault,
+        float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)

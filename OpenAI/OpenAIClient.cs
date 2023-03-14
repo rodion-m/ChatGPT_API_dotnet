@@ -9,6 +9,7 @@ using OpenAI.Models.Images;
 
 namespace OpenAI;
 
+/// <summary> Thread-safe OpenAI client. </summary>
 public class OpenAiClient : IDisposable
 {
     private const string DefaultHost = "https://api.openai.com/v1/";
@@ -44,7 +45,7 @@ public class OpenAiClient : IDisposable
     public async Task<string> GetChatCompletions(
         UserMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
-        string model = ChatCompletionModels.Gpt35Turbo,
+        string model = ChatCompletionModels.Default,
         CancellationToken cancellationToken = default)
     {
         if (dialog == null) throw new ArgumentNullException(nameof(dialog));
@@ -61,7 +62,7 @@ public class OpenAiClient : IDisposable
     public async Task<string> GetChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
-        string model = ChatCompletionModels.Gpt35Turbo,
+        string model = ChatCompletionModels.Default,
         CancellationToken cancellationToken = default)
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
@@ -75,7 +76,7 @@ public class OpenAiClient : IDisposable
         return res.Choices[0].Message!.Content;
     }
 
-    public async Task<ChatCompletionResponse> GetChatCompletions(
+    internal async Task<ChatCompletionResponse> GetChatCompletions(
         ChatCompletionRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -113,23 +114,40 @@ public class OpenAiClient : IDisposable
     /// <param name="messages">The history of messaging</param>
     /// <param name="maxTokens">The length of the response</param>
     /// <param name="model">One of <see cref="ChatCompletionModels"/></param>
+    /// <param name="temperature">
+    /// What sampling temperature to use, between 0 and 2.
+    /// Higher values like 0.8 will make the output more random,
+    /// while lower values like 0.2 will make it more focused and deterministic.
+    /// </param>
+    /// <param name="user">
+    /// A unique identifier representing your end-user, which can help OpenAI to monitor
+    /// and detect abuse.
+    /// </param>
+    /// <param name="requestModifier">A modifier of the raw request. Allows to specify any custom properties.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Chunks of ChatGPT's response, one by one</returns>
+    /// <returns>Chunks of ChatGPT's response, one by one.</returns>
     public IAsyncEnumerable<string> StreamChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
-        string model = ChatCompletionModels.Gpt35Turbo,
+        string model = ChatCompletionModels.Default,
+        float temperature = ChatCompletionRequest.TemperatureDefault,
+        string? user = null,
+        Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        return StreamChatCompletions(new ChatCompletionRequest()
+        var request = new ChatCompletionRequest()
         {
             Model = model,
             MaxTokens = maxTokens,
             Messages = messages,
-            Stream = true
-        }, cancellationToken);
+            Stream = true,
+            User = user,
+            Temperature = temperature
+        };
+        requestModifier?.Invoke(request);
+        return StreamChatCompletions(request, cancellationToken);
     }
 
     /// <summary>
@@ -143,7 +161,7 @@ public class OpenAiClient : IDisposable
     public IAsyncEnumerable<string> StreamChatCompletions(
         UserMessage messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
-        string model = ChatCompletionModels.Gpt35Turbo,
+        string model = ChatCompletionModels.Default,
         CancellationToken cancellationToken = default)
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
@@ -163,40 +181,23 @@ public class OpenAiClient : IDisposable
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         request.Stream = true;
-        var httpRequest = new HttpRequestMessage(HttpMethod.Post, ChatCompletionsEndpoint)
+        await foreach (var response in StartStreaming().WithCancellation(cancellationToken))
         {
-            Content = JsonContent.Create(request, options: _nullIgnoreSerializerOptions)
-        };
-        var response = await _httpClient
-            .SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-            .ConfigureAwait(false);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken)
-                .ConfigureAwait(false);
-            ThrowChatCompletionResponseException(response.StatusCode, responseContent);
-        }
-
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken)
-            .ConfigureAwait(false);
-        using var reader = new StreamReader(stream);
-        while (await ReadLineAsync(reader, cancellationToken).ConfigureAwait(false) is { } line)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (line.StartsWith("data: "))
-                line = line.Substring("data: ".Length);
-
-            if (string.IsNullOrWhiteSpace(line)) continue;
-            if (line == "[DONE]")
-            {
-                yield break;
-            }
-
-            var res = JsonSerializer.Deserialize<ChatCompletionResponse>(line);
-            var content = res!.Choices[0].Delta?.Content;
+            var content = response!.Choices[0].Delta?.Content;
             if (content is not null)
                 yield return content;
+        }
+
+        IAsyncEnumerable<ChatCompletionResponse> StartStreaming()
+        {
+            return _httpClient.StreamUsingServerSentEvents<
+                ChatCompletionRequest, ChatCompletionResponse>
+            (
+                ChatCompletionsEndpoint, 
+                request, 
+                _nullIgnoreSerializerOptions, 
+                cancellationToken
+            );
         }
     }
 
@@ -266,16 +267,5 @@ public class OpenAiClient : IDisposable
             OpenAiImageSize._1024 => "1024x1024",
             _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
         };
-    }
-    
-    private static ValueTask<string?> ReadLineAsync(
-        TextReader reader,
-        CancellationToken cancellationToken)
-    {
-#if NET7_0_OR_GREATER
-        return reader.ReadLineAsync(cancellationToken);
-#else
-        return new ValueTask<string?>(reader.ReadLineAsync());
-#endif
     }
 }

@@ -8,6 +8,7 @@ namespace OpenAI.Models.ChatCompletion;
 /// </summary>
 public class ChatCompletionRequest
 {
+    public const float TemperatureDefault = 1f;
     public const int MaxTokensLimit = 4096;
     public const int MaxTokensDefault = 32;
     
@@ -15,6 +16,7 @@ public class ChatCompletionRequest
 
     /// <summary>
     /// ID of the model to use. Currently, only gpt-3.5-turbo and gpt-3.5-turbo-0301 are supported.
+    /// <see cref="ChatCompletionModels"/>
     /// </summary>
     [JsonPropertyName("model")]
     public string Model { get; set; }
@@ -26,11 +28,13 @@ public class ChatCompletionRequest
     public IEnumerable<ChatCompletionMessage> Messages { get; set; }
 
     /// <summary>
-    /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
+    /// What sampling temperature to use, between 0 and 2.
+    /// Higher values like 0.8 will make the output more random,
+    /// while lower values like 0.2 will make it more focused and deterministic.
     /// </summary>
     [JsonPropertyName("temperature")]
-    public double Temperature { get; set; } = 1;
-
+    public float Temperature { get; set; } = TemperatureDefault;
+    
     /// <summary>
     /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.
     /// </summary>
@@ -63,7 +67,7 @@ public class ChatCompletionRequest
     public int MaxTokens
     {
         get => _maxTokens;
-        internal set
+        set
         {
             if (value > MaxTokensLimit)
             {
@@ -94,8 +98,8 @@ public class ChatCompletionRequest
 
     /// <summary>
     /// A unique identifier representing your end-user, which can help OpenAI to monitor
-    /// and detect abuse. Learn more.
+    /// and detect abuse.
     /// </summary>
     [JsonPropertyName("user")]
-    public string User { get; set; }
+    public string? User { get; set; }
 }

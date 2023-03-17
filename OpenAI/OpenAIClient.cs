@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OpenAI.Exceptions;
 using OpenAI.Models.ChatCompletion;
 using OpenAI.Models.Images;
 
@@ -93,20 +94,17 @@ public class OpenAiClient : IDisposable
 
         if (!response.IsSuccessStatusCode)
         {
-            ThrowChatCompletionResponseException(response.StatusCode, responseContent);
+            ThrowNotExpectedResponseException(response.StatusCode, responseContent);
         }
 
         var jsonResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseContent)!;
         return jsonResponse;
     }
 
-    private static void ThrowChatCompletionResponseException(
+    private static void ThrowNotExpectedResponseException(
         HttpStatusCode statusCode,
-        string responseContent)
-    {
-        throw new Exception($"Failed to generate chat response *{statusCode}:" +
-                            $" {responseContent}");
-    }
+        string responseContent) 
+        => throw new NotExpectedResponseException(statusCode, responseContent);
 
     /// <summary>
     /// Start streaming chat completions like ChatGPT
@@ -193,9 +191,9 @@ public class OpenAiClient : IDisposable
             return _httpClient.StreamUsingServerSentEvents<
                 ChatCompletionRequest, ChatCompletionResponse>
             (
-                ChatCompletionsEndpoint, 
-                request, 
-                _nullIgnoreSerializerOptions, 
+                ChatCompletionsEndpoint,
+                request,
+                _nullIgnoreSerializerOptions,
                 cancellationToken
             );
         }

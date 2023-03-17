@@ -14,7 +14,9 @@ public class Chat : IDisposable
     public ChatInfo ChatInfo { get; }
     public string UserId { get; }
     public Guid ChatId => ChatInfo.Id;
-    
+    public bool IsWriting { get; private set; }
+    public bool IsCancelled => _cts?.IsCancellationRequested ?? false;
+
     private readonly IMessageStore _messageStore;
     private readonly OpenAiClient _client;
     private bool _isNew;
@@ -40,6 +42,8 @@ public class Chat : IDisposable
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _cts.Token.Register(() => IsWriting = false);
+        
         var history = await LoadHistory(cancellationToken);
         var messages = history.Append(new UserMessage(message));
         //todo calculate chat length and check against max tokens
@@ -50,6 +54,7 @@ public class Chat : IDisposable
             requestModifier: ChatInfo.Config.ModifyRequest,
             cancellationToken: _cts.Token
         );
+        IsWriting = true;
         await foreach (var chunk in stream.WithCancellation(cancellationToken))
         {
             sb.Append(chunk);
@@ -58,6 +63,7 @@ public class Chat : IDisposable
         
         await _messageStore.SaveMessages(
             UserId, ChatId, message, sb.ToString(), _cts.Token);
+        IsWriting = false;
         _isNew = false;
     }
 

@@ -55,3 +55,19 @@ byte[] image = await _client.GenerateImageBytes("bicycle", "test", OpenAiImageSi
 Uri[] uris = await _client.GenerateImagesUris("bicycle", "test", OpenAiImageSize._256, count: 2);
 ```
 More examples see in the tests.
+
+# API Parameters
+Here is a list of all parameters that can be used in the ChatCompletions (ChatGPT) API request (https://github.com/rodion-m/ChatGPT_API_dotnet/blob/master/OpenAI/Models/ChatCompletion/ChatCompletionRequest.cs).
+Some of them are taken from this article: https://towardsdatascience.com/gpt-3-parameters-and-prompt-design-1a595dc5b405 \
+Below listed parameters for ChatCompletions API.
+
+## Model
+The prediction-generating AI model is specified by the engine parameter. The available models are:
+*   `ChatCompletionModels.Gpt3_5_Turbo` (Default): Most capable GPT-3.5 model and optimized for chat at 1/10th the cost of text-davinci-003. Will be updated with OpenAI's latest model iteration.
+*   `ChatCompletionModels.Gpt3_5_Turbo_0301`: Snapshot of gpt-3.5-turbo from March 1st 2023. Unlike gpt-3.5-turbo, this model will not receive updates, and will only be supported for a three month period ending on June 1st 2023.
+*   `ChatCompletionModels.Gpt4`: More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat. Will be updated with OpenAI's latest model iteration. \*
+*   `ChatCompletionModels.Gpt4_0314`: Snapshot of gpt-4 from March 14th 2023. Unlike gpt-4, this model will not receive updates, and will only be supported for a three month period ending on June 14th 2023. \*
+*   `ChatCompletionModels.Gpt4_32k`: Same capabilities as the base gpt-4 mode but with 4x the context length. Will be updated with OpenAI's latest model iteration. \*
+*   `ChatCompletionModels.Gpt4_32k_0314`: Snapshot of gpt-4-32 from March 14th 2023. Unlike gpt-4-32k, this model will not receive updates, and will only be supported for a three month period ending on June 14th 2023. \* \
+Note that training data for all models is up to Sep 2021. \
+\* These models are currently in beta and are not yet available to all users. Here is the link for joining waitlist: https://openai.com/waitlist/gpt-4-api

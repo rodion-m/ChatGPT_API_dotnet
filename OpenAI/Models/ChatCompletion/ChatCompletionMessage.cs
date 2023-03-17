@@ -39,4 +39,5 @@ public class ChatCompletionMessage
     }
 
     public IReadOnlyList<ChatCompletionMessage> GetMessages() => Messages.AsReadOnly();
+    public int GetTotalLength() => Messages.Sum(m => m.Content.Length);
 }

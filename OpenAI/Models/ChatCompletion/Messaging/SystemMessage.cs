@@ -1,7 +1,8 @@
 ﻿namespace OpenAI.Models.ChatCompletion;
 
 /// <summary>
-/// A message from the system
+/// A message from the system.
+/// The recommended way to create it using method <see cref="Dialog"/>.<see cref="Dialog.StartAsSystem(string)"/>
 /// </summary>
 /// <remarks>
 /// Typically, a conversation is formatted with a system message first,

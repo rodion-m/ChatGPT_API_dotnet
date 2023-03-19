@@ -1,5 +1,9 @@
 namespace OpenAI.Models.ChatCompletion;
 
+/// <summary>
+/// The available roles of the message in the chat.
+/// See https://github.com/openai/openai-python/blob/main/chatml.md for more information.
+/// </summary>
 public static class ChatCompletionRoles
 {
     public const string System = "system";

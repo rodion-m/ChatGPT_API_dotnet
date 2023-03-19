@@ -1,7 +1,8 @@
 ﻿namespace OpenAI.Models.ChatCompletion;
 
 /// <summary>
-/// A message from the user
+/// A message from the user.
+/// The recommended way to create it using method <see cref="Dialog"/>.<see cref="Dialog.StartAsUser(string)"/>
 /// </summary>
 /// <remarks>
 /// The user messages help instruct the assistant.

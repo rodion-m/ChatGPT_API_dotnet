@@ -2,9 +2,19 @@ using System.Text.Json.Serialization;
 
 namespace OpenAI.Models.ChatCompletion;
 
+/// <summary>
+/// A message in a chat dialog.
+/// It's recommended to use <see cref="Dialog"/> bulder to create conversation.
+/// </summary>
 public class ChatCompletionMessage
 {
-    /// <summary>One of <see cref="ChatCompletionRoles"/></summary>
+    /// <summary>
+    /// The role of the message in the chat.
+    /// One of <see cref="ChatCompletionRoles"/>
+    /// </summary>
+    /// <remarks>
+    /// See https://github.com/openai/openai-python/blob/main/chatml.md for more information.
+    /// </remarks>
     [JsonPropertyName("role")]
     public string Role { get; init; }
 

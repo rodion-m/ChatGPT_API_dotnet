@@ -30,7 +30,8 @@ public class ChatCompletionRequest
     }
 
     /// <summary>
-    /// The messages to generate chat completions for, in the chat format.
+    /// The messages to generate chat completions for, in the ChatML format.
+    /// About ChatML: https://github.com/openai/openai-python/blob/main/chatml.md
     /// </summary>
     [JsonPropertyName("messages")]
     public IEnumerable<ChatCompletionMessage> Messages
@@ -80,8 +81,8 @@ public class ChatCompletionRequest
     /// <summary>
     /// The maximum number of tokens allowed for the generated answer.
     /// Defaults to <see cref="MaxTokensDefault"/>.
-    /// This value is validated and limited with <see cref="ChatCompletionModels.GetMaxTokensLimitForModel"/>.
-    /// It's possible to calculate approximately tokens count using <see cref="ChatCompletionMessage.CalculateApproxTotalTokenCount()"/> method
+    /// This value is validated and limited with <see cref="ChatCompletionModels.GetMaxTokensLimitForModel"/> meghod.
+    /// It's possible to calculate approximately tokens count using <see cref="ChatCompletionMessage.CalculateApproxTotalTokenCount()"/> method.
     /// </summary>
     /// <remarks>
     /// The number of tokens can be retrieved from the API response: <see cref="ChatCompletionResponse.Usage"/>

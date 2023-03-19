@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
-using OpenAI.ChatCompletions.Chat.Models;
+using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
-namespace OpenAI.ChatCompletions.Chat;
+namespace OpenAI.ChatGpt;
 
-public class InMemoryMessageStore : IMessageStore
+internal class InMemoryMessageStore : IMessageStore
 {
     private readonly ConcurrentDictionary<string, Dictionary<Guid, Topic>> _users = new();
     private readonly ConcurrentDictionary<string, Dictionary<Guid, List<ChatCompletionMessage>>> 

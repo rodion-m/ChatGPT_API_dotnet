@@ -1,4 +1,4 @@
-namespace OpenAI.ChatCompletions.Chat.Models;
+namespace OpenAI.ChatGpt.Models;
 
 public class Topic
 {

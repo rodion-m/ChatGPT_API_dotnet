@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OpenAI\OpenAI.csproj" />
+      <ProjectReference Include="..\OpenAI.Core\OpenAI.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

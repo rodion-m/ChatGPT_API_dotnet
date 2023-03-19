@@ -46,16 +46,22 @@ public class OpenAiClient : IDisposable
         UserMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
+        float temperature = ChatCompletionTemperatures.Default,
+        string? user = null,
+        Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
         if (dialog == null) throw new ArgumentNullException(nameof(dialog));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var res = await GetChatCompletions(new ChatCompletionRequest()
-        {
-            Model = model,
-            MaxTokens = maxTokens,
-            Messages = dialog.GetMessages()
-        }, cancellationToken);
+        var request = CreateChatCompletionRequest(dialog.GetMessages(),
+            maxTokens,
+            model,
+            temperature,
+            user,
+            false,
+            requestModifier
+        );
+        var res = await GetChatCompletions(request, cancellationToken);
         return res.Choices[0].Message!.Content;
     }
 
@@ -63,16 +69,22 @@ public class OpenAiClient : IDisposable
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
+        float temperature = ChatCompletionTemperatures.Default,
+        string? user = null,
+        Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var res = await GetChatCompletions(new ChatCompletionRequest()
-        {
-            Model = model,
-            MaxTokens = maxTokens,
-            Messages = messages
-        }, cancellationToken);
+        var request = CreateChatCompletionRequest(messages,
+            maxTokens,
+            model,
+            temperature,
+            user,
+            false,
+            requestModifier
+        );
+        var res = await GetChatCompletions(request, cancellationToken);
         return res.Choices[0].Message!.Content;
     }
 
@@ -129,17 +141,37 @@ public class OpenAiClient : IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
+        var request = CreateChatCompletionRequest(messages,
+            maxTokens,
+            model,
+            temperature,
+            user,
+            true,
+            requestModifier
+        );
+        return StreamChatCompletions(request, cancellationToken);
+    }
+
+    private static ChatCompletionRequest CreateChatCompletionRequest(
+        IEnumerable<ChatCompletionMessage> messages,
+        int maxTokens, 
+        string model, 
+        float temperature, 
+        string? user, 
+        bool stream,
+        Action<ChatCompletionRequest>? requestModifier)
+    {
         var request = new ChatCompletionRequest()
         {
             Model = model,
             MaxTokens = maxTokens,
             Messages = messages,
-            Stream = true,
+            Stream = stream,
             User = user,
             Temperature = temperature
         };
         requestModifier?.Invoke(request);
-        return StreamChatCompletions(request, cancellationToken);
+        return request;
     }
 
     /// <summary>

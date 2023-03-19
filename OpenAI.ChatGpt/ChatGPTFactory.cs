@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using OpenAI.ChatCompletions.Chat.Models;
+using OpenAI.ChatGpt.Models;
 
-namespace OpenAI.ChatCompletions.Chat;
+namespace OpenAI.ChatGpt;
 
-public class ChatGPTFactory : IDisposable
+internal class ChatGPTFactory : IDisposable
 {
     private readonly OpenAiClient _client;
     private readonly ChatCompletionsConfig _config;

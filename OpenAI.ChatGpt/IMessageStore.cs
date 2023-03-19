@@ -1,7 +1,7 @@
-using OpenAI.ChatCompletions.Chat.Models;
+using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
-namespace OpenAI.ChatCompletions.Chat;
+namespace OpenAI.ChatGpt;
 
 public interface IMessageStore
 {

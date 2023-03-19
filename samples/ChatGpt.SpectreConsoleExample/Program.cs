@@ -1,5 +1,5 @@
 ﻿using OpenAI;
-using OpenAI.ChatCompletions.Chat;
+using OpenAI.ChatGpt;
 using Spectre.Console;
 
 using Console = Spectre.Console.AnsiConsole;
@@ -9,7 +9,9 @@ Console.MarkupLine("[underline red]Press Ctrl+C to stop writing[/]");
 
 Console.WriteLine();
 
-Chat chat = await CreateChat();
+var apiKey = LoadApiKey();
+Chat chat = await ChatGPT.CreateInMemoryChat(apiKey);
+
 SetupCancellation();
 
 var name = Console.Ask<string?>("What's your [green]name[/]?") ?? "Me";
@@ -27,15 +29,13 @@ while (AnsiConsole.Ask<string>($"[underline green]{name}[/]: ") is { } userMessa
     Console.WriteLine();
 }
 
-async Task<Chat> CreateChat()
+string LoadApiKey()
 {
-    var apiKey = Environment.GetEnvironmentVariable("openai_api_key_paid");
-    if (apiKey is null)
-    {
-        apiKey = Console.Ask<string>(
-            "Please enter your [green]OpenAI API key[/] (you can get it from https://platform.openai.com/account/api-keys): ");
-    }
-    return await ChatGPT.CreateInMemoryChat(apiKey);
+    var s = Environment.GetEnvironmentVariable("openai_api_key_paid") 
+            ?? Console.Ask<string>("Please enter your [green]OpenAI API key[/] " +
+                                   "(you can get it from https://platform.openai.com/account/api-keys): ");
+
+    return s;
 }
 
 void SetupCancellation()

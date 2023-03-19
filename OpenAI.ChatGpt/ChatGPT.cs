@@ -1,7 +1,7 @@
-﻿using OpenAI.ChatCompletions.Chat.Models;
+﻿using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
-namespace OpenAI.ChatCompletions.Chat;
+namespace OpenAI.ChatGpt;
 
 public class ChatGPT : IDisposable
 {
@@ -24,7 +24,7 @@ public class ChatGPT : IDisposable
     }
     
     /// <summary>
-    /// If your don't have users use this ChatGPT constructor
+    /// If your don't have users use this ChatGPT constructor.
     /// </summary>
     public ChatGPT(
         OpenAiClient client,

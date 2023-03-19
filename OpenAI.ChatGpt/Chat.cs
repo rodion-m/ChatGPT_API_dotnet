@@ -1,9 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
-using OpenAI.ChatCompletions.Chat.Models;
+using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
-namespace OpenAI.ChatCompletions.Chat;
+namespace OpenAI.ChatGpt;
 
 /// <summary>
 /// This is a class that is used for communication between a user and the assistant (ChatGPT).
@@ -36,7 +36,41 @@ public class Chat : IDisposable
         _isNew = isNew;
     }
     
-    // TODO add 
+    public Task<string> GetNextMessageResponse(
+        string message,
+        CancellationToken cancellationToken = default)
+    {
+        if (message == null) throw new ArgumentNullException(nameof(message));
+        var chatCompletionMessage = new UserMessage(message);
+        return GetNextMessageResponse(chatCompletionMessage, cancellationToken);
+    }
+
+    private async Task<string> GetNextMessageResponse(
+        UserOrSystemMessage message, 
+         CancellationToken cancellationToken)
+    {
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _cts.Token.Register(() => IsWriting = false);
+
+        var history = await LoadHistory(cancellationToken);
+        var messages = history.Append(message);
+        
+        IsWriting = true;
+        var response = await _client.GetChatCompletions(
+            messages,
+            user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
+            requestModifier: Topic.Config.ModifyRequest,
+            cancellationToken: _cts.Token
+        );
+
+        await _messageStore.SaveMessages(
+            UserId, ChatId, message, response, _cts.Token);
+        IsWriting = false;
+        _isNew = false;
+
+        return response;
+    }
+    
     public IAsyncEnumerable<string> StreamNextMessageResponse(
         string message,
         CancellationToken cancellationToken = default)
@@ -55,15 +89,14 @@ public class Chat : IDisposable
 
         var history = await LoadHistory(cancellationToken);
         var messages = history.Append(message);
-        //todo calculate chat length and check against max tokens
         var sb = new StringBuilder();
+        IsWriting = true;
         var stream = _client.StreamChatCompletions(
             messages,
             user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
             requestModifier: Topic.Config.ModifyRequest,
             cancellationToken: _cts.Token
         );
-        IsWriting = true;
         await foreach (var chunk in stream.WithCancellation(cancellationToken))
         {
             sb.Append(chunk);

@@ -2,12 +2,14 @@ using System.Net;
 
 namespace OpenAI.Exceptions;
 
-internal class NotExpectedResponseException : Exception
+public class NotExpectedResponseException : Exception
 {
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public HttpStatusCode StatusCode { get; }
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public string Content { get; }
 
-    public NotExpectedResponseException(
+    internal NotExpectedResponseException(
         HttpStatusCode statusCode,
         string content) : base($"Failed to retrive response ({statusCode}): {content}")
     {
@@ -15,7 +17,7 @@ internal class NotExpectedResponseException : Exception
         Content = content;
     }
     
-    public NotExpectedResponseException(
+    internal NotExpectedResponseException(
         string message,
         HttpStatusCode statusCode,
         string content) : base(message)

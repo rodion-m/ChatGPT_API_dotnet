@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace OpenAI;
+﻿namespace OpenAI;
 
 public static class AsyncEnumerableExtensions
 {
@@ -21,7 +19,11 @@ public static class AsyncEnumerableExtensions
             }
             catch (OperationCanceledException)
             {
-                if (throwOnCancellation) throw;
+                if (throwOnCancellation)
+                {
+                    await enumerator.DisposeAsync().ConfigureAwait(false);
+                    throw;
+                }
             }
             if (result != null)
                 yield return result;

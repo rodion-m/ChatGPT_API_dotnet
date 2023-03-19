@@ -1,14 +1,21 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using OpenAI.Exceptions;
 
 namespace OpenAI;
 
 internal static class HttpClientExtensions
 {
     private static readonly int DataHeaderLength = "data: ".Length;
+        
+    private enum ProcessResponseEventResult
+    {
+        Response,
+        Done,
+        Empty
+    }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
     internal static async IAsyncEnumerable<TResponse>
@@ -97,26 +104,5 @@ internal static class HttpClientExtensions
 #else
         return new ValueTask<string?>(reader.ReadLineAsync());
 #endif
-    }
-}
-
-public enum ProcessResponseEventResult
-{
-    Response,
-    Done,
-    Empty
-}
-
-public class ServerSentEventsResponseException : Exception
-{
-    public HttpStatusCode StatusCode { get; }
-    public string ResponseContent { get; }
-
-    internal ServerSentEventsResponseException(HttpStatusCode statusCode, string responseContent)
-        : base($"Server sent events request returned status code {statusCode}: {responseContent}")
-    {
-        StatusCode = statusCode;
-        ResponseContent =
-            responseContent ?? throw new ArgumentNullException(nameof(responseContent));
     }
 }

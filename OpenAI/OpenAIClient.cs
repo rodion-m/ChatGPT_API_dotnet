@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -94,17 +93,12 @@ public class OpenAiClient : IDisposable
 
         if (!response.IsSuccessStatusCode)
         {
-            ThrowNotExpectedResponseException(response.StatusCode, responseContent);
+            throw new NotExpectedResponseException(response.StatusCode, responseContent);
         }
 
         var jsonResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseContent)!;
         return jsonResponse;
     }
-
-    private static void ThrowNotExpectedResponseException(
-        HttpStatusCode statusCode,
-        string responseContent) 
-        => throw new NotExpectedResponseException(statusCode, responseContent);
 
     /// <summary>
     /// Start streaming chat completions like ChatGPT
@@ -181,7 +175,7 @@ public class OpenAiClient : IDisposable
         request.Stream = true;
         await foreach (var response in StartStreaming().WithCancellation(cancellationToken))
         {
-            var content = response!.Choices[0].Delta?.Content;
+            var content = response.Choices[0].Delta?.Content;
             if (content is not null)
                 yield return content;
         }
@@ -218,7 +212,7 @@ public class OpenAiClient : IDisposable
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to generate image: {responseContent}");
+            throw new NotExpectedResponseException(response.StatusCode, responseContent);
         }
 
         var jsonResponse =
@@ -248,7 +242,7 @@ public class OpenAiClient : IDisposable
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to generate image: {responseContent}");
+            throw new NotExpectedResponseException(response.StatusCode, responseContent);
         }
 
         var jsonResponse =

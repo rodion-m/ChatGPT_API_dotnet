@@ -1,13 +1,13 @@
 namespace OpenAI.ChatCompletions.Chat.Models;
 
-public class ChatInfo
+public class Topic
 {
 #pragma warning disable CS8618
-    private ChatInfo() {}
+    private Topic() {}
 #pragma warning restore CS8618
 
 
-    public ChatInfo(
+    public Topic(
         Guid id, 
         string userId, 
         string? name, 

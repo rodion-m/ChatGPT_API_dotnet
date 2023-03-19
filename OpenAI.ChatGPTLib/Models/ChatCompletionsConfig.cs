@@ -66,6 +66,9 @@ public class ChatCompletionsConfig
         if (Temperature is not null) request.Temperature = Temperature.Value;
     }
 
+    /// <summary>
+    /// Merges two <see cref="ChatCompletionsConfig"/>s with respect to <paramref name="config"/>.
+    /// </summary>
     public static ChatCompletionsConfig? Combine(
         ChatCompletionsConfig? baseConfig,
         ChatCompletionsConfig? config)
@@ -83,5 +86,11 @@ public class ChatCompletionsConfig
                                          baseConfig.PassUserIdToOpenAiRequests,
         };
         return result;
+    }
+
+    public static ChatCompletionsConfig CombineOrDefault(
+        ChatCompletionsConfig? baseConfig, ChatCompletionsConfig? config)
+    {
+        return Combine(baseConfig, config) ?? Default;
     }
 }

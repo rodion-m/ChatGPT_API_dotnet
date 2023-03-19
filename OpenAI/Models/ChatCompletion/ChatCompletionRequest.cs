@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 #pragma warning disable CS8618
 namespace OpenAI.Models.ChatCompletion;
@@ -68,7 +69,7 @@ public class ChatCompletionRequest
     /// If set, partial message deltas will be sent, like in ChatGPT. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message.
     /// </summary>
     [JsonPropertyName("stream")]
-    public bool Stream { get; set; } = false;
+    public bool Stream { get; set; }
 
     /// <summary>
     /// Up to 4 sequences where the API will stop generating further tokens.
@@ -77,9 +78,17 @@ public class ChatCompletionRequest
     public List<string>? Stop { get; set; }
 
     /// <summary>
-    /// The maximum number of tokens allowed for the generated answer. By default,
-    /// the number of tokens the model can return will be 4096.
+    /// The maximum number of tokens allowed for the generated answer.
+    /// Defaults to <see cref="MaxTokensDefault"/>.
+    /// This value is validated and limited with <see cref="ChatCompletionModels.GetMaxTokensLimitForModel"/>.
+    /// It's possible to calculate approximately tokens count using <see cref="ChatCompletionMessage.CalculateApproxTotalTokenCount()"/> method
     /// </summary>
+    /// <remarks>
+    /// The number of tokens can be retrieved from the API response: <see cref="ChatCompletionResponse.Usage"/>
+    /// As a rule of thumb for English, 1 token is around 4 characters (so 100 tokens ≈ 75 words).
+    /// See: https://platform.openai.com/tokenizer
+    /// Encoding algorithm can be found here: https://github.com/latitudegames/GPT-3-Encoder
+    /// </remarks>
     [JsonPropertyName("max_tokens")]
     public int MaxTokens
     {

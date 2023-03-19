@@ -11,4 +11,8 @@
       <ProjectReference Include="..\OpenAI\OpenAI.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CSharpMinifier" Version="1.2.1" />
+    </ItemGroup>
+
 </Project>

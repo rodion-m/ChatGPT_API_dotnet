@@ -9,7 +9,7 @@
 /// The system message helps set the behavior of the assistant. In the example above,
 /// the assistant was instructed with “You are a helpful assistant.”
 /// </remarks>
-public class SystemMessage : ChatCompletionMessage
+public class SystemMessage : UserOrSystemMessage
 {
     /// <summary>
     /// A message from the system

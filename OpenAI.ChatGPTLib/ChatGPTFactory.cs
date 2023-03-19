@@ -43,7 +43,7 @@ public class ChatGPTFactory : IDisposable
             _client, 
             userId, 
             _messageStore, 
-            ChatCompletionsConfig.Combine(_config, config) ?? ChatCompletionsConfig.Default
+            ChatCompletionsConfig.Combine(_config, config)
         );
     }
     
@@ -52,7 +52,7 @@ public class ChatGPTFactory : IDisposable
         return new ChatGPT(
             _client, 
             _messageStore, 
-            ChatCompletionsConfig.Combine(_config, config) ?? ChatCompletionsConfig.Default
+            ChatCompletionsConfig.Combine(_config, config)
         );
     }
 

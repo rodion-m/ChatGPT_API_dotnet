@@ -1,8 +1,5 @@
-﻿using ChatGPT_Console;
-using OpenAI;
+﻿using OpenAI;
 using OpenAI.ChatCompletions.Chat;
-using OpenAI.ChatCompletions.Chat.Models;
-using OpenAI.Models.ChatCompletion;
 using Spectre.Console;
 
 using Console = Spectre.Console.AnsiConsole;
@@ -32,21 +29,13 @@ while (AnsiConsole.Ask<string>($"[underline green]{name}[/]: ") is { } userMessa
 
 async Task<Chat> CreateChat()
 {
-    var key = Environment.GetEnvironmentVariable("openai_api_key_paid");
-    if (key is null)
+    var apiKey = Environment.GetEnvironmentVariable("openai_api_key_paid");
+    if (apiKey is null)
     {
-        key = Console.Ask<string>(
+        apiKey = Console.Ask<string>(
             "Please enter your [green]OpenAI API key[/] (you can get it from https://platform.openai.com/account/api-keys): ");
     }
-    ChatGPTFactory factory = ChatGPTFactory.CreateInMemory(
-        key,
-        new ChatCompletionsConfig()
-        {
-            Temperature = ChatCompletionTemperatures.Balanced
-        });
-    ChatGPT chatGpt = factory.Create();
-    Chat chat = await chatGpt.StartNewChat();
-    return chat;
+    return await ChatGPT.CreateInMemoryChat(apiKey);
 }
 
 void SetupCancellation()

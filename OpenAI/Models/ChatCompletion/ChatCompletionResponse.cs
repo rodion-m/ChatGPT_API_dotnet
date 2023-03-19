@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 #pragma warning disable CS8618
 namespace OpenAI.Models.ChatCompletion;
@@ -51,6 +52,7 @@ public class ChatCompletionResponse
         public string Content { get; set; }
     }
 
+    // ReSharper disable once InconsistentNaming
     public class _Usage
     {
         [JsonPropertyName("prompt_tokens")]

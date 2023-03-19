@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+// ReSharper disable NotAccessedPositionalProperty.Global
 
 namespace OpenAI.Models.Images;
 
@@ -16,5 +17,6 @@ internal record ImageGenerationRequest(
     public string Size { get; init; } = Size ?? throw new ArgumentNullException(nameof(Size));
 
     [JsonPropertyName("response_format")]
-    public string ResponseFormat { get; init; } = ResponseFormat ?? throw new ArgumentNullException(nameof(ResponseFormat));
+    public string ResponseFormat { get; init; } 
+        = ResponseFormat ?? throw new ArgumentNullException(nameof(ResponseFormat));
 }

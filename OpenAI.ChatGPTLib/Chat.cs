@@ -11,9 +11,9 @@ namespace OpenAI.ChatCompletions.Chat;
 /// <remarks>Not thread-safe. Use one instance per user.</remarks>
 public class Chat : IDisposable
 {
-    public ChatInfo ChatInfo { get; }
+    public Topic Topic { get; }
     public string UserId { get; }
-    public Guid ChatId => ChatInfo.Id;
+    public Guid ChatId => Topic.Id;
     public bool IsWriting { get; private set; }
     public bool IsCancelled => _cts?.IsCancellationRequested ?? false;
 
@@ -26,32 +26,41 @@ public class Chat : IDisposable
         IMessageStore messageStore,
         OpenAiClient client,
         string userId,
-        ChatInfo chatInfo,
+        Topic topic,
         bool isNew)
     {
         UserId = userId ?? throw new ArgumentNullException(nameof(userId));
-        ChatInfo = chatInfo ?? throw new ArgumentNullException(nameof(chatInfo));
+        Topic = topic ?? throw new ArgumentNullException(nameof(topic));
         _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _isNew = isNew;
     }
     
-    public async IAsyncEnumerable<string> StreamNextMessageResponse(
+    // TODO add 
+    public IAsyncEnumerable<string> StreamNextMessageResponse(
         string message,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
+        var chatCompletionMessage = new UserMessage(message);
+        return StreamNextMessageResponse(chatCompletionMessage, cancellationToken);
+    }
+
+    private async IAsyncEnumerable<string> StreamNextMessageResponse(
+        UserOrSystemMessage message, 
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _cts.Token.Register(() => IsWriting = false);
-        
+
         var history = await LoadHistory(cancellationToken);
-        var messages = history.Append(new UserMessage(message));
+        var messages = history.Append(message);
         //todo calculate chat length and check against max tokens
         var sb = new StringBuilder();
         var stream = _client.StreamChatCompletions(
             messages,
-            user: ChatInfo.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
-            requestModifier: ChatInfo.Config.ModifyRequest,
+            user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
+            requestModifier: Topic.Config.ModifyRequest,
             cancellationToken: _cts.Token
         );
         IsWriting = true;
@@ -60,7 +69,7 @@ public class Chat : IDisposable
             sb.Append(chunk);
             yield return chunk;
         }
-        
+
         await _messageStore.SaveMessages(
             UserId, ChatId, message, sb.ToString(), _cts.Token);
         IsWriting = false;

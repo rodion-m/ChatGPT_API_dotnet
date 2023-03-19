@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+#pragma warning disable CS0618
 
 namespace OpenAI.Models.ChatCompletion;
 
@@ -76,18 +77,20 @@ public static class ChatCompletionModels
         { Gpt3_5_Turbo_0301, 4096 }
     };
     
-    private static bool _validateModelName = true;
+    private static volatile bool _validateModelName = true;
     
     
     /// <summary>
     /// Gets the maximum number of tokens that can be processed by the model
     /// </summary>
     /// <param name="model">GPT model</param>
-    public static int MaxTokensForModel(string model)
+    public static int GetMaxTokensLimitForModel(string model)
     {
         if (model == null) throw new ArgumentNullException(nameof(model));
         if (!MaxTokensLimits.ContainsKey(model))
+        {
             throw new ArgumentException($"Invalid model: {model}", nameof(model));
+        }
         return MaxTokensLimits[model];
     }
     
@@ -99,7 +102,9 @@ public static class ChatCompletionModels
     {
         if (model == null) throw new ArgumentNullException(nameof(model));
         if (string.IsNullOrWhiteSpace(model))
+        {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(model));
+        }
         return MaxTokensLimits.ContainsKey(model);
     }
 
@@ -107,7 +112,9 @@ public static class ChatCompletionModels
     {
         if (model == null) throw new ArgumentNullException(nameof(model));
         if (string.IsNullOrWhiteSpace(model))
+        {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(model));
+        }
         if (_validateModelName && !MaxTokensLimits.ContainsKey(model))
         {
             throw new ArgumentException($"Invalid model: {model}", nameof(model));
@@ -130,7 +137,9 @@ public static class ChatCompletionModels
         if (model == null) throw new ArgumentNullException(nameof(model));
         if (maxTokens < 1) throw new ArgumentOutOfRangeException(nameof(maxTokens));
         if (!MaxTokensLimits.TryGetValue(model, out var limit))
+        {
             throw new ArgumentException($"Invalid model: {model}", nameof(model));
+        }
         if (maxTokens > limit)
         {
             throw new ArgumentOutOfRangeException(

@@ -17,17 +17,17 @@ public class OpenAiClient : IDisposable
     private const string ChatCompletionsEndpoint = "chat/completions";
 
     private readonly HttpClient _httpClient;
-
+    private readonly bool _isHttpClientInjected;
+    
     private readonly JsonSerializerOptions _nullIgnoreSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public OpenAiClient(HttpClient httpClient)
-    {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-    }
-
+    /// <summary>
+    ///  Creates a new OpenAI client with given <paramref name="apiKey"/>.
+    /// </summary>
+    /// <param name="apiKey">OpenAI API key. Can be issued here: https://platform.openai.com/account/api-keys</param>
     public OpenAiClient(string apiKey)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -40,7 +40,35 @@ public class OpenAiClient : IDisposable
         _httpClient.DefaultRequestHeaders.Authorization = header;
     }
 
-    public void Dispose() => _httpClient.Dispose();
+    /// <summary>
+    /// Creates a new OpenAI client from DI with given <paramref name="httpClient"/>.
+    /// </summary>
+    /// <param name="httpClient">
+    /// <see cref="HttpClient"/> from DI. It should have an Authorization header set with OpenAI API key.
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// Indicates that OpenAI API key is not set in
+    /// <paramref name="httpClient"/>.<see cref="HttpClient.DefaultRequestHeaders"/>.<see cref="HttpRequestHeaders.Authorization"/> header.
+    /// </exception>
+    public OpenAiClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        if (httpClient.DefaultRequestHeaders.Authorization is null)
+        {
+            throw new ArgumentException(
+                "HttpClient must have an Authorization header set." +
+                "It should include OpenAI's API key.", 
+                nameof(httpClient)
+            );
+        }
+        httpClient.BaseAddress ??= new Uri(DefaultHost);
+        _isHttpClientInjected = true;
+    }
+
+    public void Dispose()
+    {
+        if (!_isHttpClientInjected) _httpClient.Dispose();
+    }
 
     public async Task<string> GetChatCompletions(
         UserMessage dialog,

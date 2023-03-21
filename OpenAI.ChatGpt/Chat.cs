@@ -47,7 +47,7 @@ public class Chat : IDisposable
 
     private async Task<string> GetNextMessageResponse(
         UserOrSystemMessage message, 
-         CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _cts.Token.Register(() => IsWriting = false);
@@ -109,10 +109,10 @@ public class Chat : IDisposable
         _isNew = false;
     }
 
-    private Task<IEnumerable<ChatCompletionMessage>> LoadHistory(CancellationToken cancellationToken)
+    private async Task<IEnumerable<ChatCompletionMessage>> LoadHistory(CancellationToken cancellationToken)
     {
-        if (_isNew) return Task.FromResult(Enumerable.Empty<ChatCompletionMessage>());
-        return _messageStore.GetMessages(UserId, ChatId, cancellationToken);
+        if (_isNew) return Enumerable.Empty<ChatCompletionMessage>();
+        return await _messageStore.GetMessages(UserId, ChatId, cancellationToken);
     }
 
     public void Stop()

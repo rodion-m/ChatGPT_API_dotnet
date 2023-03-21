@@ -21,9 +21,16 @@ public class ChatCompletionMessage
     /// <summary>The message text</summary>
     [JsonPropertyName("content")]
     public string Content { get; init; }
-    
-    protected readonly List<ChatCompletionMessage> Messages;
-    
+
+    private List<ChatCompletionMessage>? _messages;
+    protected List<ChatCompletionMessage> Messages
+    {
+        get
+        {
+            return _messages ??= new List<ChatCompletionMessage>() { this };
+        }
+    }
+
     /// <param name="role">One of <see cref="ChatCompletionRoles"/></param>
     /// <param name="content">The message text</param>
     public ChatCompletionMessage(string role, string content)
@@ -34,7 +41,6 @@ public class ChatCompletionMessage
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(content));
         Role = role;
         Content = content;
-        Messages = new List<ChatCompletionMessage>(1) { this };
     }
     
     internal ChatCompletionMessage(
@@ -44,7 +50,7 @@ public class ChatCompletionMessage
     {
         if (role == null) throw new ArgumentNullException(nameof(role));
         if (content == null) throw new ArgumentNullException(nameof(content));
-        Messages = messages ?? throw new ArgumentNullException(nameof(messages));
+        _messages = messages ?? throw new ArgumentNullException(nameof(messages));
         Messages.Add(this);
     }
 

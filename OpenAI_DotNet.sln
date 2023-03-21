@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Extensions",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGpt.ConsoleExample", "samples\ChatGpt.ConsoleExample\ChatGpt.ConsoleExample.csproj", "{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.EntityFrameworkCore", "OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj", "{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E43C67EE-337F-47EA-B41A-269DBFFC3F95} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}

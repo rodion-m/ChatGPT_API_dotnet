@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using OpenAI.ChatGpt.Models;
 
 namespace OpenAI.ChatGpt;
@@ -34,7 +33,7 @@ internal class ChatGPTFactory : IDisposable
     }
 
     public ChatGPTFactory(
-        IOptions<ChatGPTCredentials> credentials,
+        IOptions<ChatGptCredentials> credentials,
         IOptions<ChatCompletionsConfig> config,
         IMessageStore messageStore)
     {
@@ -61,10 +60,16 @@ internal class ChatGPTFactory : IDisposable
         return new ChatGPTFactory(apiKey, new InMemoryMessageStore(), config);
     }
 
-    public ChatGPT Create(string userId, ChatCompletionsConfig? config = null)
+    public async Task<ChatGPT> Create(
+        string userId, 
+        ChatCompletionsConfig? config = null, 
+        bool ensureStorageCreated = true)
     {
         if (userId == null) throw new ArgumentNullException(nameof(userId));
-        // one of config or _config must be not null:
+        if (ensureStorageCreated)
+        {
+            await _messageStore.EnsureStorageCreated();
+        }
         return new ChatGPT(
             _client,
             userId,
@@ -73,8 +78,12 @@ internal class ChatGPTFactory : IDisposable
         );
     }
 
-    public ChatGPT Create(ChatCompletionsConfig? config = null)
+    public async Task<ChatGPT> Create(ChatCompletionsConfig? config = null, bool ensureStorageCreated = true)
     {
+        if (ensureStorageCreated)
+        {
+            await _messageStore.EnsureStorageCreated();
+        }
         return new ChatGPT(
             _client,
             _messageStore,
@@ -86,13 +95,4 @@ internal class ChatGPTFactory : IDisposable
     {
         _client.Dispose();
     }
-}
-
-internal class ChatGPTCredentials
-{
-    public string ApiKey { get; set; }
-    public string? ApiHost { get; set; }
-    
-    public AuthenticationHeaderValue AuthHeader() 
-        => new("Bearer", ApiKey);
 }

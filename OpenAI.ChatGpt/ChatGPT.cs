@@ -77,20 +77,27 @@ public class ChatGPT : IDisposable
         string? name = null,
         ChatCompletionsConfig? config = null,
         UserOrSystemMessage? initialDialog = null,
-        DateTimeOffset? createdAt = null,
         CancellationToken cancellationToken = default)
     {
-        createdAt ??= DateTimeOffset.Now;
         config = ChatCompletionsConfig.CombineOrDefault(_config, config);
-        var topic = new Topic(_messageStore.NewTopicId(), _userId, name, createdAt.Value, config);
-        await _messageStore.AddTopic(_userId, topic, cancellationToken);
+        var topic = new Topic(_messageStore.NewTopicId(), _userId, name, _messageStore.Now(), config);
+        await _messageStore.AddTopic(topic, cancellationToken);
         if (initialDialog is not null)
         {
-            await _messageStore.SaveMessages(_userId, topic.Id, initialDialog.GetMessages(), cancellationToken);
+            var messages = ConvertToPersistentMessages(initialDialog, topic);
+            await _messageStore.SaveMessages(_userId, topic.Id, messages, cancellationToken);
         }
 
         _currentChat = CreateChat(topic, true);
         return _currentChat;
+    }
+
+    private IEnumerable<PersistentChatMessage> ConvertToPersistentMessages(ChatCompletionMessage dialog, Topic topic)
+    {
+        return dialog.GetMessages()
+            .Select(m => new PersistentChatMessage(
+                _messageStore.NewMessageId(), _userId, topic.Id, _messageStore.Now(), m)
+            );
     }
 
     public async Task<Chat> SetTopic(Guid topicId, CancellationToken cancellationToken = default)

@@ -1,30 +1,29 @@
 ﻿using System.Collections.Concurrent;
 using OpenAI.ChatGpt.Models;
-using OpenAI.Models.ChatCompletion;
 
 namespace OpenAI.ChatGpt;
 
 internal class InMemoryMessageStore : IMessageStore
 {
     private readonly ConcurrentDictionary<string, Dictionary<Guid, Topic>> _users = new();
-    private readonly ConcurrentDictionary<string, Dictionary<Guid, List<ChatCompletionMessage>>> 
+    private readonly ConcurrentDictionary<string, Dictionary<Guid, List<PersistentChatMessage>>> 
         _messages = new();
 
     public Task SaveMessages(
         string userId, 
         Guid topicId, 
-        IEnumerable<ChatCompletionMessage> messages,
+        IEnumerable<PersistentChatMessage> messages,
         CancellationToken cancellationToken)
     {
         if (!_messages.TryGetValue(userId, out var userMessages))
         {
-            userMessages = new Dictionary<Guid, List<ChatCompletionMessage>>();
+            userMessages = new Dictionary<Guid, List<PersistentChatMessage>>();
             _messages.TryAdd(userId, userMessages);
         }
 
         if (!userMessages.TryGetValue(topicId, out var chatMessages))
         {
-            chatMessages = new List<ChatCompletionMessage>();
+            chatMessages = new List<PersistentChatMessage>();
             userMessages.TryAdd(topicId, chatMessages);
         }
 
@@ -32,16 +31,16 @@ internal class InMemoryMessageStore : IMessageStore
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<ChatCompletionMessage>> GetMessages(string userId, Guid topicId, CancellationToken cancellationToken)
+    public Task<IEnumerable<PersistentChatMessage>> GetMessages(string userId, Guid topicId, CancellationToken cancellationToken)
     {
         if (!_messages.TryGetValue(userId, out var userMessages))
         {
-            return Task.FromResult(Enumerable.Empty<ChatCompletionMessage>());
+            return Task.FromResult(Enumerable.Empty<PersistentChatMessage>());
         }
 
         if (!userMessages.TryGetValue(topicId, out var chatMessages))
         {
-            return Task.FromResult(Enumerable.Empty<ChatCompletionMessage>());
+            return Task.FromResult(Enumerable.Empty<PersistentChatMessage>());
         }
 
         return Task.FromResult(chatMessages.AsEnumerable());
@@ -57,7 +56,7 @@ internal class InMemoryMessageStore : IMessageStore
         var lastTopic = userChats.Values.MaxBy(x => x.CreatedAt);
         return Task.FromResult(lastTopic);
     }
-
+    
     public Task<IEnumerable<Topic>> GetTopics(string userId, CancellationToken cancellationToken)
     {
         if (!_users.TryGetValue(userId, out var topics))
@@ -83,15 +82,17 @@ internal class InMemoryMessageStore : IMessageStore
         return Task.FromResult(topic);
     }
 
-    public Task AddTopic(string userId, Topic topic, CancellationToken cancellationToken)
+    public Task AddTopic(Topic topic, CancellationToken cancellationToken)
     {
-        if (!_users.TryGetValue(userId, out var userChats))
+        if (!_users.TryGetValue(topic.UserId, out var userTopics))
         {
-            userChats = new Dictionary<Guid, Topic>();
-            _users.TryAdd(userId, userChats);
+            userTopics = new Dictionary<Guid, Topic>();
+            _users.TryAdd(topic.UserId, userTopics);
         }
 
-        userChats.Add(topic.Id, topic);
+        userTopics.Add(topic.Id, topic);
         return Task.CompletedTask;
     }
+    
+    public Task EnsureStorageCreated() => Task.CompletedTask;
 }

@@ -33,8 +33,7 @@ await foreach (string chunk in _client.StreamChatCompletions(new UserMessage(tex
 ## Continue dialog with ChatGPT (message history)
 Use `ThenAssistant` and `ThenUser` methods to create a dialog:
 ```csharp
-ChatCompletionDialog dialog = 
-    Dialog.StartAsUser("How many meters are in a kilometer? Write just the number.") //the message from user
+var dialog = Dialog.StartAsUser("How many meters are in a kilometer? Write just the number.") //the message from user
           .ThenAssistant("1000") // response from the assistant
           .ThenUser("Convert it to hex. Write just the number."); // the next message from user
 

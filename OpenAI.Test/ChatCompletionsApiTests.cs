@@ -64,7 +64,7 @@ public class ChatCompletionsApiTests
     [Fact]
     public async void Stream_chatgpt_response_for_dialog_works()
     {
-        ChatCompletionDialog dialog = 
+        var dialog = 
             Dialog.StartAsUser("How many meters are in a kilometer? Write just the number.")
                 .ThenAssistant("1000")
                 .ThenUser("Convert it to hex. Write just the number.")

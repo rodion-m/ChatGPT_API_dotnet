@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Headers;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using OpenAI.ChatGpt.Models;
 
@@ -16,6 +15,7 @@ namespace OpenAI.ChatGpt;
 ///     .AddPolicyHandler(GetRetryPolicy())
 ///     .AddPolicyHandler(GetCircuitBreakerPolicy());
 /// </example>
+// ReSharper disable once InconsistentNaming
 internal class ChatGPTFactory : IDisposable
 {
     private readonly OpenAiClient _client;
@@ -51,7 +51,7 @@ internal class ChatGPTFactory : IDisposable
     {
         if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
         _client = new OpenAiClient(apiKey);
-        _config = config ?? new ChatCompletionsConfig();
+        _config = config ?? ChatCompletionsConfig.Default;
         _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
     }
 

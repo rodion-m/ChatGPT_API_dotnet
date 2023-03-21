@@ -71,7 +71,7 @@ public class OpenAiClient : IDisposable
     }
 
     public async Task<string> GetChatCompletions(
-        UserMessage dialog,
+        UserOrSystemMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
@@ -211,7 +211,7 @@ public class OpenAiClient : IDisposable
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Chunks of ChatGPT's response, one by one</returns>
     public IAsyncEnumerable<string> StreamChatCompletions(
-        UserMessage messages,
+        UserOrSystemMessage messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         CancellationToken cancellationToken = default)

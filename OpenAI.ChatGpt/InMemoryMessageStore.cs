@@ -47,6 +47,17 @@ internal class InMemoryMessageStore : IMessageStore
         return Task.FromResult(chatMessages.AsEnumerable());
     }
 
+    public Task<Topic?> GetLastTopicOrNull(string userId, CancellationToken cancellationToken)
+    {
+        if (!_users.TryGetValue(userId, out var userChats))
+        {
+            return Task.FromResult<Topic?>(null);
+        }
+
+        var lastTopic = userChats.Values.MaxBy(x => x.CreatedAt);
+        return Task.FromResult(lastTopic);
+    }
+
     public Task<IEnumerable<Topic>> GetTopics(string userId, CancellationToken cancellationToken)
     {
         if (!_users.TryGetValue(userId, out var topics))

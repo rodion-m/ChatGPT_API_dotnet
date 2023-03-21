@@ -9,10 +9,12 @@
         <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
         <Product>OpenAI API</Product>
         <Version>2.0.0</Version>
-        <Description>.NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
+        <Description>.NET client for the OpenAI Chat Completions API (ChatGPT) with easy DI supporting. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <RootNamespace>OpenAI.ChatGpt</RootNamespace>
+        <Title>OpenAI ChatGPT SDK for .NET</Title>
+        <PackageTags>chatgpt, openai, sdk, apiclient, chatcompletions, gpt3, gpt4</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

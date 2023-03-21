@@ -22,6 +22,8 @@ public interface IMessageStore
         CancellationToken cancellationToken
     );
     
+    Task<Topic?> GetLastTopicOrNull(string userId, CancellationToken cancellationToken);
+
     Task SaveMessages(string userId,
         Guid topicId,
         UserOrSystemMessage message,

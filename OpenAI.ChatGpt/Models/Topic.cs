@@ -7,7 +7,7 @@ public class Topic
 #pragma warning restore CS8618
 
 
-    public Topic(
+    internal Topic(
         Guid id, 
         string userId, 
         string? name, 

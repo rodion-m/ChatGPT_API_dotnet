@@ -14,7 +14,7 @@ public static class Dialog
     public static UserMessage StartAsUser(string userMessage)
     {
         if (userMessage == null) throw new ArgumentNullException(nameof(userMessage));
-        return new ChatCompletionDialog(userMessage);
+        return new UserMessage(userMessage);
     }
     
     /// <summary>

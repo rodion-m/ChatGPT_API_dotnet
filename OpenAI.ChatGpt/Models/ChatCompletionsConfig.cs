@@ -4,7 +4,7 @@ namespace OpenAI.ChatGpt.Models;
 
 public class ChatCompletionsConfig
 {
-    public static ChatCompletionsConfig Default { get; } = new()
+    public static ChatCompletionsConfig Default => new()
     {
         PassUserIdToOpenAiRequests = true
     };

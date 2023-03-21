@@ -26,10 +26,10 @@ public class AssistantMessage : ChatCompletionMessage
     {
     }
 
-    public ChatCompletionDialog ThenUser(string userMessage)
+    public UserMessage ThenUser(string userMessage)
     {
         if (string.IsNullOrWhiteSpace(userMessage))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(userMessage));
-        return new ChatCompletionDialog(Messages, userMessage);
+        return new UserMessage(Messages, userMessage);
     }
 }

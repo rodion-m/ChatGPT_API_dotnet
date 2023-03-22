@@ -15,7 +15,7 @@ namespace OpenAI.ChatGpt;
 ///     .AddPolicyHandler(GetCircuitBreakerPolicy());
 /// </example>
 // ReSharper disable once InconsistentNaming
-internal class ChatGPTFactory : IDisposable
+public class ChatGPTFactory : IDisposable
 {
     private readonly OpenAiClient _client;
     private readonly ChatCompletionsConfig _config;

@@ -88,7 +88,7 @@ public class ChatGPT : IDisposable
             await _messageStore.SaveMessages(_userId, topic.Id, messages, cancellationToken);
         }
 
-        _currentChat = CreateChat(topic, true);
+        _currentChat = CreateChat(topic, initialDialog is null);
         return _currentChat;
     }
 

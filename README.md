@@ -1,5 +1,6 @@
 # OpenAI Chat Completions (ChatGPT) and Images client for .NET
-This is a .NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.
+This is a .NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams. \
+***Looking for a ready solution to integrate ChatGPT into your application? It'll be available in few days (prototype is available [here](https://github.com/rodion-m/ChatGPT_API_dotnet/blob/master/OpenAI.ChatGpt/ChatGPT.cs)). At the moment you can just use the client directly.***
 
 ## Preparation
 First, you need to create an OpenAI account and get an API key. You can do this at https://platform.openai.com/account/api-keys.
@@ -44,7 +45,7 @@ await foreach (var chunk in _client.StreamChatCompletions(dialog, maxTokens: 80)
 ```
 Or just send message history as a collection.
 
-## OpenAI Images API (text-to-image)
+## OpenAI Images API (text-to-image) [aka DALLE-2]
 ### Generate image bytes
 ```csharp
 byte[] image = await _client.GenerateImageBytes("bicycle", "test", OpenAiImageSize._256);

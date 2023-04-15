@@ -2,13 +2,13 @@
 
 public static class AsyncEnumerableExtensions
 {
-    public static async IAsyncEnumerable<string> ThrowOnCancellation(
-        this IAsyncEnumerable<string> stream, 
-        bool throwOnCancellation)
+    public static async IAsyncEnumerable<T> ThrowOnCancellation<T>(
+        this IAsyncEnumerable<T> stream, 
+        bool throwOnCancellation) where T: class
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         var enumerator = stream.GetAsyncEnumerator();
-        string? result = null;
+        T? result = null;
         var hasResult = true;
         while (hasResult)
         {

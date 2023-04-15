@@ -3,7 +3,7 @@ using FluentAssertions;
 using OpenAI.Models.ChatCompletion;
 using Xunit.Abstractions;
 
-namespace OpenAI.Test;
+namespace OpenAI.Core.Test;
 
 [Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ChatCompletionsApiTests

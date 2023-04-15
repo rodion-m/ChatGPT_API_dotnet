@@ -1,20 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.Core", "OpenAI.Core\OpenAI.Core.csproj", "{A1A4460F-C7E8-48D4-B319-EADFB67A62F8}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33417.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.Core", "OpenAI.Core\OpenAI.Core.csproj", "{A1A4460F-C7E8-48D4-B319-EADFB67A62F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.Test", "OpenAI.Test\OpenAI.Test.csproj", "{439F883C-BA89-4DAE-84FC-8302055F989B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.Core.Test", "tests\OpenAI.Core.Test\OpenAI.Core.Test.csproj", "{439F883C-BA89-4DAE-84FC-8302055F989B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt", "OpenAI.ChatGpt\OpenAI.ChatGpt.csproj", "{F68FE4B2-DA47-496C-B129-EE875C133D2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt", "OpenAI.ChatGpt\OpenAI.ChatGpt.csproj", "{F68FE4B2-DA47-496C-B129-EE875C133D2D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{80DB142C-5A1B-431C-BD85-19C83C6FC0A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGpt.SpectreConsoleExample", "samples\ChatGpt.SpectreConsoleExample\ChatGpt.SpectreConsoleExample.csproj", "{E43C67EE-337F-47EA-B41A-269DBFFC3F95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGpt.SpectreConsoleExample", "samples\ChatGpt.SpectreConsoleExample\ChatGpt.SpectreConsoleExample.csproj", "{E43C67EE-337F-47EA-B41A-269DBFFC3F95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Extensions", "OpenAI.ChatGpt.Extensions\OpenAI.ChatGpt.Extensions.csproj", "{124630DD-563A-4C9D-AA9A-5D24564CB5DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.Extensions", "OpenAI.ChatGpt.Extensions\OpenAI.ChatGpt.Extensions.csproj", "{124630DD-563A-4C9D-AA9A-5D24564CB5DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGpt.ConsoleExample", "samples\ChatGpt.ConsoleExample\ChatGpt.ConsoleExample.csproj", "{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGpt.ConsoleExample", "samples\ChatGpt.ConsoleExample\ChatGpt.ConsoleExample.csproj", "{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.EntityFrameworkCore", "OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj", "{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.EntityFrameworkCore", "OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj", "{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGpt.TelegramBotExample", "samples\ChatGpt.TelegramBotExample\ChatGpt.TelegramBotExample.csproj", "{3B6DA37B-43F0-4EDB-B5FB-427CCA484C9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeworkChecker", "HomeworkChecker\HomeworkChecker.csproj", "{B283E130-DFC3-4276-A314-B180AB276CCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorChatGPT", "samples\ChatGpt.BlazorExample\BlazorChatGPT.csproj", "{46B72320-70F6-4286-A43D-51EB0BDDA5BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGPT.Test", "tests\OpenAI.ChatGPT.Test\OpenAI.ChatGPT.Test.csproj", "{7A50F277-75AA-4C4D-B0C9-08FE77A1A9E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{926D63B6-9F6A-45A1-B5B7-5F36352C23AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,9 +63,33 @@ Global
 		{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B6DA37B-43F0-4EDB-B5FB-427CCA484C9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B6DA37B-43F0-4EDB-B5FB-427CCA484C9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B6DA37B-43F0-4EDB-B5FB-427CCA484C9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B6DA37B-43F0-4EDB-B5FB-427CCA484C9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B283E130-DFC3-4276-A314-B180AB276CCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B283E130-DFC3-4276-A314-B180AB276CCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B283E130-DFC3-4276-A314-B180AB276CCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B283E130-DFC3-4276-A314-B180AB276CCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46B72320-70F6-4286-A43D-51EB0BDDA5BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46B72320-70F6-4286-A43D-51EB0BDDA5BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46B72320-70F6-4286-A43D-51EB0BDDA5BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46B72320-70F6-4286-A43D-51EB0BDDA5BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A50F277-75AA-4C4D-B0C9-08FE77A1A9E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A50F277-75AA-4C4D-B0C9-08FE77A1A9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A50F277-75AA-4C4D-B0C9-08FE77A1A9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A50F277-75AA-4C4D-B0C9-08FE77A1A9E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E43C67EE-337F-47EA-B41A-269DBFFC3F95} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
 		{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
+		{3B6DA37B-43F0-4EDB-B5FB-427CCA484C9B} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
+		{B283E130-DFC3-4276-A314-B180AB276CCE} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
+		{46B72320-70F6-4286-A43D-51EB0BDDA5BE} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
+		{439F883C-BA89-4DAE-84FC-8302055F989B} = {926D63B6-9F6A-45A1-B5B7-5F36352C23AB}
+		{7A50F277-75AA-4C4D-B0C9-08FE77A1A9E4} = {926D63B6-9F6A-45A1-B5B7-5F36352C23AB}
 	EndGlobalSection
 EndGlobal

@@ -1,13 +1,15 @@
-﻿using OpenAI.ChatGpt.Models;
+﻿using OpenAI.ChatGpt.Interfaces;
+using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
 namespace OpenAI.ChatGpt;
 
 /// <summary> Chat conversations provider </summary>
+// ReSharper disable once InconsistentNaming
 public class ChatGPT : IDisposable
 {
     private readonly string _userId;
-    private readonly IMessageStore _messageStore;
+    private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ChatCompletionsConfig? _config;
     private readonly OpenAiClient _client;
     private Chat? _currentChat;
@@ -18,12 +20,12 @@ public class ChatGPT : IDisposable
     public ChatGPT(
         OpenAiClient client,
         string userId, 
-        IMessageStore messageStore, 
+        IChatHistoryStorage chatHistoryStorage, 
         ChatCompletionsConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _userId = userId ?? throw new ArgumentNullException(nameof(userId));
-        _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
+        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _config = config;
     }
     
@@ -32,11 +34,11 @@ public class ChatGPT : IDisposable
     /// </summary>
     public ChatGPT(
         OpenAiClient client,
-        IMessageStore messageStore, 
+        IChatHistoryStorage chatHistoryStorage, 
         ChatCompletionsConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
-        _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
+        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _userId = Guid.Empty.ToString();
         _config = config;
     }
@@ -51,7 +53,7 @@ public class ChatGPT : IDisposable
     {
         if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
         var client = new OpenAiClient(apiKey);
-        var chatGpt = new ChatGPT(client, new InMemoryMessageStore(), config);
+        var chatGpt = new ChatGPT(client, new InMemoryChatHistoryStorage(), config);
         return chatGpt.StartNewTopic(initialDialog: initialDialog);
     }
     
@@ -66,7 +68,7 @@ public class ChatGPT : IDisposable
         CancellationToken cancellationToken = default)
     {
         if (_currentChat is not null) return _currentChat;
-        var topic = await _messageStore.GetLastTopicOrNull(_userId, cancellationToken);
+        var topic = await _chatHistoryStorage.GetMostRecentTopicOrNull(_userId, cancellationToken);
         return topic is null
             ? await StartNewTopic(cancellationToken: cancellationToken)
             : await SetTopic(topic, cancellationToken);
@@ -80,12 +82,12 @@ public class ChatGPT : IDisposable
         CancellationToken cancellationToken = default)
     {
         config = ChatCompletionsConfig.CombineOrDefault(_config, config);
-        var topic = new Topic(_messageStore.NewTopicId(), _userId, name, _messageStore.Now(), config);
-        await _messageStore.AddTopic(topic, cancellationToken);
+        var topic = new Topic(_chatHistoryStorage.NewTopicId(), _userId, name, _chatHistoryStorage.Now(), config);
+        await _chatHistoryStorage.AddTopic(topic, cancellationToken);
         if (initialDialog is not null)
         {
             var messages = ConvertToPersistentMessages(initialDialog, topic);
-            await _messageStore.SaveMessages(_userId, topic.Id, messages, cancellationToken);
+            await _chatHistoryStorage.SaveMessages(_userId, topic.Id, messages, cancellationToken);
         }
 
         _currentChat = CreateChat(topic, initialDialog is null);
@@ -96,13 +98,13 @@ public class ChatGPT : IDisposable
     {
         return dialog.GetMessages()
             .Select(m => new PersistentChatMessage(
-                _messageStore.NewMessageId(), _userId, topic.Id, _messageStore.Now(), m)
+                _chatHistoryStorage.NewMessageId(), _userId, topic.Id, _chatHistoryStorage.Now(), m)
             );
     }
 
     public async Task<Chat> SetTopic(Guid topicId, CancellationToken cancellationToken = default)
     {
-        var topic = await _messageStore.GetTopic(_userId, topicId, cancellationToken);
+        var topic = await _chatHistoryStorage.GetTopic(_userId, topicId, cancellationToken);
         if (topic is null)
         {
             throw new ArgumentException($"Chat with id {topicId} not found for user {_userId}");
@@ -120,12 +122,12 @@ public class ChatGPT : IDisposable
     private Chat CreateChat(Topic topic, bool isNew)
     {
         if (topic == null) throw new ArgumentNullException(nameof(topic));
-        return new Chat(_messageStore, _client, _userId, topic, isNew);
+        return new Chat(_chatHistoryStorage, _client, _userId, topic, isNew);
     }
     
     public async Task<IReadOnlyList<Topic>> GetTopics(CancellationToken cancellationToken = default)
     {
-        var chats = await _messageStore.GetTopics(_userId, cancellationToken);
+        var chats = await _chatHistoryStorage.GetTopics(_userId, cancellationToken);
         return chats.ToList();
     }
 

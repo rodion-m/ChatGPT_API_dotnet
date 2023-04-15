@@ -1,4 +1,4 @@
-﻿namespace OpenAI.Test;
+﻿namespace OpenAI.Core.Test;
 
 public static class Helpers
 {

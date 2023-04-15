@@ -18,7 +18,7 @@ public class OpenAiClient : IDisposable
 
     private readonly HttpClient _httpClient;
     private readonly bool _isHttpClientInjected;
-    
+
     private readonly JsonSerializerOptions _nullIgnoreSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
@@ -57,10 +57,11 @@ public class OpenAiClient : IDisposable
         {
             throw new ArgumentException(
                 "HttpClient must have an Authorization header set." +
-                "It should include OpenAI's API key.", 
+                "It should include OpenAI's API key.",
                 nameof(httpClient)
             );
         }
+
         httpClient.BaseAddress ??= new Uri(DefaultHost);
         _isHttpClientInjected = true;
     }
@@ -182,18 +183,17 @@ public class OpenAiClient : IDisposable
 
     private static ChatCompletionRequest CreateChatCompletionRequest(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens, 
-        string model, 
-        float temperature, 
-        string? user, 
+        int maxTokens,
+        string model,
+        float temperature,
+        string? user,
         bool stream,
         Action<ChatCompletionRequest>? requestModifier)
     {
-        var request = new ChatCompletionRequest()
+        var request = new ChatCompletionRequest(messages)
         {
             Model = model,
             MaxTokens = maxTokens,
-            Messages = messages,
             Stream = stream,
             User = user,
             Temperature = temperature
@@ -208,23 +208,31 @@ public class OpenAiClient : IDisposable
     /// <param name="messages">The history of messaging</param>
     /// <param name="maxTokens">The length of the response</param>
     /// <param name="model">One of <see cref="ChatCompletionModels"/></param>
+    /// <param name="temperature"><see cref="ChatCompletionRequest.Temperature"/>></param>
+    /// <param name="user"><see cref="ChatCompletionRequest.User"/></param>
+    /// <param name="requestModifier">Request modifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Chunks of ChatGPT's response, one by one</returns>
     public IAsyncEnumerable<string> StreamChatCompletions(
         UserOrSystemMessage messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
+        float temperature = ChatCompletionTemperatures.Default,
+        string? user = null,
+        Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        return StreamChatCompletions(new ChatCompletionRequest()
-        {
-            Model = model,
-            MaxTokens = maxTokens,
-            Messages = messages.GetMessages(),
-            Stream = true
-        }, cancellationToken);
+        var request = CreateChatCompletionRequest(messages.GetMessages(),
+            maxTokens,
+            model,
+            temperature,
+            user,
+            true,
+            requestModifier
+        );
+        return StreamChatCompletions(request, cancellationToken);
     }
 
     public async IAsyncEnumerable<string> StreamChatCompletions(
@@ -233,24 +241,26 @@ public class OpenAiClient : IDisposable
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         request.Stream = true;
-        await foreach (var response in StartStreaming().WithCancellation(cancellationToken))
+        await foreach (var response in StreamChatCompletionsRaw(request, cancellationToken)
+            .WithCancellation(cancellationToken))
         {
             var content = response.Choices[0].Delta?.Content;
             if (content is not null)
                 yield return content;
         }
+    }
 
-        IAsyncEnumerable<ChatCompletionResponse> StartStreaming()
-        {
-            return _httpClient.StreamUsingServerSentEvents<
-                ChatCompletionRequest, ChatCompletionResponse>
-            (
-                ChatCompletionsEndpoint,
-                request,
-                _nullIgnoreSerializerOptions,
-                cancellationToken
-            );
-        }
+    public IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(
+        ChatCompletionRequest request, CancellationToken cancellationToken = default)
+    {
+        request.Stream = true;
+        return _httpClient.StreamUsingServerSentEvents<ChatCompletionRequest, ChatCompletionResponse>
+        (
+            ChatCompletionsEndpoint,
+            request,
+            _nullIgnoreSerializerOptions,
+            cancellationToken
+        );
     }
 
     public async Task<byte[]> GenerateImageBytes(

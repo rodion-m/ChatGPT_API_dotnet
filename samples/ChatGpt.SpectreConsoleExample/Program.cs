@@ -20,9 +20,9 @@ Chat chat = await ChatGPT.CreateInMemoryChat(
 SetupCancellation(chat);
 
 Console.MarkupLine("[underline yellow]Start chat. Now ask something ChatGPT...[/]");
-while (AnsiConsole.Ask<string>($"[underline green]{name}[/]: ") is { } userMessage)
+while (Console.Ask<string>($"[underline green]{name}[/]: ") is { } userMessage)
 {
-    AnsiConsole.Markup("[underline red]ChatGPT[/]: ");
+    Console.Markup("[underline red]ChatGPT[/]: ");
     var stream = chat.StreamNextMessageResponse(userMessage)
         .ThrowOnCancellation(false);
     await foreach (string chunk in stream.SkipWhile(string.IsNullOrWhiteSpace))
@@ -35,11 +35,11 @@ while (AnsiConsole.Ask<string>($"[underline green]{name}[/]: ") is { } userMessa
 
 string LoadApiKey()
 {
-    var s = Environment.GetEnvironmentVariable("openai_api_key_paid")
+    var key = Environment.GetEnvironmentVariable("openai_api_key_paid")
             ?? Console.Ask<string>("Please enter your [green]OpenAI API key[/] " +
                                    "(you can get it from https://platform.openai.com/account/api-keys): ");
 
-    return s;
+    return key;
 }
 
 void SetupCancellation(Chat chat)

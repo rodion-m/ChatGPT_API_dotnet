@@ -20,7 +20,7 @@ public class ChatCompletionMessage
 
     /// <summary>The message text</summary>
     [JsonPropertyName("content")]
-    public string Content { get; init; }
+    public string Content { get; set; }
 
     private List<ChatCompletionMessage>? _messages;
     protected List<ChatCompletionMessage> Messages
@@ -88,4 +88,11 @@ public class ChatCompletionMessage
     /// <summary> How many tokens in one word (0.75) </summary>
     private const double TokenToWordAverageRatio = 3d / 4d;
     private const double TokensAverageQuantityInOneWord = 1d / TokenToWordAverageRatio;
+
+    public override string ToString()
+    {
+        return _messages == null
+            ? $"{Role}: {Content}"
+            :  string.Join(Environment.NewLine, _messages.Select(m => $"{m.Role}: {m.Content}"));
+    }
 }

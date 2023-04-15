@@ -9,6 +9,7 @@ public static class ChatCompletionTemperatures
     public const float Deterministic = 0.2f;
     public const float Balanced = 0.5f;
     public const float Random = 0.8f;
+    public const float Creative = 1f;
     public const float Insane = 2f;
     
     public const float Minimum = 0f;

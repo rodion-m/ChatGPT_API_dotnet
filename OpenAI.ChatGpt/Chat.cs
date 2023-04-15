@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
+using OpenAI.ChatGpt.Interfaces;
 using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
@@ -17,13 +18,13 @@ public class Chat : IDisposable
     public bool IsWriting { get; private set; }
     public bool IsCancelled => _cts?.IsCancellationRequested ?? false;
 
-    private readonly IMessageStore _messageStore;
+    private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly OpenAiClient _client;
     private bool _isNew;
     private CancellationTokenSource? _cts;
 
     internal Chat(
-        IMessageStore messageStore,
+        IChatHistoryStorage chatHistoryStorage,
         OpenAiClient client,
         string userId,
         Topic topic,
@@ -31,7 +32,7 @@ public class Chat : IDisposable
     {
         UserId = userId ?? throw new ArgumentNullException(nameof(userId));
         Topic = topic ?? throw new ArgumentNullException(nameof(topic));
-        _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
+        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _isNew = isNew;
     }
@@ -63,7 +64,7 @@ public class Chat : IDisposable
             cancellationToken: _cts.Token
         );
 
-        await _messageStore.SaveMessages(
+        await _chatHistoryStorage.SaveMessages(
             UserId, ChatId, message, response, _cts.Token);
         IsWriting = false;
         _isNew = false;
@@ -103,7 +104,7 @@ public class Chat : IDisposable
             yield return chunk;
         }
 
-        await _messageStore.SaveMessages(
+        await _chatHistoryStorage.SaveMessages(
             UserId, ChatId, message, sb.ToString(), _cts.Token);
         IsWriting = false;
         _isNew = false;
@@ -112,7 +113,7 @@ public class Chat : IDisposable
     private async Task<IEnumerable<ChatCompletionMessage>> LoadHistory(CancellationToken cancellationToken)
     {
         if (_isNew) return Enumerable.Empty<ChatCompletionMessage>();
-        return await _messageStore.GetMessages(UserId, ChatId, cancellationToken);
+        return await _chatHistoryStorage.GetMessages(UserId, ChatId, cancellationToken);
     }
 
     public void Stop()

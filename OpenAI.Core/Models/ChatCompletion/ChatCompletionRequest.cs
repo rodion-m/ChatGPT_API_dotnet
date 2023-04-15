@@ -19,6 +19,11 @@ public class ChatCompletionRequest
     private float _temperature = ChatCompletionTemperatures.Default;
     private IEnumerable<ChatCompletionMessage> _messages;
 
+    public ChatCompletionRequest(IEnumerable<ChatCompletionMessage> messages)
+    {
+        _messages = messages ?? throw new ArgumentNullException(nameof(messages));
+    }
+
     /// <summary>
     /// ID of the model to use. One of: <see cref="ChatCompletionModels"/>
     /// </summary>

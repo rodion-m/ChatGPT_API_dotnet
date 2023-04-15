@@ -13,6 +13,9 @@ public class ChatCompletionsConfig
     private string? _model;
     private float? _temperature;
 
+    public string? InitialSystemMessage { get; set; }
+    public string? InitialUserMessage { get; set; }
+
     public int? MaxTokens
     {
         get => _maxTokens;
@@ -57,6 +60,19 @@ public class ChatCompletionsConfig
 
     public bool? PassUserIdToOpenAiRequests { get; set; }
 
+    public UserOrSystemMessage? GetInitialDialogOrNull()
+    {
+        return (InitialSystemMessage, InitialUserMessage) switch
+        {
+            (not null, not null) => Dialog
+                .StartAsSystem(InitialSystemMessage)
+                .ThenUser(InitialUserMessage),
+            (not null, null) => Dialog.StartAsSystem(InitialSystemMessage),
+            (null, not null) => Dialog.StartAsUser(InitialUserMessage),
+            _ => null
+        };
+    }
+
     internal void ModifyRequest(ChatCompletionRequest request)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
@@ -84,6 +100,8 @@ public class ChatCompletionsConfig
             _temperature = config._temperature ?? baseConfig._temperature,
             PassUserIdToOpenAiRequests = config.PassUserIdToOpenAiRequests ??
                                          baseConfig.PassUserIdToOpenAiRequests,
+            InitialSystemMessage = config.InitialSystemMessage ?? baseConfig.InitialSystemMessage,
+            InitialUserMessage = config.InitialUserMessage ?? baseConfig.InitialUserMessage
         };
         return result;
     }

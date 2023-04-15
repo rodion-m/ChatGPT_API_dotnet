@@ -53,6 +53,12 @@ public class OpenAiClient : IDisposable
     public OpenAiClient(HttpClient httpClient)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        ValidateHttpClient(httpClient);
+        _isHttpClientInjected = true;
+    }
+
+    private static void ValidateHttpClient(HttpClient httpClient)
+    {
         if (httpClient.DefaultRequestHeaders.Authorization is null)
         {
             throw new ArgumentException(
@@ -62,8 +68,14 @@ public class OpenAiClient : IDisposable
             );
         }
 
-        httpClient.BaseAddress ??= new Uri(DefaultHost);
-        _isHttpClientInjected = true;
+        if (httpClient.BaseAddress is null)
+        {
+            throw new ArgumentException(
+                "HttpClient must have a BaseAddress set." +
+                "It should be set to OpenAI's API endpoint.",
+                nameof(httpClient)
+            );
+        }
     }
 
     public void Dispose()

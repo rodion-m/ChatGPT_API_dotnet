@@ -1,4 +1,5 @@
 ﻿using OpenAI.ChatGpt.Interfaces;
+using OpenAI.ChatGpt.Internal;
 using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
@@ -10,6 +11,7 @@ public class ChatGPT : IDisposable
 {
     private readonly string _userId;
     private readonly IChatHistoryStorage _chatHistoryStorage;
+    private readonly IInternalClock _clock;
     private readonly ChatCompletionsConfig? _config;
     private readonly OpenAiClient _client;
     private Chat? _currentChat;
@@ -19,13 +21,15 @@ public class ChatGPT : IDisposable
     /// </summary>
     public ChatGPT(
         OpenAiClient client,
-        string userId, 
-        IChatHistoryStorage chatHistoryStorage, 
+        IChatHistoryStorage chatHistoryStorage,
+        IInternalClock clock,
+        string userId,
         ChatCompletionsConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _userId = userId ?? throw new ArgumentNullException(nameof(userId));
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
+        _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _config = config;
     }
     
@@ -34,11 +38,13 @@ public class ChatGPT : IDisposable
     /// </summary>
     public ChatGPT(
         OpenAiClient client,
-        IChatHistoryStorage chatHistoryStorage, 
+        IChatHistoryStorage chatHistoryStorage,
+        IInternalClock clock,
         ChatCompletionsConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
+        _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _userId = Guid.Empty.ToString();
         _config = config;
     }
@@ -49,11 +55,12 @@ public class ChatGPT : IDisposable
     public static Task<Chat> CreateInMemoryChat(
         string apiKey,
         ChatCompletionsConfig? config = null,
-        UserOrSystemMessage? initialDialog = null)
+        UserOrSystemMessage? initialDialog = null,
+        IInternalClock? clock = null)
     {
         if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
         var client = new OpenAiClient(apiKey);
-        var chatGpt = new ChatGPT(client, new InMemoryChatHistoryStorage(), config);
+        var chatGpt = new ChatGPT(client, new InMemoryChatHistoryStorage(), clock ?? new InternalClockUtc(), config);
         return chatGpt.StartNewTopic(initialDialog: initialDialog);
     }
     
@@ -82,8 +89,9 @@ public class ChatGPT : IDisposable
         CancellationToken cancellationToken = default)
     {
         config = ChatCompletionsConfig.CombineOrDefault(_config, config);
-        var topic = new Topic(_chatHistoryStorage.NewTopicId(), _userId, name, _chatHistoryStorage.Now(), config);
+        var topic = new Topic(_chatHistoryStorage.NewTopicId(), _userId, name, _clock.GetCurrentTime(), config);
         await _chatHistoryStorage.AddTopic(topic, cancellationToken);
+        initialDialog ??= config.GetInitialDialogOrNull();
         if (initialDialog is not null)
         {
             var messages = ConvertToPersistentMessages(initialDialog, topic);
@@ -98,7 +106,7 @@ public class ChatGPT : IDisposable
     {
         return dialog.GetMessages()
             .Select(m => new PersistentChatMessage(
-                _chatHistoryStorage.NewMessageId(), _userId, topic.Id, _chatHistoryStorage.Now(), m)
+                _chatHistoryStorage.NewMessageId(), _userId, topic.Id, _clock.GetCurrentTime(), m)
             );
     }
 
@@ -122,7 +130,7 @@ public class ChatGPT : IDisposable
     private Chat CreateChat(Topic topic, bool isNew)
     {
         if (topic == null) throw new ArgumentNullException(nameof(topic));
-        return new Chat(_chatHistoryStorage, _client, _userId, topic, isNew);
+        return new Chat(_chatHistoryStorage, _clock, _client, _userId, topic, isNew);
     }
     
     public async Task<IReadOnlyList<Topic>> GetTopics(CancellationToken cancellationToken = default)

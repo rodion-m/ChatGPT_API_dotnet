@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 using OpenAI.ChatGpt.Interfaces;
+using OpenAI.ChatGpt.Internal;
 using OpenAI.ChatGpt.Models;
 using OpenAI.Models.ChatCompletion;
 
@@ -19,21 +20,24 @@ public class Chat : IDisposable
     public bool IsCancelled => _cts?.IsCancellationRequested ?? false;
 
     private readonly IChatHistoryStorage _chatHistoryStorage;
+    private readonly IInternalClock _clock;
     private readonly OpenAiClient _client;
     private bool _isNew;
     private CancellationTokenSource? _cts;
 
     internal Chat(
         IChatHistoryStorage chatHistoryStorage,
+        IInternalClock clock,
         OpenAiClient client,
         string userId,
         Topic topic,
         bool isNew)
     {
+        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
+        _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+        _client = client ?? throw new ArgumentNullException(nameof(client));
         UserId = userId ?? throw new ArgumentNullException(nameof(userId));
         Topic = topic ?? throw new ArgumentNullException(nameof(topic));
-        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
-        _client = client ?? throw new ArgumentNullException(nameof(client));
         _isNew = isNew;
     }
     
@@ -65,7 +69,7 @@ public class Chat : IDisposable
         );
 
         await _chatHistoryStorage.SaveMessages(
-            UserId, ChatId, message, response, _cts.Token);
+            UserId, ChatId, message, response, _clock.GetCurrentTime(), _cts.Token);
         IsWriting = false;
         _isNew = false;
 
@@ -105,7 +109,7 @@ public class Chat : IDisposable
         }
 
         await _chatHistoryStorage.SaveMessages(
-            UserId, ChatId, message, sb.ToString(), _cts.Token);
+            UserId, ChatId, message, sb.ToString(), _clock.GetCurrentTime(), _cts.Token);
         IsWriting = false;
         _isNew = false;
     }

@@ -8,7 +8,6 @@ namespace OpenAI.ChatGpt.EntityFrameworkCore;
 public class EfChatHistoryStorage : IChatHistoryStorage
 {
     private readonly ChatGptDbContext _dbContext;
-
     
     public EfChatHistoryStorage(ChatGptDbContext dbContext)
     {

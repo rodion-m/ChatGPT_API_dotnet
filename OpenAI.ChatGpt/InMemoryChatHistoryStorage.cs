@@ -5,6 +5,12 @@ using OpenAI.ChatGpt.Models;
 
 namespace OpenAI.ChatGpt;
 
+/// <summary>
+/// Represents an in-memory storage for managing messages and topics.
+/// </summary>
+/// <remarks>
+/// Thread safe for different users. Not thread safe for the same user.
+/// </remarks>
 public class InMemoryChatHistoryStorage : IChatHistoryStorage
 {
     private readonly ConcurrentDictionary<string, Dictionary<Guid, Topic>> _users = new();

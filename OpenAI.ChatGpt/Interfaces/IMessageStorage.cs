@@ -63,6 +63,7 @@ public interface IMessageStorage
     /// <param name="topicId">The topic ID.</param>
     /// <param name="message">The user or system message.</param>
     /// <param name="assistantMessage">The assistant message.</param>
+    /// <param name="dateTime">Date and time for messages.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task SaveMessages(
@@ -70,6 +71,7 @@ public interface IMessageStorage
         Guid topicId,
         UserOrSystemMessage message,
         string assistantMessage,
+        DateTimeOffset? dateTime,
         CancellationToken cancellationToken);
 
     /// <summary>

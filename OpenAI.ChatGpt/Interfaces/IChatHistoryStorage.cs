@@ -1,6 +1,6 @@
 using OpenAI.ChatGpt.Models;
-using OpenAI.Models.ChatCompletion;
-using static OpenAI.Models.ChatCompletion.ChatCompletionRoles;
+using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
+using static OpenAI.ChatGpt.Models.ChatCompletion.ChatCompletionRoles;
 
 namespace OpenAI.ChatGpt.Interfaces;
 

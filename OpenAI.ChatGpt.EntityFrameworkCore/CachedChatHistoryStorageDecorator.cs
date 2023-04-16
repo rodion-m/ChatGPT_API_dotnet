@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using OpenAI.ChatGpt.Interfaces;
-using OpenAI.ChatGpt.Models;
 
 namespace OpenAI.ChatGpt.EntityFrameworkCore;
 

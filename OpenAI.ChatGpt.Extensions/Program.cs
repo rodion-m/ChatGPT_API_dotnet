@@ -1,4 +1,4 @@
-﻿using OpenAI;
+﻿using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.Extensions;
 
 var client = new OpenAiClient(Environment.GetEnvironmentVariable("openai_api_key_paid")!);

@@ -1,7 +1,7 @@
 ﻿using OpenAI.ChatGpt.Interfaces;
 using OpenAI.ChatGpt.Internal;
 using OpenAI.ChatGpt.Models;
-using OpenAI.Models.ChatCompletion;
+using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt;
 
@@ -11,7 +11,7 @@ public class ChatGPT : IDisposable
 {
     private readonly string _userId;
     private readonly IChatHistoryStorage _chatHistoryStorage;
-    private readonly IInternalClock _clock;
+    private readonly ITimeProvider _clock;
     private readonly ChatCompletionsConfig? _config;
     private readonly OpenAiClient _client;
     private Chat? _currentChat;
@@ -22,7 +22,7 @@ public class ChatGPT : IDisposable
     public ChatGPT(
         OpenAiClient client,
         IChatHistoryStorage chatHistoryStorage,
-        IInternalClock clock,
+        ITimeProvider clock,
         string userId,
         ChatCompletionsConfig? config)
     {
@@ -39,7 +39,7 @@ public class ChatGPT : IDisposable
     public ChatGPT(
         OpenAiClient client,
         IChatHistoryStorage chatHistoryStorage,
-        IInternalClock clock,
+        ITimeProvider clock,
         ChatCompletionsConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
@@ -56,11 +56,11 @@ public class ChatGPT : IDisposable
         string apiKey,
         ChatCompletionsConfig? config = null,
         UserOrSystemMessage? initialDialog = null,
-        IInternalClock? clock = null)
+        ITimeProvider? clock = null)
     {
         if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
         var client = new OpenAiClient(apiKey);
-        var chatGpt = new ChatGPT(client, new InMemoryChatHistoryStorage(), clock ?? new InternalClockUtc(), config);
+        var chatGpt = new ChatGPT(client, new InMemoryChatHistoryStorage(), clock ?? new TimeProviderUtc(), config);
         return chatGpt.StartNewTopic(initialDialog: initialDialog);
     }
     

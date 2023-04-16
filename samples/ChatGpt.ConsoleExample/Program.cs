@@ -1,5 +1,4 @@
-﻿using OpenAI;
-using OpenAI.ChatGpt;
+﻿using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.Models;
 
 Console.InputEncoding = System.Text.Encoding.Unicode;

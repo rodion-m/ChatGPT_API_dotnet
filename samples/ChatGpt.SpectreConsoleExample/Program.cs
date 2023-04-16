@@ -1,7 +1,5 @@
-﻿using OpenAI;
-using OpenAI.ChatGpt;
+﻿using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.Models;
-using Spectre.Console;
 using Console = Spectre.Console.AnsiConsole;
 
 Console.MarkupLine("[underline yellow]Welcome to ChatGPT Console![/]");

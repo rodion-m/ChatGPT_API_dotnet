@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAI.ChatGpt.Exceptions;
-using OpenAI.ChatGpt.Interfaces;
-using OpenAI.ChatGpt.Models;
 
 namespace OpenAI.ChatGpt.EntityFrameworkCore;
 

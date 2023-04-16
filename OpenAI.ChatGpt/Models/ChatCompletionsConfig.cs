@@ -1,4 +1,5 @@
-using OpenAI.Models.ChatCompletion;
+using OpenAI.ChatGpt.Models.ChatCompletion;
+using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt.Models;
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OpenAI.ChatGpt.Models;
 
 namespace OpenAI.ChatGpt.EntityFrameworkCore;
 

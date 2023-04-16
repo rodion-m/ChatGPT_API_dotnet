@@ -3,7 +3,7 @@ using System.Text;
 using OpenAI.ChatGpt.Interfaces;
 using OpenAI.ChatGpt.Internal;
 using OpenAI.ChatGpt.Models;
-using OpenAI.Models.ChatCompletion;
+using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt;
 
@@ -20,14 +20,14 @@ public class Chat : IDisposable
     public bool IsCancelled => _cts?.IsCancellationRequested ?? false;
 
     private readonly IChatHistoryStorage _chatHistoryStorage;
-    private readonly IInternalClock _clock;
+    private readonly ITimeProvider _clock;
     private readonly OpenAiClient _client;
     private bool _isNew;
     private CancellationTokenSource? _cts;
 
     internal Chat(
         IChatHistoryStorage chatHistoryStorage,
-        IInternalClock clock,
+        ITimeProvider clock,
         OpenAiClient client,
         string userId,
         Topic topic,

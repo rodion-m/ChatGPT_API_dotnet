@@ -15,7 +15,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OpenAI.ChatGpt\OpenAI.ChatGpt.csproj" />
+      <ProjectReference Include="..\OpenAI.ChatGpt.DependencyInjection\OpenAI.ChatGpt.DependencyInjection.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="OpenAI.ChatGpt.UnitTests" />
+        <InternalsVisibleTo Include="OpenAI.ChatGpt.IntegrationTests" />
     </ItemGroup>
 
 </Project>

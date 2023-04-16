@@ -1,5 +1,5 @@
-using OpenAI.ChatGpt.Models;
 using OpenAI.ChatGpt.Exceptions;
+using OpenAI.ChatGpt.Models;
 
 namespace OpenAI.ChatGpt.Interfaces;
 

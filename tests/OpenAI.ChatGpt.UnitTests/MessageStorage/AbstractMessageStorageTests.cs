@@ -48,7 +48,7 @@ public abstract class AbstractMessageStorageTests
 
         // Act
         Func<Task> act = async () =>
-            await _messageStorage.SaveMessages(userId, topicId, null, cancellationToken);
+            await _messageStorage.SaveMessages(userId, topicId, null!, cancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("*messages*");
@@ -58,13 +58,13 @@ public abstract class AbstractMessageStorageTests
     public async Task Save_messages_with_null_user_id_is_invalid()
     {
         // Arrange
-        string userId = null;
+        string? userId = null;
         Guid topicId = Guid.NewGuid();
         CancellationToken cancellationToken = new CancellationToken();
 
         // Act
         Func<Task> act = async () =>
-            await _messageStorage.SaveMessages(userId, topicId, null, cancellationToken);
+            await _messageStorage.SaveMessages(userId!, topicId, null!, cancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("*userId*");
@@ -113,12 +113,11 @@ public abstract class AbstractMessageStorageTests
     public async Task Get_messages_with_null_user_id_is_invalid()
     {
         // Arrange
-        string userId = null;
+        string? userId = null;
         Guid topicId = Guid.NewGuid();
-        CancellationToken cancellationToken = new CancellationToken();
 
         // Act
-        Func<Task> act = () => _messageStorage.GetMessages(userId, topicId, cancellationToken);
+        Func<Task> act = () => _messageStorage.GetMessages(userId!, topicId, default);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("*userId*");
@@ -181,11 +180,10 @@ public abstract class AbstractMessageStorageTests
         Guid topicId = Guid.NewGuid();
         Guid messageId = Guid.NewGuid();
         string newMessage = "Edited message";
-        CancellationToken cancellationToken = new CancellationToken();
 
         // Act
-        Func<Task> act = () => _messageStorage.EditMessage(userId, topicId, messageId, newMessage,
-            cancellationToken);
+        Func<Task> act = () => _messageStorage.EditMessage(userId!, topicId, messageId, newMessage,
+            default);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("*userId*");
@@ -199,12 +197,11 @@ public abstract class AbstractMessageStorageTests
         Guid topicId = Guid.NewGuid();
         Guid messageId = Guid.NewGuid();
         string? newMessage = null;
-        CancellationToken cancellationToken = new CancellationToken();
 
         // Act
         Func<Task> act = async () =>
-            await _messageStorage.EditMessage(userId, topicId, messageId, newMessage,
-                cancellationToken);
+            await _messageStorage.EditMessage(userId, topicId, messageId, newMessage!,
+                default);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("*newMessage*");
@@ -279,14 +276,13 @@ public abstract class AbstractMessageStorageTests
     public async Task Delete_message_with_null_user_id_is_invalid()
     {
         // Arrange
-        string userId = null;
+        string? userId = null;
         Guid topicId = Guid.NewGuid();
         Guid messageId = Guid.NewGuid();
-        CancellationToken cancellationToken = new CancellationToken();
 
         // Act
         Func<Task> act = async () =>
-            await _messageStorage.DeleteMessage(userId, topicId, messageId, cancellationToken);
+            await _messageStorage.DeleteMessage(userId!, topicId, messageId, default);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("*userId*");

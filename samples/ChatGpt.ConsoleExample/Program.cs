@@ -33,6 +33,10 @@ string LoadApiKey()
         Console.WriteLine("Please enter your OpenAI API key " +
                             "(you can get it from https://platform.openai.com/account/api-keys): ");
         key = Console.ReadLine();
+        if (key is null)
+        {
+            throw new Exception("API key is not provided");
+        }
     }
 
     return key;

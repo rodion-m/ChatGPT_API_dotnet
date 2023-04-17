@@ -9,7 +9,7 @@ public class ChatCompletionsApiTests
     public ChatCompletionsApiTests(ITestOutputHelper outputHelper)
     {
         _outputHelper = outputHelper;
-        _client = new OpenAiClient(Helpers.GetKeyFromEnvironment("OPEN_AI_API_KEY"));
+        _client = new OpenAiClient(Helpers.GetKeyFromEnvironment("OPENAI_API_KEY"));
     }
 
     [Fact]

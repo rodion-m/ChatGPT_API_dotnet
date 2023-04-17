@@ -33,7 +33,7 @@ while (Console.Ask<string>($"[underline green]{name}[/]: ") is { } userMessage)
 
 string LoadApiKey()
 {
-    var key = Environment.GetEnvironmentVariable("openai_api_key_paid")
+    var key = Environment.GetEnvironmentVariable("openai_api_key")
             ?? Console.Ask<string>("Please enter your [green]OpenAI API key[/] " +
                                    "(you can get it from https://platform.openai.com/account/api-keys): ");
 

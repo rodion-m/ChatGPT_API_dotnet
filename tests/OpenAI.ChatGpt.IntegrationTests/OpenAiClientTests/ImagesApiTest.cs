@@ -11,7 +11,7 @@ public class ImagesApiTest
     public ImagesApiTest(ITestOutputHelper outputHelper)
     {
         _outputHelper = outputHelper;
-        _client = new OpenAiClient(Helpers.GetKeyFromEnvironment("openai_api_key_paid"));
+        _client = new OpenAiClient(Helpers.GetKeyFromEnvironment("openai_api_key"));
     }
 
     [Fact(Skip = "Images API will be removed")]

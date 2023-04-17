@@ -27,7 +27,7 @@ while (Console.ReadLine() is { } userMessage)
 
 string LoadApiKey()
 {
-    var key = Environment.GetEnvironmentVariable("openai_api_key_paid");
+    var key = Environment.GetEnvironmentVariable("openai_api_key");
     if (key is null)
     {
         Console.WriteLine("Please enter your OpenAI API key " +

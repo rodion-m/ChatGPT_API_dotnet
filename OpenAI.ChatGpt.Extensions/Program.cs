@@ -1,7 +1,7 @@
 ﻿using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.Extensions;
 
-var client = new OpenAiClient(Environment.GetEnvironmentVariable("openai_api_key")!);
+var client = new OpenAiClient(Environment.GetEnvironmentVariable("OPEN_AI_API_KEY")!);
 
 var testsCode = await client.GenerateTestsForCodeInFolder(
 @"C:\Users\rodio\RiderProjects\OpenAI_DotNet\OpenAI",

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OpenAI.ChatGpt.AspNetCore.Models;
 
-namespace OpenAI.ChatGpt.DependencyInjection.Extensions;
+namespace OpenAI.ChatGpt.AspNetCore.Extensions;
 
 public static class ServiceCollectionExtensions
 {

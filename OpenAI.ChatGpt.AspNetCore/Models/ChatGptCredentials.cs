@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 
 #pragma warning disable CS8618
 
-namespace OpenAI.ChatGpt.DependencyInjection.Models;
+namespace OpenAI.ChatGpt.AspNetCore.Models;
 
 public class ChatGptCredentials
 {

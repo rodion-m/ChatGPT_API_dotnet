@@ -5,14 +5,14 @@
         <LangVersion>11</LangVersion>
         <Authors>Rodion Mostovoi</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageId>OpenAI.ChatGPT.DependencyInjection</PackageId>
+        <PackageId>OpenAI.ChatGPT.AspNetCore</PackageId>
         <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
         <Product>OpenAI ChatGPT integration for .NET with DI</Product>
         <Version>2.0.0</Version>
         <Description>OpenAI Chat Completions API (ChatGPT) integration with easy DI supporting (Microsoft.Extensions.DependencyInjection). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4, di</PackageTags>
+        <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4, aspnetcore</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 

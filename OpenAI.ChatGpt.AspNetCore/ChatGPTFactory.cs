@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using OpenAI.ChatGpt.AspNetCore.Models;
 
-namespace OpenAI.ChatGpt.DependencyInjection;
+namespace OpenAI.ChatGpt.AspNetCore;
 
 /// <summary>
 ///  Factory for creating <see cref="ChatGPT" /> instances from DI.

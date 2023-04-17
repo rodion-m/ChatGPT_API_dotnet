@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using static OpenAI.ChatGpt.DependencyInjection.Extensions.ServiceCollectionExtensions;
+using static OpenAI.ChatGpt.AspNetCore.Extensions.ServiceCollectionExtensions;
 
 namespace OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 

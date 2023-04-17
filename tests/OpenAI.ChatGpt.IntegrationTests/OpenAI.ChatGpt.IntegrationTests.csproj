@@ -27,7 +27,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj" />
-        <ProjectReference Include="..\..\OpenAI.ChatGpt.DependencyInjection\OpenAI.ChatGpt.DependencyInjection.csproj" />
+        <ProjectReference Include="..\..\OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj" />
     </ItemGroup>
 
 </Project>

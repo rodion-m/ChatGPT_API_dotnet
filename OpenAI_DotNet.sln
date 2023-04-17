@@ -5,7 +5,7 @@ VisualStudioVersion = 17.6.33417.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt", "OpenAI.ChatGpt\OpenAI.ChatGpt.csproj", "{A1A4460F-C7E8-48D4-B319-EADFB67A62F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.DependencyInjection", "OpenAI.ChatGpt.DependencyInjection\OpenAI.ChatGpt.DependencyInjection.csproj", "{F68FE4B2-DA47-496C-B129-EE875C133D2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.AspNetCore", "OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj", "{F68FE4B2-DA47-496C-B129-EE875C133D2D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{80DB142C-5A1B-431C-BD85-19C83C6FC0A3}"
 EndProject

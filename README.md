@@ -1,4 +1,5 @@
 # OpenAI Chat Completions (ChatGPT) and Images client for .NET
+[![.NET](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml)
 This is a .NET client for the OpenAI Chat Completions API (ChatGPT). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams. \
 ***Looking for a ready solution to integrate ChatGPT into your application? It'll be available in few days (prototype is available [here](https://github.com/rodion-m/ChatGPT_API_dotnet/blob/master/OpenAI.ChatGpt/ChatGPT.cs)). At the moment you can just use the client directly.***
 

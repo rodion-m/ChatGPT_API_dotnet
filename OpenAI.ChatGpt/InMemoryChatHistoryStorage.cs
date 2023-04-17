@@ -37,7 +37,7 @@ public class InMemoryChatHistoryStorage : IChatHistoryStorage
         if (!userMessages.TryGetValue(topicId, out var chatMessages))
         {
             chatMessages = new List<PersistentChatMessage>();
-            userMessages.TryAdd(topicId, chatMessages);
+            userMessages.Add(topicId, chatMessages);
         }
 
         chatMessages.AddRange(messages);

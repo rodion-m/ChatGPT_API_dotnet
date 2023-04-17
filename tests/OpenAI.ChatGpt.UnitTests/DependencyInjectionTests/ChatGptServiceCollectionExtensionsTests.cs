@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using static OpenAI.ChatGpt.DependencyInjection.Extensions.ServiceCollectionExtensions;
+using static OpenAI.ChatGpt.AspNetCore.Extensions.ServiceCollectionExtensions;
 
 namespace OpenAI.ChatGpt.UnitTests.DependencyInjectionTests;
 

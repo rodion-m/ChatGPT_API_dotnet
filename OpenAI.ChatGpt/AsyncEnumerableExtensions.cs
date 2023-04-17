@@ -3,8 +3,7 @@
 public static class AsyncEnumerableExtensions
 {
     public static async IAsyncEnumerable<T> ThrowOnCancellation<T>(
-        this IAsyncEnumerable<T> stream, 
-        bool throwOnCancellation) where T: class
+        this IAsyncEnumerable<T> stream, bool throwOnCancellation) where T: class
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         var enumerator = stream.GetAsyncEnumerator();
@@ -26,7 +25,9 @@ public static class AsyncEnumerableExtensions
                 }
             }
             if (result != null)
+            {
                 yield return result;
+            }
         }
 
         await enumerator.DisposeAsync().ConfigureAwait(false);

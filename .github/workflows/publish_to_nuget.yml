@@ -20,16 +20,19 @@ jobs:
         dotnet-version: 7.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build and Generate Packages
-      run: dotnet build --configuration Release --no-restore --output generated_packages
+    - name: Build
+      run: dotnet build --no-restore
     - name: Test
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: dotnet test --no-build --verbosity normal
       
-    - name: Push NuGet Packages
+    - name: Find NuGet packages
+      run: echo "NUPKG_FILES=$(find . -name '*.nupkg')" >> $GITHUB_ENV
+    - name: Push NuGet packages
       run: |
-        for pkg in generated_packages/*.nupkg; do
-          echo "Pushing $pkg..."
-          dotnet nuget push $pkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        IFS=';' read -ra packages <<< "$NUPKG_FILES"
+        for pkg in "${packages[@]}"; do
+          dotnet nuget push "$pkg" --source 'https://api.nuget.org/v3/index.json' --api-key ${{ secrets.NUGET_API_KEY }}
         done
+    

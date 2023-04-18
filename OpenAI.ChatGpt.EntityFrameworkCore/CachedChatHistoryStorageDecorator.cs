@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace OpenAI.ChatGpt.EntityFrameworkCore;
 
+[Fody.ConfigureAwait(false)]
 public class CachedChatHistoryStorageDecorator : IChatHistoryStorage
 {
     private readonly IChatHistoryStorage _chatHistoryStorage;
@@ -21,9 +22,9 @@ public class CachedChatHistoryStorageDecorator : IChatHistoryStorage
         _cacheConfig = cacheConfig.Value;
     }
     
-    private string GetUserTopicsKey(string userId) => $"chatbot_topics_{userId}";
-    private string GetMessagesKey(Guid topicId) => $"chatbot_messages_{topicId}";
-    private string GetTopicKey(Guid topicId) => $"chatbot_topic_{topicId}";
+    private static string GetUserTopicsKey(string userId) => $"chatbot_topics_{userId}";
+    private static string GetMessagesKey(Guid topicId) => $"chatbot_messages_{topicId}";
+    private static string GetTopicKey(Guid topicId) => $"chatbot_topic_{topicId}";
 
     /// <inheritdoc/>
     public Task<IEnumerable<Topic>> GetTopics(string userId, CancellationToken cancellationToken)

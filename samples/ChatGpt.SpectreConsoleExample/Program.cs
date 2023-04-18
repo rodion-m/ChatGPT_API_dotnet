@@ -21,8 +21,7 @@ Console.MarkupLine("[underline yellow]Start chat. Now ask something ChatGPT...[/
 while (Console.Ask<string>($"[underline green]{name}[/]: ") is { } userMessage)
 {
     Console.Markup("[underline red]ChatGPT[/]: ");
-    var stream = chat.StreamNextMessageResponse(userMessage)
-        .ThrowOnCancellation(false);
+    var stream = chat.StreamNextMessageResponse(userMessage, throwOnCancellation: false);
     await foreach (string chunk in stream.SkipWhile(string.IsNullOrWhiteSpace))
     {
         if (!chat.IsCancelled) Console.Write(chunk);

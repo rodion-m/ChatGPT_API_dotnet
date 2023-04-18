@@ -78,19 +78,23 @@ public class Chat : IDisposable
     
     public IAsyncEnumerable<string> StreamNextMessageResponse(
         string message,
+        bool throwOnCancellation = true,
         CancellationToken cancellationToken = default)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var chatCompletionMessage = new UserMessage(message);
-        return StreamNextMessageResponse(chatCompletionMessage, cancellationToken);
+        return StreamNextMessageResponse(chatCompletionMessage, throwOnCancellation, cancellationToken);
     }
 
     private async IAsyncEnumerable<string> StreamNextMessageResponse(
         UserOrSystemMessage message, 
+        bool throwOnCancellation,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _cts.Token.Register(() => IsWriting = false);
+        var originalCancellationToken = cancellationToken;
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(originalCancellationToken);
+        cancellationToken = _cts.Token;
+        cancellationToken.Register(() => IsWriting = false);
 
         var history = await LoadHistory(cancellationToken);
         var messages = history.Append(message);
@@ -100,16 +104,21 @@ public class Chat : IDisposable
             messages,
             user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
             requestModifier: Topic.Config.ModifyRequest,
-            cancellationToken: _cts.Token
+            cancellationToken: cancellationToken
         );
-        await foreach (var chunk in stream.WithCancellation(cancellationToken))
+        await foreach (var chunk in stream
+                           .ConfigureExceptions(throwOnCancellation)
+                           .WithCancellation(cancellationToken))
         {
             sb.Append(chunk);
             yield return chunk;
         }
+        
+        if(cancellationToken.IsCancellationRequested && !throwOnCancellation)
+            yield break;
 
         await _chatHistoryStorage.SaveMessages(
-            UserId, ChatId, message, sb.ToString(), _clock.GetCurrentTime(), _cts.Token);
+            UserId, ChatId, message, sb.ToString(), _clock.GetCurrentTime(), cancellationToken);
         IsWriting = false;
         _isNew = false;
     }

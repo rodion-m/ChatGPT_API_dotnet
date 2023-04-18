@@ -1,9 +1,11 @@
 ﻿namespace OpenAI.ChatGpt;
 
+[Fody.ConfigureAwait(false)]
 public static class AsyncEnumerableExtensions
 {
-    public static async IAsyncEnumerable<T> ThrowOnCancellation<T>(
-        this IAsyncEnumerable<T> stream, bool throwOnCancellation) where T: class
+    internal static async IAsyncEnumerable<T> ConfigureExceptions<T>(
+        this IAsyncEnumerable<T> stream, 
+        bool throwOnCancellation) where T: class
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         var enumerator = stream.GetAsyncEnumerator();
@@ -13,14 +15,14 @@ public static class AsyncEnumerableExtensions
         {
             try
             {
-                hasResult = await enumerator.MoveNextAsync().ConfigureAwait(false);
+                hasResult = await enumerator.MoveNextAsync();
                 result = hasResult ? enumerator.Current : null;
             }
             catch (OperationCanceledException)
             {
                 if (throwOnCancellation)
                 {
-                    await enumerator.DisposeAsync().ConfigureAwait(false);
+                    await enumerator.DisposeAsync();
                     throw;
                 }
             }
@@ -30,6 +32,6 @@ public static class AsyncEnumerableExtensions
             }
         }
 
-        await enumerator.DisposeAsync().ConfigureAwait(false);
+        await enumerator.DisposeAsync();
     }
 }

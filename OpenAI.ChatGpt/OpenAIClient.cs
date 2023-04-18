@@ -11,6 +11,7 @@ using OpenAI.ChatGpt.Models.Images;
 namespace OpenAI.ChatGpt;
 
 /// <summary> Thread-safe OpenAI client. </summary>
+[Fody.ConfigureAwait(false)]
 public class OpenAiClient : IDisposable
 {
     private const string DefaultHost = "https://api.openai.com/v1/";
@@ -140,10 +141,9 @@ public class OpenAiClient : IDisposable
             request,
             cancellationToken: cancellationToken,
             options: _nullIgnoreSerializerOptions
-        ).ConfigureAwait(false);
+        );
         var responseContent = await response.Content
-            .ReadAsStringAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -290,9 +290,8 @@ public class OpenAiClient : IDisposable
             ImagesEndpoint,
             request,
             cancellationToken: cancellationToken
-        ).ConfigureAwait(false);
-        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken)
-            .ConfigureAwait(false);
+        );
+        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -321,9 +320,8 @@ public class OpenAiClient : IDisposable
             request,
             options: _nullIgnoreSerializerOptions,
             cancellationToken: cancellationToken
-        ).ConfigureAwait(false);
-        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken)
-            .ConfigureAwait(false);
+        );
+        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {

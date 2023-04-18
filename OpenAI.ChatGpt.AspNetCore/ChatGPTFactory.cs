@@ -14,6 +14,7 @@ namespace OpenAI.ChatGpt.AspNetCore;
 ///     .AddPolicyHandler(GetRetryPolicy())
 ///     .AddPolicyHandler(GetCircuitBreakerPolicy());
 /// </example>
+[Fody.ConfigureAwait(false)]
 // ReSharper disable once InconsistentNaming
 public class ChatGPTFactory : IDisposable
 {
@@ -22,6 +23,7 @@ public class ChatGPTFactory : IDisposable
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;
     private bool _ensureStorageCreatedCalled;
+    private readonly bool _isHttpClientInjected;
 
     public ChatGPTFactory(
         IHttpClientFactory httpClientFactory,
@@ -36,9 +38,10 @@ public class ChatGPTFactory : IDisposable
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _client = CreateOpenAiClient(httpClientFactory, credentials);
+        _isHttpClientInjected = true;
     }
 
-    public ChatGPTFactory(
+    internal ChatGPTFactory(
         IOptions<ChatGptCredentials> credentials,
         IOptions<ChatCompletionsConfig> config,
         IChatHistoryStorage chatHistoryStorage,
@@ -120,6 +123,9 @@ public class ChatGPTFactory : IDisposable
 
     public void Dispose()
     {
-        _client.Dispose();
+        if (!_isHttpClientInjected)
+        {
+            _client.Dispose();
+        }
     }
 }

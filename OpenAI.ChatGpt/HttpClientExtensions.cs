@@ -6,6 +6,7 @@ using OpenAI.ChatGpt.Exceptions;
 
 namespace OpenAI.ChatGpt;
 
+[Fody.ConfigureAwait(false)]
 internal static class HttpClientExtensions
 {
     private static readonly int DataHeaderLength = "data: ".Length;
@@ -32,19 +33,17 @@ internal static class HttpClientExtensions
             Content = JsonContent.Create(request, options: serializerOptions)
         };
         requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
-        using var response = await SendAsync().ConfigureAwait(false);
+        using var response = await SendAsync();
         
         if (!response.IsSuccessStatusCode)
         {
-            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken)
-                .ConfigureAwait(false);
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
             throw new ServerSentEventsResponseException(response.StatusCode, responseContent);
         }
 
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken)
-            .ConfigureAwait(false);
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         var reader = new StreamReader(stream);
-        while (await ReadLineAsync(reader, cancellationToken).ConfigureAwait(false) is { } line)
+        while (await ReadLineAsync(reader, cancellationToken) is { } line)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var (result, data) = ProcessResponseEvent(line);
@@ -99,6 +98,7 @@ internal static class HttpClientExtensions
         TextReader reader,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(reader);
 #if NET7_0_OR_GREATER
         return reader.ReadLineAsync(cancellationToken);
 #else

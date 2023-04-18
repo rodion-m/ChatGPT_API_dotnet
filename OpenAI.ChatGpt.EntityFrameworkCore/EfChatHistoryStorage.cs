@@ -2,6 +2,7 @@
 
 namespace OpenAI.ChatGpt.EntityFrameworkCore;
 
+[Fody.ConfigureAwait(false)]
 public class EfChatHistoryStorage : IChatHistoryStorage
 {
     private readonly ChatGptDbContext _dbContext;
@@ -12,15 +13,16 @@ public class EfChatHistoryStorage : IChatHistoryStorage
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Topic>> GetTopics(string userId,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<Topic>> GetTopics(
+        string userId, CancellationToken cancellationToken)
     {
         if (userId == null) throw new ArgumentNullException(nameof(userId));
         return await _dbContext.Topics.ToListAsync(cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
-    public async Task<Topic> GetTopic(string userId, Guid topicId, CancellationToken cancellationToken)
+    public async Task<Topic> GetTopic(
+        string userId, Guid topicId, CancellationToken cancellationToken)
     {
         if (userId == null) throw new ArgumentNullException(nameof(userId));
         var topic = await _dbContext.Topics.FirstOrDefaultAsync(

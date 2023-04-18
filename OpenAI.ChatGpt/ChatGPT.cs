@@ -5,7 +5,8 @@ using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt;
 
-/// <summary> Chat conversations provider </summary>
+/// <summary> Chat conversations provider. </summary>
+[Fody.ConfigureAwait(false)]
 // ReSharper disable once InconsistentNaming
 public class ChatGPT : IDisposable
 {

@@ -32,10 +32,11 @@ jobs:
       run: |
         nupkg_files=$(find . -name '*.nupkg')
         nupkg_files="${nupkg_files//$'\n'/;}"
-        echo "::set-output name=nupkg_files::$nupkg_files"
+        echo "nupkg_files=$nupkg_files" >> $GITHUB_ENV
     - name: Push NuGet packages
       run: |
-        IFS=';' read -ra packages <<< "${{ steps.find_packages.outputs.nupkg_files }}"
+        IFS=';' read -ra packages <<< "${{ env.nupkg_files }}"
         for pkg in "${packages[@]}"; do
           dotnet nuget push "$pkg" --source 'https://api.nuget.org/v3/index.json' --api-key ${{ secrets.NUGET_API_KEY }}
         done
+    

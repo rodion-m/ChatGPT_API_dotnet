@@ -1,4 +1,4 @@
-name: .NET
+name: Publish NuGet Package
 
 on:
   release:
@@ -26,5 +26,12 @@ jobs:
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: dotnet test --no-build --verbosity normal
+      
     - name: Publish
-      run: dotnet nuget push "**\*.nupkg" --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+      run: dotnet pack --no-build --configuration Release --output packages  
+    - name: Push NuGet Packages
+      run: |
+        for pkg in packages/*.nupkg; do
+          echo "Pushing $pkg..."
+          dotnet nuget push $pkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        done

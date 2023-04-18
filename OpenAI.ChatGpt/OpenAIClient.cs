@@ -30,13 +30,17 @@ public class OpenAiClient : IDisposable
     ///  Creates a new OpenAI client with given <paramref name="apiKey"/>.
     /// </summary>
     /// <param name="apiKey">OpenAI API key. Can be issued here: https://platform.openai.com/account/api-keys</param>
-    public OpenAiClient(string apiKey)
+    /// <param name="host">Open AI API host. Default is: <see cref="DefaultHost"/></param>
+    public OpenAiClient(string apiKey, string host = DefaultHost)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(apiKey));
+        ArgumentNullException.ThrowIfNull(host);
+        if(!Uri.TryCreate(host, UriKind.Absolute, out _) || !host.EndsWith('/'))
+            throw new ArgumentException("Host must be a valid absolute URI and end with a slash.", nameof(host));
         _httpClient = new HttpClient()
         {
-            BaseAddress = new Uri(DefaultHost)
+            BaseAddress = new Uri(host)
         };
         var header = new AuthenticationHeaderValue("Bearer", apiKey);
         _httpClient.DefaultRequestHeaders.Authorization = header;

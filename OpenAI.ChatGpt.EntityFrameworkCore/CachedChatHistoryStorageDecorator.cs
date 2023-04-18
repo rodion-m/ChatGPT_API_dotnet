@@ -151,6 +151,14 @@ public class CachedChatHistoryStorageDecorator : IChatHistoryStorage
     }
 
     /// <inheritdoc/>
+    public Task<bool> ClearMessages(string userId, Guid topicId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        _cache.Remove(GetMessagesKey(topicId));
+        return _chatHistoryStorage.ClearMessages(userId, topicId, cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public async Task<Topic?> GetMostRecentTopicOrNull(string userId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(userId);
@@ -194,6 +202,14 @@ public class CachedChatHistoryStorageDecorator : IChatHistoryStorage
         }
 
         return deleted;
+    }
+
+    /// <inheritdoc/>
+    public Task<bool> ClearTopics(string userId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        _cache.Remove(GetUserTopicsKey(userId));
+        return _chatHistoryStorage.ClearTopics(userId, cancellationToken);
     }
 
     /// <inheritdoc/>

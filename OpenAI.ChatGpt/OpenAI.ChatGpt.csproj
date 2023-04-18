@@ -10,7 +10,7 @@
         <PackageId>OpenAI.ChatGPT</PackageId>
         <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
         <Product>OpenAI ChatGPT integration for .NET</Product>
-        <Version>2.0.3</Version>
+        <Version>2.1.0</Version>
         <Description>.NET integration for ChatGPT with streaming responses supporting (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression> 

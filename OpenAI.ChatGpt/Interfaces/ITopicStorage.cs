@@ -61,6 +61,14 @@ public interface ITopicStorage
     Task<bool> DeleteTopic(string userId, Guid topicId, CancellationToken cancellationToken);
     
     /// <summary>
+    /// Deletes all topics and messages associated with a user.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>The task result contains a boolean value indicating the success of the deletion.</returns>
+    public Task<bool> ClearTopics(string userId, CancellationToken cancellationToken);
+    
+    /// <summary>
     /// Generates a new unique topic ID.
     /// </summary>
     ///

@@ -102,6 +102,20 @@ public class InMemoryChatHistoryStorage : IChatHistoryStorage
     }
 
     /// <inheritdoc/>
+    public Task<bool> ClearTopics(string userId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!_users.TryGetValue(userId, out var topics))
+        {
+            return Task.FromResult(false);
+        }
+
+        topics.Clear();
+        return Task.FromResult(true);
+    }
+
+    /// <inheritdoc/>
     public async Task EditMessage(
         string userId,
         Guid topicId,
@@ -136,6 +150,25 @@ public class InMemoryChatHistoryStorage : IChatHistoryStorage
         if (userMessages.TryGetValue(topicId, out var chatMessages))
         {
             return Task.FromResult(chatMessages.RemoveAll(m => m.Id == messageId) == 1);
+        }
+
+        return Task.FromResult(false);
+    }
+
+    /// <inheritdoc/>
+    public Task<bool> ClearMessages(string userId, Guid topicId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!_messages.TryGetValue(userId, out var userMessages))
+        {
+            return Task.FromResult(false);
+        }
+
+        if (userMessages.TryGetValue(topicId, out var chatMessages))
+        {
+            chatMessages.Clear();
+            return Task.FromResult(true);
         }
 
         return Task.FromResult(false);
@@ -193,4 +226,5 @@ public class InMemoryChatHistoryStorage : IChatHistoryStorage
         cancellationToken.ThrowIfCancellationRequested();
         return Task.CompletedTask;
     }
+
 }

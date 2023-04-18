@@ -8,13 +8,7 @@ Console.WriteLine("Welcome to ChatGPT Console!");
 
 var apiKey = LoadApiKey();
 var config = new ChatCompletionsConfig() { MaxTokens = 300 };
-Chat chat = await ChatGPT.CreateInMemoryChat(apiKey, config,
-    initialDialog: Dialog.StartAsSystem(
-        "Ты русскоязычный бот, который предоставляет шпаргалки для пользователя. Контекст: IT." +
-        "Пользователь пишет тебе слово или слосочетание, а ты должен ответить что это слово означает. " +
-        "Отвечай коротко и понятно. А еще пользователь может добавлять список определений, которые ты должен запомнить."
-        )
-    );
+await using Chat chat = await ChatGPT.CreateInMemoryChat(apiKey, config);
 
 Console.Write("User: ");
 while (Console.ReadLine() is { } userMessage)

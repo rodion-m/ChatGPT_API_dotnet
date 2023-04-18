@@ -28,10 +28,7 @@ public interface IMessageStorage
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the list of messages.</returns>
     Task<IEnumerable<PersistentChatMessage>> GetMessages(
-        string userId,
-        Guid topicId,
-        CancellationToken cancellationToken
-    );
+        string userId, Guid topicId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Edits the content of a message.
@@ -42,8 +39,8 @@ public interface IMessageStorage
     /// <param name="newMessage">The new message content.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task EditMessage(string userId, Guid topicId, Guid messageId, string newMessage,
-        CancellationToken cancellationToken);
+    Task EditMessage(
+        string userId, Guid topicId, Guid messageId, string newMessage, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes a message associated with a user and a topic.
@@ -53,8 +50,17 @@ public interface IMessageStorage
     /// <param name="messageId">The message ID.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a boolean value indicating the success of the deletion.</returns>
-    Task<bool> DeleteMessage(string userId, Guid topicId, Guid messageId,
-        CancellationToken cancellationToken);
+    Task<bool> DeleteMessage(
+        string userId, Guid topicId, Guid messageId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all messages associated with the topic.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <param name="topicId">The topic ID.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>The task result contains a boolean value indicating the success of the deletion.</returns>
+    Task<bool> ClearMessages(string userId, Guid topicId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Saves a user or system message along with an assistant message.

@@ -8,14 +8,14 @@ using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 namespace OpenAI.ChatGpt;
 
 /// <summary>
-/// This is a class that is used for communication between a user and the assistant (ChatGPT).
+/// Used for communication between a user and the assistant (ChatGPT).
 /// </summary>
 /// <remarks>Not thread-safe. Use one instance per user.</remarks>
-public class Chat : IDisposable
+public class Chat : IDisposable, IAsyncDisposable
 {
     public Topic Topic { get; }
     public string UserId { get; }
-    public Guid ChatId => Topic.Id;
+    public Guid TopicId => Topic.Id;
     public bool IsWriting { get; private set; }
     public bool IsCancelled => _cts?.IsCancellationRequested ?? false;
 
@@ -23,6 +23,7 @@ public class Chat : IDisposable
     private readonly ITimeProvider _clock;
     private readonly OpenAiClient _client;
     private bool _isNew;
+    private readonly bool _clearOnDisposal;
     private CancellationTokenSource? _cts;
 
     internal Chat(
@@ -31,7 +32,8 @@ public class Chat : IDisposable
         OpenAiClient client,
         string userId,
         Topic topic,
-        bool isNew)
+        bool isNew,
+        bool clearOnDisposal)
     {
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
@@ -39,6 +41,7 @@ public class Chat : IDisposable
         UserId = userId ?? throw new ArgumentNullException(nameof(userId));
         Topic = topic ?? throw new ArgumentNullException(nameof(topic));
         _isNew = isNew;
+        _clearOnDisposal = clearOnDisposal;
     }
     
     public Task<string> GetNextMessageResponse(
@@ -69,7 +72,7 @@ public class Chat : IDisposable
         );
 
         await _chatHistoryStorage.SaveMessages(
-            UserId, ChatId, message, response, _clock.GetCurrentTime(), _cts.Token);
+            UserId, TopicId, message, response, _clock.GetCurrentTime(), _cts.Token);
         IsWriting = false;
         _isNew = false;
 
@@ -118,7 +121,7 @@ public class Chat : IDisposable
             yield break;
 
         await _chatHistoryStorage.SaveMessages(
-            UserId, ChatId, message, sb.ToString(), _clock.GetCurrentTime(), cancellationToken);
+            UserId, TopicId, message, sb.ToString(), _clock.GetCurrentTime(), cancellationToken);
         IsWriting = false;
         _isNew = false;
     }
@@ -126,7 +129,7 @@ public class Chat : IDisposable
     private async Task<IEnumerable<ChatCompletionMessage>> LoadHistory(CancellationToken cancellationToken)
     {
         if (_isNew) return Enumerable.Empty<ChatCompletionMessage>();
-        return await _chatHistoryStorage.GetMessages(UserId, ChatId, cancellationToken);
+        return await _chatHistoryStorage.GetMessages(UserId, TopicId, cancellationToken);
     }
 
     public void Stop()
@@ -137,5 +140,20 @@ public class Chat : IDisposable
     public void Dispose()
     {
         _cts?.Dispose();
+        if (_clearOnDisposal)
+        {
+            // TODO: log warning about sync disposal
+            _chatHistoryStorage.DeleteTopic(UserId, TopicId, default)
+                .GetAwaiter().GetResult();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _cts?.Dispose();
+        if (_clearOnDisposal)
+        {
+            await _chatHistoryStorage.DeleteTopic(UserId, TopicId, default);
+        }
     }
 }

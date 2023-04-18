@@ -10,7 +10,7 @@ Console.WriteLine();
 
 var name = Console.Ask<string?>("What's your [green]name[/]?") ?? "Me";
 var apiKey = LoadApiKey();
-Chat chat = await ChatGPT.CreateInMemoryChat(
+await using Chat chat = await ChatGPT.CreateInMemoryChat(
     apiKey,
     config: new ChatCompletionsConfig() { MaxTokens = 200 },
     initialDialog: Dialog.StartAsSystem($"You are helpful assistant for a person named {name}.")

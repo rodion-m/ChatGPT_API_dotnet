@@ -51,6 +51,24 @@ public class ChatGptServiceCollectionExtensionsTests
     }
     
     [Fact]
+    public async void AddChatGptInMemoryIntegration_with_Chat_injection_works()
+    {
+        // Arrange
+        var services = CreateServiceCollection();
+
+        // Act
+        services.AddChatGptInMemoryIntegration(injectInMemoryChat: true);
+
+        // Assert
+        await using var provider = services.BuildServiceProvider();
+        
+        var storage = provider.GetRequiredService<IChatHistoryStorage>();
+        storage.Should().BeOfType<InMemoryChatHistoryStorage>();
+
+        _ = provider.GetRequiredService<Chat>();
+    }
+    
+    [Fact]
     public async void AddChatGptEntityFrameworkIntegration_works()
     {
         // Arrange

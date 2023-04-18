@@ -97,6 +97,17 @@ public class EfChatHistoryStorage : IChatHistoryStorage
         return true;
     }
 
+    /// <inheritdoc/>
+    public async Task<bool> ClearTopics(string userId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        var topics = await _dbContext.Topics.Where(it => it.UserId == userId).ToListAsync(cancellationToken);
+        if (topics.Count == 0) return false;
+        _dbContext.Topics.RemoveRange(topics);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     /// <inheritdoc />
     public async Task EditMessage(
         string userId,
@@ -125,6 +136,20 @@ public class EfChatHistoryStorage : IChatHistoryStorage
             cancellationToken: cancellationToken);
         if (message == null) return false;
         _dbContext.Messages.Remove(message);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> ClearMessages(
+        string userId, Guid topicId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        var messages = await _dbContext.Messages
+            .Where(it => it.TopicId == topicId && it.UserId == userId)
+            .ToListAsync(cancellationToken);
+        if (messages.Count == 0) return false;
+        _dbContext.Messages.RemoveRange(messages);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return true;
     }

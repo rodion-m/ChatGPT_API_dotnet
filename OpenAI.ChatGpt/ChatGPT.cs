@@ -87,6 +87,7 @@ public class ChatGPT : IDisposable
         string? name = null,
         ChatCompletionsConfig? config = null,
         UserOrSystemMessage? initialDialog = null,
+        bool clearOnDisposal = false,
         CancellationToken cancellationToken = default)
     {
         config = ChatCompletionsConfig.CombineOrDefault(_config, config);
@@ -99,7 +100,7 @@ public class ChatGPT : IDisposable
             await _chatHistoryStorage.SaveMessages(_userId, topic.Id, messages, cancellationToken);
         }
 
-        _currentChat = CreateChat(topic, initialDialog is null);
+        _currentChat = CreateChat(topic, initialDialog is null, clearOnDisposal: clearOnDisposal);
         return _currentChat;
     }
 
@@ -124,14 +125,14 @@ public class ChatGPT : IDisposable
     private Task<Chat> SetTopic(Topic topic, CancellationToken cancellationToken = default)
     {
         if (topic == null) throw new ArgumentNullException(nameof(topic));
-        _currentChat = CreateChat(topic, false);
+        _currentChat = CreateChat(topic, false, false);
         return Task.FromResult(_currentChat);
     }
 
-    private Chat CreateChat(Topic topic, bool isNew)
+    private Chat CreateChat(Topic topic, bool isNew, bool clearOnDisposal)
     {
         if (topic == null) throw new ArgumentNullException(nameof(topic));
-        return new Chat(_chatHistoryStorage, _clock, _client, _userId, topic, isNew);
+        return new Chat(_chatHistoryStorage, _clock, _client, _userId, topic, isNew, clearOnDisposal);
     }
     
     public async Task<IReadOnlyList<Topic>> GetTopics(CancellationToken cancellationToken = default)

@@ -13,7 +13,7 @@ public class ChatGPT : IDisposable
     private readonly string _userId;
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;
-    private readonly ChatCompletionsConfig? _config;
+    private readonly ChatGPTConfig? _config;
     private readonly OpenAiClient _client;
     private Chat? _currentChat;
 
@@ -25,7 +25,7 @@ public class ChatGPT : IDisposable
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock,
         string userId,
-        ChatCompletionsConfig? config)
+        ChatGPTConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _userId = userId ?? throw new ArgumentNullException(nameof(userId));
@@ -41,7 +41,7 @@ public class ChatGPT : IDisposable
         OpenAiClient client,
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock,
-        ChatCompletionsConfig? config)
+        ChatGPTConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
@@ -55,7 +55,7 @@ public class ChatGPT : IDisposable
     /// </summary>
     public static Task<Chat> CreateInMemoryChat(
         string apiKey,
-        ChatCompletionsConfig? config = null,
+        ChatGPTConfig? config = null,
         UserOrSystemMessage? initialDialog = null,
         ITimeProvider? clock = null)
     {
@@ -85,12 +85,12 @@ public class ChatGPT : IDisposable
     /// <summary> Starts a new topic. </summary>
     public async Task<Chat> StartNewTopic(
         string? name = null,
-        ChatCompletionsConfig? config = null,
+        ChatGPTConfig? config = null,
         UserOrSystemMessage? initialDialog = null,
         bool clearOnDisposal = false,
         CancellationToken cancellationToken = default)
     {
-        config = ChatCompletionsConfig.CombineOrDefault(_config, config);
+        config = ChatGPTConfig.CombineOrDefault(_config, config);
         var topic = new Topic(_chatHistoryStorage.NewTopicId(), _userId, name, _clock.GetCurrentTime(), config);
         await _chatHistoryStorage.AddTopic(topic, cancellationToken);
         initialDialog ??= config.GetInitialDialogOrNull();

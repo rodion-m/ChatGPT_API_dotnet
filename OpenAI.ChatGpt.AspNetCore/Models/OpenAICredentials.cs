@@ -5,7 +5,8 @@ using System.Net.Http.Headers;
 
 namespace OpenAI.ChatGpt.AspNetCore.Models;
 
-public class ChatGptCredentials
+// ReSharper disable once InconsistentNaming
+public class OpenAICredentials
 {
     /// <summary>
     /// OpenAI API key. Can be issued here: https://platform.openai.com/account/api-keys

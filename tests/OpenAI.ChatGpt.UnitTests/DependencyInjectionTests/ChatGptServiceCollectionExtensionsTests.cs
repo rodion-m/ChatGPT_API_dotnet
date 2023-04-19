@@ -23,8 +23,8 @@ public class ChatGptServiceCollectionExtensionsTests
         services.Count.Should().BeGreaterThan(initialServiceCount);
         
         using var provider = services.BuildServiceProvider();
-        provider.GetRequiredService<IOptions<ChatGptCredentials>>();
-        provider.GetRequiredService<IOptions<ChatCompletionsConfig>>();
+        provider.GetRequiredService<IOptions<OpenAICredentials>>();
+        provider.GetRequiredService<IOptions<ChatGPTConfig>>();
         
         provider.GetRequiredService<IHttpClientFactory>();
         provider.GetRequiredService<ITimeProvider>();
@@ -100,8 +100,8 @@ public class ChatGptServiceCollectionExtensionsTests
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>()
                 {
-                    { $"{CredentialsConfigSectionPathDefault}:{nameof(ChatGptCredentials.ApiKey)}", "test-api-key" },
-                    { CompletionsConfigSectionPathDefault, ""},
+                    { $"{CredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
+                    { CchatGPTConfigSectionPathDefault, ""},
                 });
             return builder.Build();
         }

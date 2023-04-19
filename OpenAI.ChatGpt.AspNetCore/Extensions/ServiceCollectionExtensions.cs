@@ -6,14 +6,15 @@ namespace OpenAI.ChatGpt.AspNetCore.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public const string CredentialsConfigSectionPathDefault = "ChatGptCredentials";
-    public const string CompletionsConfigSectionPathDefault = "ChatCompletionsConfig";
+    public const string CredentialsConfigSectionPathDefault = "OpenAICredentials";
+    // ReSharper disable once InconsistentNaming
+    public const string CchatGPTConfigSectionPathDefault = "ChatGPTConfig";
     
     public static IServiceCollection AddChatGptInMemoryIntegration(
         this IServiceCollection services,
         bool injectInMemoryChat = true,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = CompletionsConfigSectionPathDefault)
+        string completionsConfigSectionPath = CchatGPTConfigSectionPathDefault)
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
@@ -60,7 +61,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddChatGptIntegrationCore(
         this IServiceCollection services, 
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = CompletionsConfigSectionPathDefault)
+        string completionsConfigSectionPath = CchatGPTConfigSectionPathDefault)
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
@@ -74,11 +75,11 @@ public static class ServiceCollectionExtensions
                 nameof(completionsConfigSectionPath));
         }
 
-        services.AddOptions<ChatGptCredentials>()
+        services.AddOptions<OpenAICredentials>()
             .BindConfiguration(credentialsConfigSectionPath)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        services.AddOptions<ChatCompletionsConfig>()
+        services.AddOptions<ChatGPTConfig>()
             .BindConfiguration(completionsConfigSectionPath)
             .Configure(_ => { }) //optional
             .ValidateDataAnnotations()

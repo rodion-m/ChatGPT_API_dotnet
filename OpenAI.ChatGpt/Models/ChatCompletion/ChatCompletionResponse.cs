@@ -66,4 +66,17 @@ public class ChatCompletionResponse
         [JsonPropertyName("total_tokens")]
         public long TotalTokens { get; set; }
     }
+
+    public string GetMessageContent()
+    {
+        if(Choices.Length == 0)
+        {
+            throw new InvalidOperationException("Choices is empty");
+        }
+        if (Choices[0].Message == null)
+        {
+            throw new InvalidOperationException("Message is null");
+        }
+        return Choices[0].Message!.Content;
+    }
 }

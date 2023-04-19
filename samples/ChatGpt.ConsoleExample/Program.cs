@@ -7,7 +7,7 @@ Console.OutputEncoding = System.Text.Encoding.Unicode;
 Console.WriteLine("Welcome to ChatGPT Console!");
 
 var apiKey = LoadApiKey();
-var config = new ChatCompletionsConfig() { MaxTokens = 300 };
+var config = new ChatGPTConfig() { MaxTokens = 300 };
 await using Chat chat = await ChatGPT.CreateInMemoryChat(apiKey, config);
 
 Console.Write("User: ");

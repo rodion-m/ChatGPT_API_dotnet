@@ -12,7 +12,7 @@ public class Topic
         string userId, 
         string? name, 
         DateTimeOffset createdAt,
-        ChatCompletionsConfig config)
+        ChatGPTConfig config)
     {
         Id = id;
         UserId = userId ?? throw new ArgumentNullException(nameof(userId));
@@ -25,5 +25,5 @@ public class Topic
     public string UserId { get; set; }
     public string? Name { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
-    public ChatCompletionsConfig Config { get; set; }
+    public ChatGPTConfig Config { get; set; }
 }

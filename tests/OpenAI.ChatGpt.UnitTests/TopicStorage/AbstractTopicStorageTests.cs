@@ -13,7 +13,7 @@ public abstract class AbstractTopicStorageTests
     public async Task Add_topic_for_user_and_retrieve_it()
     {
         var userId = "user-1";
-        var topic = new Topic(Guid.NewGuid(), userId, "New Topic", DateTimeOffset.UtcNow, new ChatCompletionsConfig());
+        var topic = new Topic(Guid.NewGuid(), userId, "New Topic", DateTimeOffset.UtcNow, new ChatGPTConfig());
 
         await _topicStorage.AddTopic(topic, CancellationToken.None);
         var retrievedTopic = await _topicStorage.GetTopic(userId, topic.Id, CancellationToken.None);
@@ -34,7 +34,7 @@ public abstract class AbstractTopicStorageTests
     public async Task Edit_topic_name_and_verify_changes()
     {
         var userId = "user-3";
-        var topic = new Topic(Guid.NewGuid(), userId, "Old Name", DateTimeOffset.UtcNow, new ChatCompletionsConfig());
+        var topic = new Topic(Guid.NewGuid(), userId, "Old Name", DateTimeOffset.UtcNow, new ChatGPTConfig());
 
         await _topicStorage.AddTopic(topic, CancellationToken.None);
         var newName = "New Name";
@@ -48,7 +48,7 @@ public abstract class AbstractTopicStorageTests
     public async Task Delete_topic_and_verify_removal()
     {
         var userId = "user-4";
-        var topic = new Topic(Guid.NewGuid(), userId, "Topic to delete", DateTimeOffset.UtcNow, new ChatCompletionsConfig());
+        var topic = new Topic(Guid.NewGuid(), userId, "Topic to delete", DateTimeOffset.UtcNow, new ChatGPTConfig());
 
         await _topicStorage.AddTopic(topic, CancellationToken.None);
         var deletionResult = await _topicStorage.DeleteTopic(userId, topic.Id, CancellationToken.None);
@@ -62,9 +62,9 @@ public abstract class AbstractTopicStorageTests
     public async Task Retrieve_most_recent_topic_for_user_with_multiple_topics()
     {
         var userId = "user-5";
-        var topic1 = new Topic(Guid.NewGuid(), userId, "Topic 1", DateTimeOffset.UtcNow.AddMinutes(-5), new ChatCompletionsConfig());
-        var topic2 = new Topic(Guid.NewGuid(), userId, "Topic 2", DateTimeOffset.UtcNow.AddMinutes(-2), new ChatCompletionsConfig());
-        var topic3 = new Topic(Guid.NewGuid(), userId, "Topic 3", DateTimeOffset.UtcNow.AddMinutes(-10), new ChatCompletionsConfig());
+        var topic1 = new Topic(Guid.NewGuid(), userId, "Topic 1", DateTimeOffset.UtcNow.AddMinutes(-5), new ChatGPTConfig());
+        var topic2 = new Topic(Guid.NewGuid(), userId, "Topic 2", DateTimeOffset.UtcNow.AddMinutes(-2), new ChatGPTConfig());
+        var topic3 = new Topic(Guid.NewGuid(), userId, "Topic 3", DateTimeOffset.UtcNow.AddMinutes(-10), new ChatGPTConfig());
 
         await _topicStorage.AddTopic(topic1, CancellationToken.None);
         await _topicStorage.AddTopic(topic2, CancellationToken.None);

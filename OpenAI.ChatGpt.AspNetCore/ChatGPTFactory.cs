@@ -9,7 +9,7 @@ namespace OpenAI.ChatGpt.AspNetCore;
 /// <example>
 /// builder.Services.AddHttpClient&lt;ChatGPTFactory&lt;(client =>
 ///     {
-///         client.DefaultRequestHeaders.Authorization = builder.Configuration["ChatGPTCredentials:ApiKey"];
+///         client.DefaultRequestHeaders.Authorization = builder.Configuration["OpenAICredentials:ApiKey"];
 ///     })
 ///     .AddPolicyHandler(GetRetryPolicy())
 ///     .AddPolicyHandler(GetCircuitBreakerPolicy());
@@ -19,7 +19,7 @@ namespace OpenAI.ChatGpt.AspNetCore;
 public class ChatGPTFactory : IDisposable
 {
     private readonly OpenAiClient _client;
-    private readonly ChatCompletionsConfig _config;
+    private readonly ChatGPTConfig _config;
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;
     private bool _ensureStorageCreatedCalled;
@@ -27,8 +27,8 @@ public class ChatGPTFactory : IDisposable
 
     public ChatGPTFactory(
         IHttpClientFactory httpClientFactory,
-        IOptions<ChatGptCredentials> credentials,
-        IOptions<ChatCompletionsConfig> config,
+        IOptions<OpenAICredentials> credentials,
+        IOptions<ChatGPTConfig> config,
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock)
     {
@@ -42,8 +42,8 @@ public class ChatGPTFactory : IDisposable
     }
 
     internal ChatGPTFactory(
-        IOptions<ChatGptCredentials> credentials,
-        IOptions<ChatCompletionsConfig> config,
+        IOptions<OpenAICredentials> credentials,
+        IOptions<ChatGPTConfig> config,
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock)
     {
@@ -58,18 +58,18 @@ public class ChatGPTFactory : IDisposable
         string apiKey,
         IChatHistoryStorage chatHistoryStorage, 
         ITimeProvider? clock = null, 
-        ChatCompletionsConfig? config = null)
+        ChatGPTConfig? config = null)
     {
         if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
         _client = new OpenAiClient(apiKey);
-        _config = config ?? ChatCompletionsConfig.Default;
+        _config = config ?? ChatGPTConfig.Default;
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? new TimeProviderUtc();
     }
     
     private OpenAiClient CreateOpenAiClient(
         IHttpClientFactory httpClientFactory, 
-        IOptions<ChatGptCredentials> credentials)
+        IOptions<OpenAICredentials> credentials)
     {
         var httpClient = httpClientFactory.CreateClient(nameof(ChatGPTFactory));
         httpClient.DefaultRequestHeaders.Authorization = credentials.Value.GetAuthHeader();
@@ -77,7 +77,7 @@ public class ChatGPTFactory : IDisposable
         return new OpenAiClient(httpClient);
     }
 
-    public static ChatGPTFactory CreateInMemory(string apiKey, ChatCompletionsConfig? config = null)
+    public static ChatGPTFactory CreateInMemory(string apiKey, ChatGPTConfig? config = null)
     {
         if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
         return new ChatGPTFactory(apiKey, new InMemoryChatHistoryStorage(), new TimeProviderUtc(), config);
@@ -85,7 +85,7 @@ public class ChatGPTFactory : IDisposable
 
     public async Task<ChatGPT> Create(
         string userId, 
-        ChatCompletionsConfig? config = null, 
+        ChatGPTConfig? config = null, 
         bool ensureStorageCreated = true,
         CancellationToken cancellationToken = default)
     {
@@ -100,12 +100,12 @@ public class ChatGPTFactory : IDisposable
             _chatHistoryStorage,
             _clock,
             userId,
-            ChatCompletionsConfig.Combine(_config, config)
+            ChatGPTConfig.Combine(_config, config)
         );
     }
 
     public async Task<ChatGPT> Create(
-        ChatCompletionsConfig? config = null,
+        ChatGPTConfig? config = null,
         bool ensureStorageCreated = true,
         CancellationToken cancellationToken = default)
     {
@@ -117,7 +117,7 @@ public class ChatGPTFactory : IDisposable
             _client,
             _chatHistoryStorage,
             _clock,
-            ChatCompletionsConfig.Combine(_config, config)
+            ChatGPTConfig.Combine(_config, config)
         );
     }
 

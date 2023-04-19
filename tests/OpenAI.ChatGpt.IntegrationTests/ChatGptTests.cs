@@ -37,7 +37,7 @@ public class ChatGptTests
     private static async Task<Chat> CreateInMemoryChat()
     {
         return await ChatGPT.CreateInMemoryChat(Helpers.GetKeyFromEnvironment("OPENAI_API_KEY"),
-            new ChatCompletionsConfig()
+            new ChatGPTConfig()
             {
                 MaxTokens = 100
             });

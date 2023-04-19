@@ -108,8 +108,8 @@ public class OpenAiClient : IDisposable
             false,
             requestModifier
         );
-        var res = await GetChatCompletions(request, cancellationToken);
-        return res.Choices[0].Message!.Content;
+        var response = await GetChatCompletionsRaw(request, cancellationToken);
+        return response.Choices[0].Message!.Content;
     }
 
     public async Task<string> GetChatCompletions(
@@ -131,11 +131,34 @@ public class OpenAiClient : IDisposable
             false,
             requestModifier
         );
-        var res = await GetChatCompletions(request, cancellationToken);
-        return res.Choices[0].Message!.Content;
+        var response = await GetChatCompletionsRaw(request, cancellationToken);
+        return response.GetMessageContent();
+    }
+    
+    public async Task<ChatCompletionResponse> GetChatCompletionsRaw(
+        IEnumerable<ChatCompletionMessage> messages,
+        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        string model = ChatCompletionModels.Default,
+        float temperature = ChatCompletionTemperatures.Default,
+        string? user = null,
+        Action<ChatCompletionRequest>? requestModifier = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (messages == null) throw new ArgumentNullException(nameof(messages));
+        if (model == null) throw new ArgumentNullException(nameof(model));
+        var request = CreateChatCompletionRequest(messages,
+            maxTokens,
+            model,
+            temperature,
+            user,
+            false,
+            requestModifier
+        );
+        var response = await GetChatCompletionsRaw(request, cancellationToken);
+        return response;
     }
 
-    internal async Task<ChatCompletionResponse> GetChatCompletions(
+    internal async Task<ChatCompletionResponse> GetChatCompletionsRaw(
         ChatCompletionRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -146,8 +169,7 @@ public class OpenAiClient : IDisposable
             cancellationToken: cancellationToken,
             options: _nullIgnoreSerializerOptions
         );
-        var responseContent = await response.Content
-            .ReadAsStringAsync(cancellationToken);
+        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -165,16 +187,16 @@ public class OpenAiClient : IDisposable
     /// <param name="maxTokens">The length of the response</param>
     /// <param name="model">One of <see cref="ChatCompletionModels"/></param>
     /// <param name="temperature">
-    /// What sampling temperature to use, between 0 and 2.
-    /// Higher values like 0.8 will make the output more random,
-    /// while lower values like 0.2 will make it more focused and deterministic.
+    ///     What sampling temperature to use, between 0 and 2.
+    ///     Higher values like 0.8 will make the output more random,
+    ///     while lower values like 0.2 will make it more focused and deterministic.
     /// </param>
     /// <param name="user">
-    /// A unique identifier representing your end-user, which can help OpenAI to monitor
-    /// and detect abuse.
+    ///     A unique identifier representing your end-user, which can help OpenAI to monitor
+    ///     and detect abuse.
     /// </param>
     /// <param name="requestModifier">A modifier of the raw request. Allows to specify any custom properties.</param>
-    /// <param name="cancellationToken">Cancellation token</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Chunks of ChatGPT's response, one by one.</returns>
     public IAsyncEnumerable<string> StreamChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,

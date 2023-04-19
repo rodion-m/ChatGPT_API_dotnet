@@ -1,11 +1,13 @@
+using System.ComponentModel.DataAnnotations;
 using OpenAI.ChatGpt.Models.ChatCompletion;
 using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt.Models;
 
-public class ChatCompletionsConfig
+// ReSharper disable once InconsistentNaming
+public class ChatGPTConfig
 {
-    public static ChatCompletionsConfig Default => new()
+    public static ChatGPTConfig Default => new()
     {
         PassUserIdToOpenAiRequests = true
     };
@@ -53,6 +55,7 @@ public class ChatCompletionsConfig
     /// while lower values like 0.2 will make it more focused and deterministic.
     /// Predefined values: <see cref="ChatCompletionTemperatures"/>
     /// </summary>
+    [Range(ChatCompletionTemperatures.Minimum, ChatCompletionTemperatures.Maximum)]
     public float? Temperature
     {
         get => _temperature;
@@ -84,17 +87,17 @@ public class ChatCompletionsConfig
     }
 
     /// <summary>
-    /// Merges two <see cref="ChatCompletionsConfig"/>s with respect to <paramref name="config"/>.
+    /// Merges two <see cref="ChatGPTConfig"/>s with respect to <paramref name="config"/>.
     /// </summary>
-    public static ChatCompletionsConfig? Combine(
-        ChatCompletionsConfig? baseConfig,
-        ChatCompletionsConfig? config)
+    public static ChatGPTConfig? Combine(
+        ChatGPTConfig? baseConfig,
+        ChatGPTConfig? config)
     {
         if (baseConfig is null && config is null) return null;
         if (baseConfig is null) return config;
         if (config is null) return baseConfig;
 
-        var result = new ChatCompletionsConfig()
+        var result = new ChatGPTConfig()
         {
             _model = config._model ?? baseConfig._model,
             _maxTokens = config._maxTokens ?? baseConfig._maxTokens,
@@ -107,8 +110,8 @@ public class ChatCompletionsConfig
         return result;
     }
 
-    public static ChatCompletionsConfig CombineOrDefault(
-        ChatCompletionsConfig? baseConfig, ChatCompletionsConfig? config)
+    public static ChatGPTConfig CombineOrDefault(
+        ChatGPTConfig? baseConfig, ChatGPTConfig? config)
     {
         return Combine(baseConfig, config) ?? Default;
     }

@@ -1,0 +1,213 @@
+﻿@page "/"
+@using OpenAI.ChatGpt.AspNetCore
+@using OpenAI.ChatGpt
+@using OpenAI.ChatGpt.Models
+@using OpenAI.ChatGpt.Models.ChatCompletion
+@inject IJSRuntime JsRuntime
+@inject ChatGPTFactory ChatGPTFactory
+
+<PageTitle>Index</PageTitle>
+@if (_messages is null)
+{
+    <h3>Loading messages...</h3>
+    return;
+}
+<style>
+    textarea {
+        border: 1px dashed #888;
+        border-radius: 5px;
+        width: 80%;
+        overflow: auto;
+        background: #f7f7f7
+    }
+
+    /* improved CSS for speech bubbles */
+
+    .assistant, .user {
+        position: relative;
+        font-family: arial;
+        font-size: 1.1em;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+        .assistant:after, .user:after {
+            content: '';
+            border: 20px solid transparent;
+            position: absolute;
+            margin-top: -30px;
+        }
+
+    .user {
+        background: #03a9f4;
+        color: #fff;
+        margin-left: 20%;
+        margin-right: 100px;
+        top: 30%;
+        text-align: right;
+    }
+
+    .assistant {
+        background: #4CAF50;
+        color: #fff;
+        margin-left: 100px;
+        margin-right: 20%;
+    }
+
+    .user:after {
+        border-left-color: #03a9f4;
+        border-right: 0;
+        right: -20px;
+    }
+
+    .assistant:after {
+        border-right-color: #4CAF50;
+        border-left: 0;
+        left: -20px;
+    }
+
+    .msg {
+        font-size: medium;
+    }
+</style>
+<h1>ChatGPT</h1>
+<p style="font-size:small"><b>Total Tokens:</b> @_totalTokens</p>
+<div id="chatcontainer" style="height:550px; width:80%; overflow: scroll;">
+    @foreach (var item in _messages)
+    {
+        <div>
+            @if (item.role == item.content)
+            {
+                <div style="float: right; margin-right: 20px; margin-top: 10px">
+                    <b>Human</b>
+                </div>
+                <div class="@item.role.ToLower()">
+                    <div class="msg">
+                        @item.content
+                        <br /><br />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div style="float: left; margin-left: 20px; margin-top: 10px">
+                    <b>ChatGPT&nbsp;&nbsp;</b>
+                </div>
+                <div class="@item.role.ToLower()">
+                    <div class="msg">
+                        @if (item.content != null)
+                        {
+                            @((MarkupString)item.content)
+                        }
+                        <br /><br />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+@if (!_processing)
+{
+    <textarea rows="3" cols="60" @bind="_prompt"></textarea>
+    <br />
+    <button class="btn btn-primary"
+        @onclick="CallChatGpt">
+        Call ChatGPT
+    </button>
+    <span>&nbsp;</span>
+    <button class="btn btn-info"
+        @onclick="RestartChatGpt">
+        Restart
+    </button>
+}
+else
+{
+    <br>
+    <h4>Processing...</h4>
+}
+<br /><p style="color:red">@_errorMessage</p>
+@code {
+    List<(string role, string content)> _messages = new();
+    string _prompt = "Write a 10 word description of OpenAI ChatGPT";
+    string _errorMessage = "";
+    bool _processing = false;
+    int _totalTokens = 0;
+    private Chat _chat;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await CreateNewChat();
+    }
+
+    private async Task CreateNewChat()
+    {
+        if(_chat != null) await _chat.DisposeAsync();
+        var chatGpt = await ChatGPTFactory.Create("test-user-id");
+        _chat = await chatGpt.StartNewTopic("Test Topic", clearOnDisposal: true);
+		 
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            await JsRuntime.InvokeAsync<string>("ScrollToBottom", "chatcontainer");
+        }
+        catch
+        {
+            // do nothing if this fails
+        }
+    }
+
+    async Task CallChatGpt()
+    {
+        try
+        {
+            // Set Processing to true to indicate that the method is processing
+            _processing = true;
+
+            // Call StateHasChanged to refresh the UI
+            StateHasChanged();
+
+            // Clear any previous error messages
+            _errorMessage = "";
+            var response = await _chat.GetNextMessageResponse(_prompt);
+
+            // Create a new MessageSave object with the user's prompt and other
+            // details and add it to the messages list
+            _messages.Add((ChatCompletionRoles.User, _prompt));
+            _messages.Add((ChatCompletionRoles.Assistant, response));
+
+            //TotalTokens = _chat.LastResponse.Usage.TotalTokens;
+        }
+        catch (Exception ex)
+        {
+            // Set ErrorMessage to the exception message if an error occurs
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            // Clear the prompt variable
+            _prompt = "";
+
+            // Set Processing to false to indicate 
+            // that the method is done processing
+            _processing = false;
+
+            // Call StateHasChanged to refresh the UI
+            StateHasChanged();
+        }
+    }
+
+    async Task RestartChatGpt()
+    {
+        _prompt = "Write a 10 word description of OpenAI ChatGPT";
+        await CreateNewChat();
+        _messages = new();
+        _totalTokens = 0;
+        _errorMessage = "";
+        StateHasChanged();
+    }
+}

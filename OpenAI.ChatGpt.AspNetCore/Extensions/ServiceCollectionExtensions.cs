@@ -88,7 +88,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient();
 
         services.AddSingleton<ITimeProvider, TimeProviderUtc>();
-        services.AddSingleton<ChatGPTFactory>();
+        services.AddScoped<ChatGPTFactory>();
 
         return services;
     }

@@ -6,7 +6,7 @@ using static OpenAI.ChatGpt.AspNetCore.Extensions.ServiceCollectionExtensions;
 
 namespace OpenAI.ChatGpt.UnitTests.DependencyInjectionTests;
 
-public class ChatGptServiceCollectionExtensionsTests
+public class ChatGptServicesIntegrationTests
 {
     [Fact]
     public void AddChatGptCoreIntegration_added_expected_services()

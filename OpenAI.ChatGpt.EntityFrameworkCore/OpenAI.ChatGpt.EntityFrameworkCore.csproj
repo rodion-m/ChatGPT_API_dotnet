@@ -9,7 +9,7 @@
         <PackageId>OpenAI.ChatGPT.EntityFrameworkCore</PackageId>
         <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
         <Product>OpenAI ChatGPT integration for .NET with EF Core storage</Product>
-        <Version>2.2.0</Version>
+        <Version>2.2.1</Version>
         <Description>OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core supporting. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>

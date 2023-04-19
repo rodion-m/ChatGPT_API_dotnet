@@ -82,29 +82,39 @@ public class Chat : IDisposable, IAsyncDisposable
         UserOrSystemMessage message, 
         CancellationToken cancellationToken)
     {
+        if (IsWriting)
+        {
+            throw new InvalidOperationException("Cannot start a new chat session while the previous one is still in progress.");
+        }
+        var originalCancellation = cancellationToken;
         _cts?.Dispose();
-        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _cts.Token.Register(() => IsWriting = false);
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(originalCancellation);
+        cancellationToken = _cts.Token;
 
         var history = await LoadHistory(cancellationToken);
         var messages = history.Append(message);
         
-        IsWriting = true; //TODO set false on exception
-        var response = await _client.GetChatCompletionsRaw(
-            messages,
-            user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
-            requestModifier: Topic.Config.ModifyRequest,
-            cancellationToken: _cts.Token
-        );
-        SetLastResponse(response);
+        IsWriting = true;
+        try
+        {
+            var response = await _client.GetChatCompletionsRaw(
+                messages,
+                user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
+                requestModifier: Topic.Config.ModifyRequest,
+                cancellationToken: cancellationToken
+            );
+            SetLastResponse(response);
 
-        var assistantMessage = response.GetMessageContent();
-        await _chatHistoryStorage.SaveMessages(
-            UserId, TopicId, message, assistantMessage, _clock.GetCurrentTime(), _cts.Token);
-        IsWriting = false;
-        _isNew = false;
-
-        return assistantMessage;
+            var assistantMessage = response.GetMessageContent();
+            await _chatHistoryStorage.SaveMessages(
+                UserId, TopicId, message, assistantMessage, _clock.GetCurrentTime(), cancellationToken);
+            _isNew = false;
+            return assistantMessage;
+        }
+        finally
+        {
+            IsWriting = false; 
+        }
     }
     
     public IAsyncEnumerable<string> StreamNextMessageResponse(
@@ -122,25 +132,26 @@ public class Chat : IDisposable, IAsyncDisposable
         bool throwOnCancellation,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
+        if (IsWriting)
+        {
+            throw new InvalidOperationException("Cannot start a new chat session while the previous one is still in progress.");
+        }
         var originalCancellationToken = cancellationToken;
         _cts?.Dispose();
         _cts = CancellationTokenSource.CreateLinkedTokenSource(originalCancellationToken);
         cancellationToken = _cts.Token;
-        cancellationToken.Register(() => IsWriting = false);
 
         var history = await LoadHistory(cancellationToken);
         var messages = history.Append(message);
         var sb = new StringBuilder();
-        IsWriting = true; //TODO set false on exception
+        IsWriting = true;
         var stream = _client.StreamChatCompletions(
             messages,
             user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
             requestModifier: Topic.Config.ModifyRequest,
             cancellationToken: cancellationToken
-        );
-        await foreach (var chunk in stream
-                           .ConfigureExceptions(throwOnCancellation)
-                           .WithCancellation(cancellationToken))
+        ).ConfigureExceptions(throwOnCancellation, _ => IsWriting = false);
+        await foreach (var chunk in stream.WithCancellation(cancellationToken))
         {
             sb.Append(chunk);
             yield return chunk;
@@ -148,19 +159,30 @@ public class Chat : IDisposable, IAsyncDisposable
         
         if(cancellationToken.IsCancellationRequested && !throwOnCancellation)
         {
-            IsWriting = false;
             yield break;
         }
         
         SetLastResponse(null);
 
-        await _chatHistoryStorage.SaveMessages(
-            UserId, TopicId, message, sb.ToString(), _clock.GetCurrentTime(), cancellationToken);
-        IsWriting = false;
-        _isNew = false;
+        try
+        {
+            await _chatHistoryStorage.SaveMessages(
+                UserId,
+                TopicId,
+                message,
+                sb.ToString(),
+                _clock.GetCurrentTime(),
+                cancellationToken);
+            _isNew = false;
+        }
+        finally
+        {
+            IsWriting = false;
+        }
     }
 
-    private async Task<IEnumerable<ChatCompletionMessage>> LoadHistory(CancellationToken cancellationToken)
+    private async Task<IEnumerable<ChatCompletionMessage>> LoadHistory(
+        CancellationToken cancellationToken)
     {
         if (_isNew) return Enumerable.Empty<ChatCompletionMessage>();
         return await _chatHistoryStorage.GetMessages(UserId, TopicId, cancellationToken);

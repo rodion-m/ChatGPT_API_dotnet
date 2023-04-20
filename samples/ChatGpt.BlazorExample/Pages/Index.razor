@@ -1,10 +1,12 @@
 ﻿@page "/"
 @using OpenAI.ChatGpt.AspNetCore
 @using OpenAI.ChatGpt
+@using OpenAI.ChatGpt.Interfaces
 @using OpenAI.ChatGpt.Models
 @using OpenAI.ChatGpt.Models.ChatCompletion
 @inject IJSRuntime JsRuntime
 @inject ChatGPTFactory ChatGPTFactory
+@inject IChatHistoryStorage ChatHistoryStorage
 
 <PageTitle>Index</PageTitle>
 @if (_messages is null)
@@ -77,7 +79,7 @@
     @foreach (var item in _messages)
     {
         <div>
-            @if (item.role == item.content)
+            @if (item.role == ChatCompletionRoles.User)
             {
                 <div style="float: right; margin-right: 20px; margin-top: 10px">
                     <b>Human</b>
@@ -134,6 +136,7 @@ else
     bool _processing = false;
     int _totalTokens = 0;
     private Chat _chat;
+    private string _userId = "test-user-id";
 
     protected override async Task OnInitializedAsync()
     {
@@ -144,9 +147,10 @@ else
     private async Task CreateNewChat()
     {
         if(_chat != null) await _chat.DisposeAsync();
-        var chatGpt = await ChatGPTFactory.Create("test-user-id");
-        _chat = await chatGpt.StartNewTopic("Test Topic", clearOnDisposal: true);
-		 
+        var chatGpt = await ChatGPTFactory.Create(_userId);
+        _chat = await chatGpt.ContinueOrStartNewTopic();
+        _messages = (await _chat.GetMessages()).Select(m => (m.Role, m.Content))
+            .ToList();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -180,7 +184,7 @@ else
             _messages.Add((ChatCompletionRoles.User, _prompt));
             _messages.Add((ChatCompletionRoles.Assistant, response));
 
-            //TotalTokens = _chat.LastResponse.Usage.TotalTokens;
+            _totalTokens = (int) (_chat.LastResponse?.Usage.TotalTokens ?? 0);
         }
         catch (Exception ex)
         {
@@ -204,6 +208,7 @@ else
     async Task RestartChatGpt()
     {
         _prompt = "Write a 10 word description of OpenAI ChatGPT";
+        await ChatHistoryStorage.ClearTopics(_userId, default);
         await CreateNewChat();
         _messages = new();
         _totalTokens = 0;

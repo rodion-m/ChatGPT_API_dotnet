@@ -11,7 +11,7 @@ namespace OpenAI.ChatGpt;
 public class ChatGPT : IDisposable
 {
     private readonly string _userId;
-    private readonly IChatHistoryStorage _chatHistoryStorage;
+    private readonly IChatHistoryStorage _storage;
     private readonly ITimeProvider _clock;
     private readonly ChatGPTConfig? _config;
     private readonly OpenAiClient _client;
@@ -29,7 +29,7 @@ public class ChatGPT : IDisposable
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _userId = userId ?? throw new ArgumentNullException(nameof(userId));
-        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
+        _storage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _config = config;
     }
@@ -44,7 +44,7 @@ public class ChatGPT : IDisposable
         ChatGPTConfig? config)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
-        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
+        _storage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _userId = Guid.Empty.ToString();
         _config = config;
@@ -71,12 +71,10 @@ public class ChatGPT : IDisposable
     }
 
     /// <summary> Continues the last topic or starts a new one.</summary>
-    public async Task<Chat> ContinueOrStartNewTopic(
-        DateTimeOffset? createdAt = null,
-        CancellationToken cancellationToken = default)
+    public async Task<Chat> ContinueOrStartNewTopic(CancellationToken cancellationToken = default)
     {
         if (_currentChat is not null) return _currentChat;
-        var topic = await _chatHistoryStorage.GetMostRecentTopicOrNull(_userId, cancellationToken);
+        var topic = await _storage.GetMostRecentTopicOrNull(_userId, cancellationToken);
         return topic is null
             ? await StartNewTopic(cancellationToken: cancellationToken)
             : await SetTopic(topic, cancellationToken);
@@ -91,13 +89,13 @@ public class ChatGPT : IDisposable
         CancellationToken cancellationToken = default)
     {
         config = ChatGPTConfig.CombineOrDefault(_config, config);
-        var topic = new Topic(_chatHistoryStorage.NewTopicId(), _userId, name, _clock.GetCurrentTime(), config);
-        await _chatHistoryStorage.AddTopic(topic, cancellationToken);
+        var topic = new Topic(_storage.NewTopicId(), _userId, name, _clock.GetCurrentTime(), config);
+        await _storage.AddTopic(topic, cancellationToken);
         initialDialog ??= config.GetInitialDialogOrNull();
         if (initialDialog is not null)
         {
             var messages = ConvertToPersistentMessages(initialDialog, topic);
-            await _chatHistoryStorage.SaveMessages(_userId, topic.Id, messages, cancellationToken);
+            await _storage.SaveMessages(_userId, topic.Id, messages, cancellationToken);
         }
 
         _currentChat = CreateChat(topic, initialDialog is null, clearOnDisposal: clearOnDisposal);
@@ -108,13 +106,13 @@ public class ChatGPT : IDisposable
     {
         return dialog.GetMessages()
             .Select(m => new PersistentChatMessage(
-                _chatHistoryStorage.NewMessageId(), _userId, topic.Id, _clock.GetCurrentTime(), m)
+                _storage.NewMessageId(), _userId, topic.Id, _clock.GetCurrentTime(), m)
             );
     }
 
     public async Task<Chat> SetTopic(Guid topicId, CancellationToken cancellationToken = default)
     {
-        var topic = await _chatHistoryStorage.GetTopic(_userId, topicId, cancellationToken);
+        var topic = await _storage.GetTopic(_userId, topicId, cancellationToken);
         if (topic is null)
         {
             throw new ArgumentException($"Chat with id {topicId} not found for user {_userId}");
@@ -132,12 +130,12 @@ public class ChatGPT : IDisposable
     private Chat CreateChat(Topic topic, bool isNew, bool clearOnDisposal)
     {
         if (topic == null) throw new ArgumentNullException(nameof(topic));
-        return new Chat(_chatHistoryStorage, _clock, _client, _userId, topic, isNew, clearOnDisposal);
+        return new Chat(_storage, _clock, _client, _userId, topic, isNew, clearOnDisposal);
     }
     
     public async Task<IReadOnlyList<Topic>> GetTopics(CancellationToken cancellationToken = default)
     {
-        var chats = await _chatHistoryStorage.GetTopics(_userId, cancellationToken);
+        var chats = await _storage.GetTopics(_userId, cancellationToken);
         return chats.ToList();
     }
 

@@ -14,7 +14,7 @@ namespace OpenAI.ChatGpt;
 /// </summary>
 /// <remarks>Not thread-safe. Use one instance per user.</remarks>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public class Chat : IDisposable, IAsyncDisposable
+public class ChatService : IDisposable, IAsyncDisposable
 {
     public Topic Topic { get; }
     public string UserId { get; }
@@ -31,7 +31,7 @@ public class Chat : IDisposable, IAsyncDisposable
     private readonly bool _clearOnDisposal;
     private CancellationTokenSource? _cts;
 
-    internal Chat(
+    internal ChatService(
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock,
         OpenAiClient client,

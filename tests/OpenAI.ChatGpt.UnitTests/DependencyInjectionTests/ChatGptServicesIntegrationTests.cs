@@ -57,7 +57,7 @@ public class ChatGptServicesIntegrationTests
         var services = CreateServiceCollection();
 
         // Act
-        services.AddChatGptInMemoryIntegration(injectInMemoryChat: true);
+        services.AddChatGptInMemoryIntegration(injectInMemoryChatService: true);
 
         // Assert
         await using var provider = services.BuildServiceProvider();
@@ -65,7 +65,7 @@ public class ChatGptServicesIntegrationTests
         var storage = provider.GetRequiredService<IChatHistoryStorage>();
         storage.Should().BeOfType<InMemoryChatHistoryStorage>();
 
-        _ = provider.GetRequiredService<Chat>();
+        _ = provider.GetRequiredService<ChatService>();
     }
     
     [Fact]

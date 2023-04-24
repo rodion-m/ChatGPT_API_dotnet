@@ -5,14 +5,14 @@ public class ChatGptTests
     [Fact]
     public async void Stream_chatgpt_response_cancellation_throws_exception()
     {
-        Chat chat = await CreateInMemoryChat();
+        ChatService chatService = await CreateInMemoryChat();
         const string text = "Write numbers from 1 to 50";
         await FluentActions.Invoking(
                 async () =>
                 {
-                    await foreach (var _ in chat.StreamNextMessageResponse(text))
+                    await foreach (var _ in chatService.StreamNextMessageResponse(text))
                     {
-                        chat.Stop();
+                        chatService.Stop();
                     }
                 })
             .Should().ThrowAsync<OperationCanceledException>();
@@ -21,20 +21,20 @@ public class ChatGptTests
     [Fact]
     public async void Stream_chatgpt_response_cancellation_with_throwOnCancellation_false_stopped_silently()
     {
-        Chat chat = await CreateInMemoryChat();
+        ChatService chatService = await CreateInMemoryChat();
         const string text = "Write numbers from 1 to 50";
         await FluentActions.Invoking(
                 async () =>
                 {
-                    await foreach (var _ in chat.StreamNextMessageResponse(text, throwOnCancellation: false))
+                    await foreach (var _ in chatService.StreamNextMessageResponse(text, throwOnCancellation: false))
                     {
-                        chat.Stop();
+                        chatService.Stop();
                     }
                 })
             .Should().NotThrowAsync();
     }
 
-    private static async Task<Chat> CreateInMemoryChat()
+    private static async Task<ChatService> CreateInMemoryChat()
     {
         return await ChatGPT.CreateInMemoryChat(Helpers.GetKeyFromEnvironment("OPENAI_API_KEY"),
             new ChatGPTConfig()

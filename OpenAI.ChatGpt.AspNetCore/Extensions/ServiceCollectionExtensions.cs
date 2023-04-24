@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     
     public static IServiceCollection AddChatGptInMemoryIntegration(
         this IServiceCollection services,
-        bool injectInMemoryChat = true,
+        bool injectInMemoryChatService = true,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = CchatGPTConfigSectionPathDefault)
     {
@@ -29,14 +29,14 @@ public static class ServiceCollectionExtensions
         }
         services.AddChatGptIntegrationCore(credentialsConfigSectionPath, completionsConfigSectionPath);
         services.AddSingleton<IChatHistoryStorage, InMemoryChatHistoryStorage>();
-        if(injectInMemoryChat)
+        if(injectInMemoryChatService)
         {
-            services.AddScoped<Chat>(CreateChatGptChat);
+            services.AddScoped<ChatService>(CreateChatService);
         }
         return services;
     }
 
-    private static Chat CreateChatGptChat(IServiceProvider provider)
+    private static ChatService CreateChatService(IServiceProvider provider)
     {
         ArgumentNullException.ThrowIfNull(provider);
         var userId = Guid.Empty.ToString();

@@ -8,12 +8,12 @@ Console.WriteLine("Welcome to ChatGPT Console!");
 
 var apiKey = LoadApiKey();
 var config = new ChatGPTConfig() { MaxTokens = 300 };
-await using Chat chat = await ChatGPT.CreateInMemoryChat(apiKey, config);
+await using ChatService chatService = await ChatGPT.CreateInMemoryChat(apiKey, config);
 
 Console.Write("User: ");
 while (Console.ReadLine() is { } userMessage)
 {
-    var response = await chat.GetNextMessageResponse(userMessage);
+    var response = await chatService.GetNextMessageResponse(userMessage);
     Console.WriteLine($"ChatGPT: {response.Trim()}");
     Console.Write("User: ");
 }

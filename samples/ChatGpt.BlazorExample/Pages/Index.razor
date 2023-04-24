@@ -135,7 +135,7 @@ else
     string _errorMessage = "";
     bool _processing = false;
     int _totalTokens = 0;
-    private Chat _chat;
+    private Chat _chatService;
     private string _userId = "test-user-id";
 
     protected override async Task OnInitializedAsync()
@@ -146,10 +146,10 @@ else
 
     private async Task CreateNewChat()
     {
-        if(_chat != null) await _chat.DisposeAsync();
+        if(_chatService != null) await _chatService.DisposeAsync();
         var chatGpt = await ChatGPTFactory.Create(_userId);
-        _chat = await chatGpt.ContinueOrStartNewTopic();
-        _messages = (await _chat.GetMessages()).Select(m => (m.Role, m.Content))
+        _chatService = await chatGpt.ContinueOrStartNewTopic();
+        _messages = (await _chatService.GetMessages()).Select(m => (m.Role, m.Content))
             .ToList();
     }
 
@@ -177,14 +177,14 @@ else
 
             // Clear any previous error messages
             _errorMessage = "";
-            var response = await _chat.GetNextMessageResponse(_prompt);
+            var response = await _chatService.GetNextMessageResponse(_prompt);
 
             // Create a new MessageSave object with the user's prompt and other
             // details and add it to the messages list
             _messages.Add((ChatCompletionRoles.User, _prompt));
             _messages.Add((ChatCompletionRoles.Assistant, response));
 
-            _totalTokens = (int) (_chat.LastResponse?.Usage.TotalTokens ?? 0);
+            _totalTokens = (int) (_chatService.LastResponse?.Usage.TotalTokens ?? 0);
         }
         catch (Exception ex)
         {

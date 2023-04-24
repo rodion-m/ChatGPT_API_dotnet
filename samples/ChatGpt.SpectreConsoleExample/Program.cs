@@ -10,21 +10,21 @@ Console.WriteLine();
 
 var name = Console.Ask<string?>("What's your [green]name[/]?") ?? "Me";
 var apiKey = LoadApiKey();
-await using Chat chat = await ChatGPT.CreateInMemoryChat(
+await using ChatService chatService = await ChatGPT.CreateInMemoryChat(
     apiKey,
     config: new ChatGPTConfig() { MaxTokens = 200 },
     initialDialog: Dialog.StartAsSystem($"You are helpful assistant for a person named {name}.")
 );
-SetupCancellation(chat);
+SetupCancellation(chatService);
 
 Console.MarkupLine("[underline yellow]Start chat. Now ask something ChatGPT...[/]");
 while (Console.Ask<string>($"[underline green]{name}[/]: ") is { } userMessage)
 {
     Console.Markup("[underline red]ChatGPT[/]: ");
-    var stream = chat.StreamNextMessageResponse(userMessage, throwOnCancellation: false);
+    var stream = chatService.StreamNextMessageResponse(userMessage, throwOnCancellation: false);
     await foreach (string chunk in stream.SkipWhile(string.IsNullOrWhiteSpace))
     {
-        if (!chat.IsCancelled) Console.Write(chunk);
+        if (!chatService.IsCancelled) Console.Write(chunk);
     }
 
     Console.WriteLine();
@@ -39,7 +39,7 @@ string LoadApiKey()
     return key;
 }
 
-void SetupCancellation(Chat chat)
+void SetupCancellation(ChatService chat)
 {
     System.Console.CancelKeyPress += (_, args) =>
     {

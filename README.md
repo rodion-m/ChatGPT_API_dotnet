@@ -53,6 +53,7 @@ public class YourService
 }
 ```
 See [Blazor Example](samples/ChatGpt.BlazorExample/Pages/Index.razor).
+
 If you want to configure request parameters, you can do it in `appsettings.json` configuration or in `ChatGPTFactory.Create` or in `ChatGPT.CreateTopic` methods.
 ```json
 {
@@ -88,8 +89,8 @@ Since `ChatGPTFactory` depends on `IHttClientFactory`, you can easily use any of
 
 ## Examples
 * [Blazor Example](samples/ChatGpt.BlazorExample)
-* [Console Example](samples/ChatGpt.ConsoleExample/Program.cs)
-* [Spectre Console Example](samples/ChatGpt.SpectreConsoleExample/Program.cs)
+* [Console Example](samples/ChatGpt.ConsoleExample/Program.cs) (simple)
+* [Spectre Console Example](samples/ChatGpt.SpectreConsoleExample/Program.cs) (advanced)
 
 ## API Parameters
 Here is a list of the main parameters that can be used in the ChatCompletions (ChatGPT) API request (OpenAI.ChatGpt/Models/ChatCompletion/ChatCompletionRequest.cs).

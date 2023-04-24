@@ -1,6 +1,6 @@
-[![](assets/chatgpt_console_spectre_example.gif)](samples/ChatGpt.SpectreConsoleExample/Program.cs)
+[![example gif...](assets/chatgpt_console_spectre_example.gif)](samples/ChatGpt.SpectreConsoleExample/Program.cs)
 # ChatGPT integration for .NET
-[![.NET](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml) \
+[![Nuget](https://img.shields.io/nuget/v/OpenAI.ChatGPT.EntityFrameworkCore)](https://www.nuget.org/packages/OpenAI.ChatGPT.EntityFrameworkCore/)[![.NET](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml) \
 OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core supporting. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams. \
 
 ## Preparation

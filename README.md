@@ -1,8 +1,7 @@
+[![](assets/chatgpt_console_spectre_example.gif)](samples/ChatGpt.SpectreConsoleExample/Program.cs)
 # ChatGPT integration for .NET
 [![.NET](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml) \
-[![](assets/chatgpt_console_spectre_example.gif)](blob/master/samples/ChatGpt.SpectreConsoleExample/Program.cs)
 OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core supporting. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams. \
-***Looking for a ready solution to integrate ChatGPT into your application? It'll be available in few days (prototype is available [here](https://github.com/rodion-m/ChatGPT_API_dotnet/blob/master/OpenAI.ChatGpt/ChatGPT.cs)). At the moment you can just use the client directly.***
 
 ## Preparation
 First, you need to create an OpenAI account and get an API key. You can do this at https://platform.openai.com/account/api-keys.
@@ -12,10 +11,10 @@ The easiest way to use ChatGPT service in your .NET project with DI and persiste
 ```
 Install-Package OpenAI.ChatGPT.EntityFrameworkCore
 ```
-If you don't want to use EF Core, you can install the package [OpenAI.ChatGPT.AspNetCore](https://www.nuget.org/packages/OpenAI.ChatGPT.AspNetCore/) and implement your own storage for chat history, using `IChatHistoryStorage` interface. \
+If you don't want to use EF Core, you can install the package [OpenAI.ChatGPT.AspNetCore](https://www.nuget.org/packages/OpenAI.ChatGPT.AspNetCore/) and implement your own storage for chat history, using `IChatHistoryStorage` interface.
 
 ## Usage
-1. Set OpenAI API key or even host (optional) in your project user secrets, or appsettings.json (not safe):
+1. Set the OpenAI API key or even host (optional) in your project user secrets, or the `appsettings.json` file (not safe):
 ```json
 {
   "OpenAICredentials": {
@@ -25,6 +24,7 @@ If you don't want to use EF Core, you can install the package [OpenAI.ChatGPT.As
 }
 ```
 Also, you can specify OpenAI API key as environment variable `ASPNETCORE_OpenAICredentials:ApiKey`.
+
 2. Add ChatGPT integration with EF to your DI container:
 ```csharp
 builder.Services.AddChatGptEntityFrameworkIntegration(
@@ -52,7 +52,7 @@ public class YourService
     }
 }
 ```
-See [Blazor Example](blob/master/samples/ChatGpt.BlazorExample/Pages/Index.razor).
+See [Blazor Example](samples/ChatGpt.BlazorExample/Pages/Index.razor).
 If you want to configure request parameters, you can do it in `appsettings.json` configuration or in `ChatGPTFactory.Create` or in `ChatGPT.CreateTopic` methods.
 ```json
 {
@@ -66,10 +66,10 @@ If you want to configure request parameters, you can do it in `appsettings.json`
   }
 }
 ```
-See parameters description inside [ChatGPTConfig](blob/master/OpenAI.ChatGpt/Models/ChatGPTConfig.cs).
+See parameters description inside [ChatGPTConfig](OpenAI.ChatGpt/Models/ChatGPTConfig.cs).
 
 ## Exceptions
-If the server answer is not success status code, the client will throw [NotExpectedResponseException](OpenAI.ChatGpt/Exceptions/NotExpectedResponseException.cs). The exception will contain the error message from the OpenAI API. \
+If the server response is not a success status code, the client will throw a [NotExpectedResponseException](OpenAI.ChatGpt/Exceptions/NotExpectedResponseException.cs). The exception will contain the error message from the OpenAI API. \
 By default, requesting cancellation or `ChatService.Stop()` method calling will throw `OperationCanceledException`. If you don't want to throw it (relevant for streaming responses), you can set `throwOnCancellation` parameter to `false`:
 ```csharp
 await foreach (string chunk in chatService.StreamNextMessageResponse(text, throwOnCancellation: false))
@@ -79,20 +79,20 @@ await foreach (string chunk in chatService.StreamNextMessageResponse(text, throw
 ```
 
 ## Thread safety and async
-`ChatGPTFactory`, `ChatGPT` and `ChatService` thread-safety is depend on the `IChatHistoryStorage` implementation. If you use `ChatGPTFactory` with entity framework, it's NOT thread-safe. \
+`ChatGPTFactory`, `ChatGPT` classes thread-safety is depend on the `IChatHistoryStorage` implementation. If you use `ChatGPTFactory` with entity framework, it's NOT thread-safe. `ChatService` class is not thread-safe. \
 Anyways, this services are designed to be used safely with DI, so you don't need to worry about it. \
 All from all the packages are designed to be used in async context and use `ConfigureAwait(false)` (thanks for the `ConfigureAwait.Fody` package).
 
 ## Retries, timeouts and other policies
-Since `ChatGPTFactory` depends on `IHttClientFactory`, you can easily use any of the available policies for it, like Polly. \
+Since `ChatGPTFactory` depends on `IHttClientFactory`, you can easily use any of the available policies for it, like Polly.
 
 ## Examples
-* [Blazor Example](blob/master/samples/ChatGpt.BlazorExample)
-* [Console Example](blob/master/samples/ChatGpt.ConsoleExample/Program.cs)
-* [Spectre Console Example](blob/master/samples/ChatGpt.SpectreConsoleExample/Program.cs)
+* [Blazor Example](samples/ChatGpt.BlazorExample)
+* [Console Example](samples/ChatGpt.ConsoleExample/Program.cs)
+* [Spectre Console Example](samples/ChatGpt.SpectreConsoleExample/Program.cs)
 
 ## API Parameters
-Here is a list of the main parameters that can be used in the ChatCompletions (ChatGPT) API request (blob/master/OpenAI.ChatGpt/Models/ChatCompletion/ChatCompletionRequest.cs).
+Here is a list of the main parameters that can be used in the ChatCompletions (ChatGPT) API request (OpenAI.ChatGpt/Models/ChatCompletion/ChatCompletionRequest.cs).
 Some of them are taken from this article: https://towardsdatascience.com/gpt-3-parameters-and-prompt-design-1a595dc5b405 \
 Below listed parameters for ChatCompletions API.
 
@@ -130,7 +130,7 @@ A temperature parameter close to 1 would mean that the logits are passed through
 
 More parameters description can be found here: Some of them are taken from this article: https://towardsdatascience.com/gpt-3-parameters-and-prompt-design-1a595dc5b405
 
-# Raw client without DI
+# Using raw client without DI
 If you don't need DI and chat history, you can use only the NuGet package [OpenAI.ChatGPT](https://www.nuget.org/packages/OpenAI.ChatGPT):
 ```
 Install-Package OpenAI.ChatGPT

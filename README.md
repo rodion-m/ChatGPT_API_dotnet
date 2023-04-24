@@ -54,7 +54,7 @@ public class YourService
 ```
 See [Blazor Example](samples/ChatGpt.BlazorExample/Pages/Index.razor).
 
-If you want to configure request parameters, you can do it in `appsettings.json` configuration or in `ChatGPTFactory.Create` or in `ChatGPT.CreateTopic` methods.
+If you want to configure request parameters, you can do it in `appsettings.json` configuration or in `ChatGPTFactory.Create` or in `ChatGPT.CreateChat` methods.
 ```json
 {
   "ChatGPTConfig": {

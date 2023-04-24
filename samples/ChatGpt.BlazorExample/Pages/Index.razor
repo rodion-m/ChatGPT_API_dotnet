@@ -135,7 +135,7 @@ else
     string _errorMessage = "";
     bool _processing = false;
     int _totalTokens = 0;
-    private Chat _chatService;
+    private ChatService? _chatService;
     private string _userId = "test-user-id";
 
     protected override async Task OnInitializedAsync()
@@ -167,6 +167,7 @@ else
 
     async Task CallChatGpt()
     {
+        if(_chatService is null) return;
         try
         {
             // Set Processing to true to indicate that the method is processing

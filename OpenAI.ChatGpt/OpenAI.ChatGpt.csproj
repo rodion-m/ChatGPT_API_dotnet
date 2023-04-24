@@ -10,27 +10,29 @@
         <PackageId>OpenAI.ChatGPT</PackageId>
         <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
         <Product>OpenAI ChatGPT integration for .NET</Product>
-        <Version>2.4.0</Version>
+        <Version>2.4.1</Version>
         <Description>.NET integration for ChatGPT with streaming responses supporting (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression> 
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <RootNamespace>OpenAI.ChatGpt</RootNamespace>
         <Copyright>Rodion Mostovoi</Copyright>
         <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4</PackageTags>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <InternalsVisibleTo Include="OpenAI.ChatGpt.UnitTests" />
-        <InternalsVisibleTo Include="OpenAI.ChatGpt.IntegrationTests" />
+        <InternalsVisibleTo Include="OpenAI.ChatGpt.UnitTests"/>
+        <InternalsVisibleTo Include="OpenAI.ChatGpt.IntegrationTests"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2" />
-      <PackageReference Include="Fody" Version="6.6.4">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
+        <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Fody" Version="6.6.4">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

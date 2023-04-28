@@ -54,7 +54,7 @@ public class YourService
 ```
 See [Blazor Example](samples/ChatGpt.BlazorExample/Pages/Index.razor).
 
-If you want to configure request parameters, you can do it in `appsettings.json` configuration or in `ChatGPTFactory.Create` or in `ChatGPT.CreateTopic` methods.
+If you want to configure request parameters, you can do it in `appsettings.json` configuration or in `ChatGPTFactory.Create` or in `ChatGPT.CreateChat` methods.
 ```json
 {
   "ChatGPTConfig": {
@@ -82,7 +82,7 @@ await foreach (string chunk in chatService.StreamNextMessageResponse(text, throw
 ## Thread safety and async
 `ChatGPTFactory`, `ChatGPT` classes thread-safety is depend on the `IChatHistoryStorage` implementation. If you use `ChatGPTFactory` with entity framework, it's NOT thread-safe. `ChatService` class is not thread-safe. \
 Anyways, this services are designed to be used safely with DI, so you don't need to worry about it. \
-All from all the packages are designed to be used in async context and use `ConfigureAwait(false)` (thanks for the `ConfigureAwait.Fody` package).
+All the methods from all the packages are designed to be used in async context and use `ConfigureAwait(false)` (thanks for the `ConfigureAwait.Fody` package).
 
 ## Retries, timeouts and other policies
 Since `ChatGPTFactory` depends on `IHttClientFactory`, you can easily use any of the available policies for it, like Polly.

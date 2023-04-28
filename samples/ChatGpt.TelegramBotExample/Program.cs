@@ -17,9 +17,9 @@ var botClient = new TelegramBotClient(accessToken);
 var openAiKey = Helpers.GetKeyFromEnvironment("OPENAI_API_KEY");
 await using var serviceProvider = CreateServiceProvider(
     openAiKey, 
-    host: "https://api.pawan.krd/v1/", 
     initialMessage: "You are ChatGPT helpful assistant worked inside Telegram.", 
-    maxTokens: 300
+    maxTokens: 300,
+    host: "https://api.pawan.krd/v1/" //delete this line if you use default openAI host
 );
 
 using CancellationTokenSource cts = new();
@@ -47,7 +47,7 @@ Console.ReadLine();
 cts.Cancel();
 
 ServiceProvider CreateServiceProvider(
-    string openaikey, string host, string initialMessage, int maxTokens)
+    string openaikey, string initialMessage, int maxTokens, string? host = null)
 {
     var services = new ServiceCollection();
     services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
@@ -55,7 +55,7 @@ ServiceProvider CreateServiceProvider(
         .Configure(cred =>
         {
             cred.ApiKey = openaikey;
-            cred.ApiHost = host;
+            if(host is not null) cred.ApiHost = host;
         });
     services.AddOptions<ChatGPTConfig>()
         .Configure(config =>

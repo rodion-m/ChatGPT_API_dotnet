@@ -61,7 +61,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddChatGptIntegrationCore(
         this IServiceCollection services, 
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault)
+        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
+        )
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
@@ -88,7 +90,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient();
 
         services.AddSingleton<ITimeProvider, TimeProviderUtc>();
-        services.AddScoped<ChatGPTFactory>();
+        services.Add(new ServiceDescriptor(typeof(ChatGPTFactory), typeof(ChatGPTFactory), serviceLifetime));
 
         return services;
     }

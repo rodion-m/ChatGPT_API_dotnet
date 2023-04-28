@@ -13,7 +13,8 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault)
+        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(optionsAction);
@@ -28,9 +29,24 @@ public static class ServiceCollectionExtensions
                 nameof(completionsConfigSectionPath));
         }
         
-        services.AddChatGptIntegrationCore(credentialsConfigSectionPath, completionsConfigSectionPath);
-        services.AddDbContext<ChatGptDbContext>(optionsAction);
-        services.AddScoped<IChatHistoryStorage, EfChatHistoryStorage>();
+        services.AddChatGptIntegrationCore(
+            credentialsConfigSectionPath, completionsConfigSectionPath, serviceLifetime);
+        services.AddDbContext<ChatGptDbContext>(optionsAction, serviceLifetime);
+        switch (serviceLifetime)
+        {
+            case ServiceLifetime.Singleton:
+                services.AddSingleton<IChatHistoryStorage, EfChatHistoryStorage>();
+                break;
+            case ServiceLifetime.Scoped:
+                services.AddScoped<IChatHistoryStorage, EfChatHistoryStorage>();
+                break;
+            case ServiceLifetime.Transient:
+                services.AddTransient<IChatHistoryStorage, EfChatHistoryStorage>();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
+        }
+        
         return services;
     }
 }

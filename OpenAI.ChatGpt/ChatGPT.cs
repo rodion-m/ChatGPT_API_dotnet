@@ -16,6 +16,9 @@ public class ChatGPT : IDisposable
     private readonly ChatGPTConfig? _config;
     private readonly OpenAiClient _client;
     private ChatService? _currentChat;
+    
+    private static readonly string NoUser = Guid.Empty.ToString();
+    private readonly bool _isClientInjected;
 
     /// <summary>
     /// Use this constructor to create chat conversation provider for the specific user.
@@ -32,6 +35,7 @@ public class ChatGPT : IDisposable
         _storage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _config = config;
+        _isClientInjected = true;
     }
     
     /// <summary>
@@ -46,8 +50,25 @@ public class ChatGPT : IDisposable
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _storage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
-        _userId = Guid.Empty.ToString();
+        _userId = NoUser;
         _config = config;
+        _isClientInjected = true;
+    }
+    
+    public ChatGPT(
+        string apiKey,
+        IChatHistoryStorage chatHistoryStorage,
+        ITimeProvider clock,
+        string? userId,
+        ChatGPTConfig? config,
+        string? host)
+    {
+        _client = host is null ? new OpenAiClient(apiKey) : new OpenAiClient(apiKey, host);
+        _userId = userId ?? NoUser;
+        _storage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
+        _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+        _config = config;
+        _isClientInjected = false;
     }
 
     /// <summary>
@@ -57,17 +78,24 @@ public class ChatGPT : IDisposable
         string apiKey,
         ChatGPTConfig? config = null,
         UserOrSystemMessage? initialDialog = null,
-        ITimeProvider? clock = null)
+        ITimeProvider? clock = null,
+        string? host = null,
+        CancellationToken cancellationToken = default)
     {
-        if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
-        var client = new OpenAiClient(apiKey);
-        var chatGpt = new ChatGPT(client, new InMemoryChatHistoryStorage(), clock ?? new TimeProviderUtc(), config);
-        return chatGpt.StartNewTopic(initialDialog: initialDialog);
+        ArgumentNullException.ThrowIfNull(apiKey);
+        var chatGpt = new ChatGPT(
+            apiKey, new InMemoryChatHistoryStorage(), clock ?? new TimeProviderUtc(), null, config, host);
+        return chatGpt.StartNewTopic(initialDialog: initialDialog, cancellationToken: cancellationToken);
     }
     
     public void Dispose()
     {
+        Stop();
         _currentChat?.Dispose();
+        if (!_isClientInjected)
+        {
+            _client.Dispose();
+        }
     }
 
     /// <summary> Continues the last topic or starts a new one.</summary>

@@ -37,7 +37,8 @@ public class OpenAiClient : IDisposable
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(apiKey));
         ArgumentNullException.ThrowIfNull(host);
         if(!Uri.TryCreate(host, UriKind.Absolute, out _) || !host.EndsWith('/'))
-            throw new ArgumentException("Host must be a valid absolute URI and end with a slash.", nameof(host));
+            throw new ArgumentException("Host must be a valid absolute URI and end with a slash." +
+                                        $"For example: {DefaultHost}", nameof(host));
         _httpClient = new HttpClient()
         {
             BaseAddress = new Uri(host)
@@ -86,7 +87,10 @@ public class OpenAiClient : IDisposable
 
     public void Dispose()
     {
-        if (!_isHttpClientInjected) _httpClient.Dispose();
+        if (!_isHttpClientInjected)
+        {
+            _httpClient.Dispose();
+        }
     }
 
     public async Task<string> GetChatCompletions(
@@ -170,7 +174,7 @@ public class OpenAiClient : IDisposable
             options: _nullIgnoreSerializerOptions
         );
         var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-
+        
         if (!response.IsSuccessStatusCode)
         {
             throw new NotExpectedResponseException(response.StatusCode, responseContent);

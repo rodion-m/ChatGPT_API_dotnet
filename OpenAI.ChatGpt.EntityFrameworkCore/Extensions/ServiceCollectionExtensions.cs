@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = CchatGPTConfigSectionPathDefault)
+        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(optionsAction);

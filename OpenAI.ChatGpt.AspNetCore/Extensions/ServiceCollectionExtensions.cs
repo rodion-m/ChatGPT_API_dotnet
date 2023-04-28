@@ -8,13 +8,13 @@ public static class ServiceCollectionExtensions
 {
     public const string CredentialsConfigSectionPathDefault = "OpenAICredentials";
     // ReSharper disable once InconsistentNaming
-    public const string CchatGPTConfigSectionPathDefault = "ChatGPTConfig";
+    public const string ChatGPTConfigSectionPathDefault = "ChatGPTConfig";
     
     public static IServiceCollection AddChatGptInMemoryIntegration(
         this IServiceCollection services,
         bool injectInMemoryChatService = true,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = CchatGPTConfigSectionPathDefault)
+        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault)
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
@@ -61,7 +61,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddChatGptIntegrationCore(
         this IServiceCollection services, 
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = CchatGPTConfigSectionPathDefault)
+        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault)
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))

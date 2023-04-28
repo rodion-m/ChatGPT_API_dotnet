@@ -101,7 +101,7 @@ public class ChatGptServicesIntegrationTests
                 .AddInMemoryCollection(new Dictionary<string, string?>()
                 {
                     { $"{CredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
-                    { CchatGPTConfigSectionPathDefault, ""},
+                    { ChatGPTConfigSectionPathDefault, ""},
                 });
             return builder.Build();
         }

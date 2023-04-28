@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.5" />
-    <PackageReference Include="OpenAI.ChatGPT.EntityFrameworkCore" Version="2.4.0" />
+    <PackageReference Include="OpenAI.ChatGPT.EntityFrameworkCore" Version="2.4.1" />
   </ItemGroup>
 
 </Project>

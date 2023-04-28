@@ -33,6 +33,7 @@ public class ChatGptEntityFrameworkIntegrationTests
     {
         var services = new ServiceCollection();
         services.AddSingleton(CreateConfiguration());
+
         return services;
 
         IConfiguration CreateConfiguration()
@@ -41,8 +42,9 @@ public class ChatGptEntityFrameworkIntegrationTests
                 .AddInMemoryCollection(new Dictionary<string, string?>()
                 {
                     { $"{CredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
-                    { CchatGPTConfigSectionPathDefault, ""},
+                    { ChatGPTConfigSectionPathDefault, ""},
                 });
+            
             return builder.Build();
         }
     }

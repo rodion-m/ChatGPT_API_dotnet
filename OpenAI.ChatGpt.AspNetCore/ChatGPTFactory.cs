@@ -22,8 +22,8 @@ public class ChatGPTFactory : IDisposable
     private readonly ChatGPTConfig _config;
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;
-    private bool _ensureStorageCreatedCalled;
     private readonly bool _isHttpClientInjected;
+    private volatile bool _ensureStorageCreatedCalled;
 
     public ChatGPTFactory(
         IHttpClientFactory httpClientFactory,
@@ -58,10 +58,11 @@ public class ChatGPTFactory : IDisposable
         string apiKey,
         IChatHistoryStorage chatHistoryStorage, 
         ITimeProvider? clock = null, 
-        ChatGPTConfig? config = null)
+        ChatGPTConfig? config = null,
+        string? host = null)
     {
-        if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
-        _client = new OpenAiClient(apiKey);
+        ArgumentNullException.ThrowIfNull(apiKey);
+        _client = host is null ? new OpenAiClient(apiKey) : new OpenAiClient(apiKey, host);
         _config = config ?? ChatGPTConfig.Default;
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? new TimeProviderUtc();
@@ -77,10 +78,13 @@ public class ChatGPTFactory : IDisposable
         return new OpenAiClient(httpClient);
     }
 
-    public static ChatGPTFactory CreateInMemory(string apiKey, ChatGPTConfig? config = null)
+    public static ChatGPTFactory CreateInMemory(
+        string apiKey, 
+        ChatGPTConfig? config = null,
+        string? host = null)
     {
-        if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
-        return new ChatGPTFactory(apiKey, new InMemoryChatHistoryStorage(), new TimeProviderUtc(), config);
+        ArgumentNullException.ThrowIfNull(apiKey);
+        return new ChatGPTFactory(apiKey, new InMemoryChatHistoryStorage(), new TimeProviderUtc(), config, host);
     }
 
     public async Task<ChatGPT> Create(
@@ -89,7 +93,7 @@ public class ChatGPTFactory : IDisposable
         bool ensureStorageCreated = true,
         CancellationToken cancellationToken = default)
     {
-        if (userId == null) throw new ArgumentNullException(nameof(userId));
+        ArgumentNullException.ThrowIfNull(userId);
         if (ensureStorageCreated && !_ensureStorageCreatedCalled)
         {
             await _chatHistoryStorage.EnsureStorageCreated(cancellationToken);

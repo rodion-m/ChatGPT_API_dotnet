@@ -14,7 +14,7 @@ public class ChatGPT : IDisposable
     private readonly IChatHistoryStorage _storage;
     private readonly ITimeProvider _clock;
     private readonly ChatGPTConfig? _config;
-    private readonly OpenAiClient _client;
+    private readonly IOpenAiClient _client;
     private ChatService? _currentChat;
     
     private static readonly string NoUser = Guid.Empty.ToString();
@@ -24,7 +24,7 @@ public class ChatGPT : IDisposable
     /// Use this constructor to create chat conversation provider for the specific user.
     /// </summary>
     public ChatGPT(
-        OpenAiClient client,
+        IOpenAiClient client,
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock,
         string userId,
@@ -42,7 +42,7 @@ public class ChatGPT : IDisposable
     /// If you don't have users use this ChatGPT constructor.
     /// </summary>
     public ChatGPT(
-        OpenAiClient client,
+        IOpenAiClient client,
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock,
         ChatGPTConfig? config)

@@ -18,7 +18,7 @@ namespace OpenAI.ChatGpt.AspNetCore;
 // ReSharper disable once InconsistentNaming
 public class ChatGPTFactory : IDisposable
 {
-    private readonly OpenAiClient _client;
+    private readonly IOpenAiClient _client;
     private readonly ChatGPTConfig _config;
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;

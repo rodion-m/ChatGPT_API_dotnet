@@ -1,4 +1,5 @@
 ﻿using OpenAI.ChatGpt.Models.Images;
+using OpenAI.Tests.Shared;
 
 namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
 
@@ -11,7 +12,7 @@ public class ImagesApiTest
     public ImagesApiTest(ITestOutputHelper outputHelper)
     {
         _outputHelper = outputHelper;
-        _client = new OpenAiClient(Helpers.GetKeyFromEnvironment("OPENAI_API_KEY"));
+        _client = new OpenAiClient(Helpers.GetOpenAiKey());
     }
 
     [Fact(Skip = "Images API will be removed")]

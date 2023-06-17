@@ -12,11 +12,13 @@ namespace OpenAI.ChatGpt;
 
 /// <summary> Thread-safe OpenAI client. </summary>
 [Fody.ConfigureAwait(false)]
-public class OpenAiClient : IDisposable
+public class OpenAiClient : IDisposable, IOpenAiClient
 {
     private const string DefaultHost = "https://api.openai.com/v1/";
     private const string ImagesEndpoint = "images/generations";
     private const string ChatCompletionsEndpoint = "chat/completions";
+    
+    private static readonly Uri DefaultHostUri = new(DefaultHost);
 
     private readonly HttpClient _httpClient;
     private readonly bool _isHttpClientInjected;
@@ -31,20 +33,31 @@ public class OpenAiClient : IDisposable
     /// </summary>
     /// <param name="apiKey">OpenAI API key. Can be issued here: https://platform.openai.com/account/api-keys</param>
     /// <param name="host">Open AI API host. Default is: <see cref="DefaultHost"/></param>
-    public OpenAiClient(string apiKey, string host = DefaultHost)
+    public OpenAiClient(string apiKey, string? host = DefaultHost)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(apiKey));
-        ArgumentNullException.ThrowIfNull(host);
-        if(!Uri.TryCreate(host, UriKind.Absolute, out _) || !host.EndsWith('/'))
-            throw new ArgumentException("Host must be a valid absolute URI and end with a slash." +
-                                        $"For example: {DefaultHost}", nameof(host));
+            throw new ArgumentException("API key cannot be null or whitespace.", nameof(apiKey));
+        var uri = ValidateHost(host);
+        
         _httpClient = new HttpClient()
         {
-            BaseAddress = new Uri(host)
+            BaseAddress = uri
         };
         var header = new AuthenticationHeaderValue("Bearer", apiKey);
         _httpClient.DefaultRequestHeaders.Authorization = header;
+    }
+
+    private static Uri ValidateHost(string? host)
+    {
+        if (host is null) return DefaultHostUri;
+        if (!Uri.TryCreate(host, UriKind.Absolute, out var uri))
+        {
+            throw new ArgumentException("Host must be a valid absolute URI and end with a slash." +
+                                        $"For example: {DefaultHost}", nameof(host));
+        }
+        if(!host.EndsWith("/")) uri = new Uri(host + "/");
+
+        return uri;
     }
 
     /// <summary>
@@ -66,6 +79,7 @@ public class OpenAiClient : IDisposable
 
     private static void ValidateHttpClient(HttpClient httpClient)
     {
+        ArgumentNullException.ThrowIfNull(httpClient);
         if (httpClient.DefaultRequestHeaders.Authorization is null)
         {
             throw new ArgumentException(
@@ -79,6 +93,14 @@ public class OpenAiClient : IDisposable
         {
             throw new ArgumentException(
                 "HttpClient must have a BaseAddress set." +
+                "It should be set to OpenAI's API endpoint.",
+                nameof(httpClient)
+            );
+        }
+        if(!httpClient.BaseAddress.AbsoluteUri.EndsWith("/"))
+        {
+            throw new ArgumentException(
+                "HttpClient's BaseAddress must end with a slash." +
                 "It should be set to OpenAI's API endpoint.",
                 nameof(httpClient)
             );

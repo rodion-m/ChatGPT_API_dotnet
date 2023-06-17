@@ -120,7 +120,6 @@ public static class ChatCompletionModels
     private static readonly Dictionary<string, int> MaxTokensLimits = new()
     {
         { Gpt4, 8192 },
-        { Gpt4, 8192 },
         { Gpt4_0613, 8192 },
         { Gpt4_32k, 32768 },
         { Gpt4_32k_0613, 32768 },

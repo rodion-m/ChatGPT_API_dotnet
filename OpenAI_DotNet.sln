@@ -25,6 +25,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGpt.BlazorExample", "sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGpt.TelegramBotExample", "samples\ChatGpt.TelegramBotExample\ChatGpt.TelegramBotExample.csproj", "{8C86E60A-77C2-4204-AF36-F4B845474016}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Modules.Translator", "OpenAI.ChatGpt.Modules.Translator\OpenAI.ChatGpt.Modules.Translator.csproj", "{E155D31C-0061-40A3-AD54-93B5DD08836B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Modules.Translator.UnitTests", "tests\OpenAI.ChatGpt.Modules.Translator.UnitTests\OpenAI.ChatGpt.Modules.Translator.UnitTests.csproj", "{49F18714-F5F9-4FFC-A674-39CE166466A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Modules.Translator.IntegrationTests", "tests\OpenAI.ChatGpt.Modules.Translator.IntegrationTests\OpenAI.ChatGpt.Modules.Translator.IntegrationTests.csproj", "{600195A2-6E93-46AF-87A7-EA2E48E5AE24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.Tests.Shared", "tests\OpenAI.Tests.Shared\OpenAI.Tests.Shared.csproj", "{E303F270-6091-47DE-9260-DAD6122005A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +75,22 @@ Global
 		{8C86E60A-77C2-4204-AF36-F4B845474016}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C86E60A-77C2-4204-AF36-F4B845474016}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C86E60A-77C2-4204-AF36-F4B845474016}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E155D31C-0061-40A3-AD54-93B5DD08836B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E155D31C-0061-40A3-AD54-93B5DD08836B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E155D31C-0061-40A3-AD54-93B5DD08836B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E155D31C-0061-40A3-AD54-93B5DD08836B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49F18714-F5F9-4FFC-A674-39CE166466A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49F18714-F5F9-4FFC-A674-39CE166466A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49F18714-F5F9-4FFC-A674-39CE166466A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49F18714-F5F9-4FFC-A674-39CE166466A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{600195A2-6E93-46AF-87A7-EA2E48E5AE24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{600195A2-6E93-46AF-87A7-EA2E48E5AE24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{600195A2-6E93-46AF-87A7-EA2E48E5AE24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{600195A2-6E93-46AF-87A7-EA2E48E5AE24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E303F270-6091-47DE-9260-DAD6122005A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E303F270-6091-47DE-9260-DAD6122005A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E303F270-6091-47DE-9260-DAD6122005A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E303F270-6091-47DE-9260-DAD6122005A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +102,8 @@ Global
 		{983A565C-5AE2-4F76-8B7B-7C5C051072C7} = {926D63B6-9F6A-45A1-B5B7-5F36352C23AB}
 		{88213D5C-AADC-4F03-ACA3-7ADDCCE87DF4} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
 		{8C86E60A-77C2-4204-AF36-F4B845474016} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
+		{49F18714-F5F9-4FFC-A674-39CE166466A6} = {926D63B6-9F6A-45A1-B5B7-5F36352C23AB}
+		{600195A2-6E93-46AF-87A7-EA2E48E5AE24} = {926D63B6-9F6A-45A1-B5B7-5F36352C23AB}
+		{E303F270-6091-47DE-9260-DAD6122005A7} = {926D63B6-9F6A-45A1-B5B7-5F36352C23AB}
 	EndGlobalSection
 EndGlobal

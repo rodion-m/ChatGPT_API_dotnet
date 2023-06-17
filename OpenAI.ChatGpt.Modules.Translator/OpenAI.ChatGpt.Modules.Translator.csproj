@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>11</LangVersion>
+        <Authors>Rodion Mostovoi</Authors>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>OpenAI.ChatGPT.Modules.Translator</PackageId>
+        <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
+        <Product>OpenAI ChatGPT based language translator</Product>
+        <Version>2.6.0</Version>
+        <Description>OpenAI ChatGPT based language translator.</Description>
+        <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4, translator</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Title>OpenAI ChatGPT based language translator</Title>
+        <Copyright>Rodion Mostovoi</Copyright>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OpenAI.ChatGpt\OpenAI.ChatGpt.csproj" />
+    </ItemGroup>
+
+</Project>

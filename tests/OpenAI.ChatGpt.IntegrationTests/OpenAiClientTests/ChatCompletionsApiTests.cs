@@ -1,4 +1,6 @@
-﻿namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
+﻿using OpenAI.Tests.Shared;
+
+namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
 
 [Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ChatCompletionsApiTests
@@ -9,7 +11,7 @@ public class ChatCompletionsApiTests
     public ChatCompletionsApiTests(ITestOutputHelper outputHelper)
     {
         _outputHelper = outputHelper;
-        _client = new OpenAiClient(Helpers.GetKeyFromEnvironment("OPENAI_API_KEY"));
+        _client = new OpenAiClient(Helpers.GetOpenAiKey());
     }
 
     [Fact]

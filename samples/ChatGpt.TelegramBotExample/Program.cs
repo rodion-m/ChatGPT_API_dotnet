@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OpenAI.ChatGpt.AspNetCore;
+using OpenAI.ChatGpt.AspNetCore.Extensions;
 using OpenAI.ChatGpt.AspNetCore.Models;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using OpenAI.ChatGpt.Models;

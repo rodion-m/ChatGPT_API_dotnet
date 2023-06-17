@@ -1,4 +1,6 @@
-﻿namespace OpenAI.ChatGpt.IntegrationTests;
+﻿using OpenAI.Tests.Shared;
+
+namespace OpenAI.ChatGpt.IntegrationTests;
 
 public class ChatGptTests
 {
@@ -36,7 +38,7 @@ public class ChatGptTests
 
     private static async Task<ChatService> CreateInMemoryChat()
     {
-        return await ChatGPT.CreateInMemoryChat(Helpers.GetKeyFromEnvironment("OPENAI_API_KEY"),
+        return await ChatGPT.CreateInMemoryChat(Helpers.GetOpenAiKey(),
             new ChatGPTConfig()
             {
                 MaxTokens = 100

@@ -26,15 +26,15 @@ public class ChatService : IDisposable, IAsyncDisposable
 
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;
-    private readonly OpenAiClient _client;
-    private bool _isNew;
+    private readonly IOpenAiClient _client;
     private readonly bool _clearOnDisposal;
     private CancellationTokenSource? _cts;
+    private bool _isNew;
 
     internal ChatService(
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock,
-        OpenAiClient client,
+        IOpenAiClient client,
         string userId,
         Topic topic,
         bool isNew,
@@ -84,7 +84,8 @@ public class ChatService : IDisposable, IAsyncDisposable
     {
         if (IsWriting)
         {
-            throw new InvalidOperationException("Cannot start a new chat session while the previous one is still in progress.");
+            throw new InvalidOperationException(
+                "Cannot start a new chat session while the previous one is still in progress.");
         }
         var originalCancellation = cancellationToken;
         _cts?.Dispose();

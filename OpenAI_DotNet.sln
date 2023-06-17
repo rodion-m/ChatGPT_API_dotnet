@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{80DB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGpt.SpectreConsoleExample", "samples\ChatGpt.SpectreConsoleExample\ChatGpt.SpectreConsoleExample.csproj", "{E43C67EE-337F-47EA-B41A-269DBFFC3F95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.Extensions", "OpenAI.ChatGpt.Extensions\OpenAI.ChatGpt.Extensions.csproj", "{124630DD-563A-4C9D-AA9A-5D24564CB5DB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGpt.ConsoleExample", "samples\ChatGpt.ConsoleExample\ChatGpt.ConsoleExample.csproj", "{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.EntityFrameworkCore", "OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj", "{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}"
@@ -45,10 +43,6 @@ Global
 		{E43C67EE-337F-47EA-B41A-269DBFFC3F95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E43C67EE-337F-47EA-B41A-269DBFFC3F95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E43C67EE-337F-47EA-B41A-269DBFFC3F95}.Release|Any CPU.Build.0 = Release|Any CPU
-		{124630DD-563A-4C9D-AA9A-5D24564CB5DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{124630DD-563A-4C9D-AA9A-5D24564CB5DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{124630DD-563A-4C9D-AA9A-5D24564CB5DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{124630DD-563A-4C9D-AA9A-5D24564CB5DB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU

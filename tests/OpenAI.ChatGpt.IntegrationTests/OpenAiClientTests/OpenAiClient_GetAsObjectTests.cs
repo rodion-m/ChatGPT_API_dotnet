@@ -58,7 +58,7 @@ public class OpenAiClientGetAsObjectTests
     public async void Get_structured_response_with_extra_data_from_ChatGPT()
     {
         var message = 
-            Dialog.StartAsSystem("Just answer the questions.")
+            Dialog.StartAsSystem("You are a smart oracle.")
                 .ThenUser("In what year was the city of Almaty originally founded?");
         var response = await _client.GetStructuredResponse<City>(message);
         response.Should().NotBeNull();

@@ -25,7 +25,7 @@ public class OpenAiClientGetAsObjectTests
     }
     
     [Fact]
-    public async void Get_structured_response_with_array_from_ChatGPT()
+    public async void Get_structured_response_with_ARRAY_from_ChatGPT()
     {
         var message = 
             Dialog.StartAsSystem("What did user input?")
@@ -43,16 +43,36 @@ public class OpenAiClientGetAsObjectTests
         response.Items[1].Quantity.Should().Be(3);
     }
     
+    [Fact]
+    public async void Get_structured_response_with_ENUM_from_ChatGPT()
+    {
+        var message = 
+            Dialog.StartAsSystem("What did user input?")
+                .ThenUser("Мой любимый цвет - красный");
+        var response = await _client.GetStructuredResponse<Thing>(message);
+        response.Should().NotBeNull();
+        response.Color.Should().Be(Thing.Colors.Red);
+    }
+    
+    [Fact]
+    public async void Get_structured_response_with_extra_data_from_ChatGPT()
+    {
+        var message = 
+            Dialog.StartAsSystem("Just answer the questions.")
+                .ThenUser("In what year was the city of Almaty originally founded?");
+        var response = await _client.GetStructuredResponse<City>(message);
+        response.Should().NotBeNull();
+        response.Name.Should().Be("Almaty");
+        response.YearOfFoundation.Should().Be(1854);
+        response.Country.Should().Be("Kazakhstan");
+    }
+    
     private class Order
     {
         public UserInfo UserInfo { get; set; }
         public List<Item> Items { get; set; }
 
-        public class Item
-        {
-            public string Name { get; set; } = "";
-            public int Quantity { get; set; }
-        }
+        public record Item(string Name, int Quantity);
     }
     
     private class UserInfo
@@ -61,4 +81,18 @@ public class OpenAiClientGetAsObjectTests
         public int Age { get; init; }
         public string Email { get; init; }
     }
+
+    private record Thing(Thing.Colors Color)
+    {
+        public enum Colors
+        {
+            None,
+            Red,
+            Green,
+            Blue
+        }
+    }
+
+    private record City(string Name, int YearOfFoundation, string Country);
 }
+

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Json.Schema;
 using Json.Schema.Generation;
 using OpenAI.ChatGpt.Models.ChatCompletion;
@@ -97,7 +98,11 @@ public static class OpenAiClientExtensions
                 rawResponseGetter,
                 cancellationToken);
 
-            jsonDeserializerOptions ??= new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            jsonDeserializerOptions ??= new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
             var deserialized = JsonSerializer.Deserialize<TObject>(response, jsonDeserializerOptions);
             if (deserialized is null)
             {

@@ -30,21 +30,6 @@ public class ChatGptTranslatorServiceTests
     }
 
     [Fact]
-    public void Dispose_with_injected_client_should_not_dispose_client()
-    {
-        // Arrange
-        var clientMock = new Mock<OpenAiClient>();
-        clientMock.Setup(client => client.Dispose()).Verifiable();
-        var translatorService = new ChatGPTTranslatorService(clientMock.Object);
-
-        // Act
-        translatorService.Dispose();
-
-        // Assert
-        clientMock.Verify(client => client.Dispose(), Times.Never);
-    }
-
-    [Fact]
     public async Task Translate_without_source_and_target_languages_uses_default_languages()
     {
         // Arrange

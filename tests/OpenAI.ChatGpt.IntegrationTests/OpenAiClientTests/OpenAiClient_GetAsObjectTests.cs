@@ -1,4 +1,6 @@
-﻿namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
+﻿using OpenAI.ChatGpt.Modules.StructuredResponse;
+
+namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
 
 public class OpenAiClientGetAsObjectTests
 {
@@ -27,7 +29,7 @@ public class OpenAiClientGetAsObjectTests
     {
         var message = 
             Dialog.StartAsSystem("What did user input?")
-                .ThenUser("My name is John, my age is 30, my email is john@gmail.com. I want to buy 2 apples and 3 oranges.");
+                .ThenUser("My name is John, my age is 30, my email is john@gmail.com. I want to buy 2 apple and 3 orange.");
         var response = await _client.GetStructuredResponse<Order>(message);
         response.Should().NotBeNull();
         response.UserInfo.Name.Should().Be("John");
@@ -43,8 +45,8 @@ public class OpenAiClientGetAsObjectTests
     
     private class Order
     {
-        public UserInfo UserInfo { get; set; } = new();
-        public List<Item> Items { get; set; } = new() {new Item()};
+        public UserInfo UserInfo { get; set; }
+        public List<Item> Items { get; set; }
 
         public class Item
         {

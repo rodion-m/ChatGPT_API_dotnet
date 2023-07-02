@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+using Json.Schema;
+using Json.Schema.Generation;
 using OpenAI.ChatGpt.Models.ChatCompletion;
 using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
-namespace OpenAI.ChatGpt;
+namespace OpenAI.ChatGpt.Modules.StructuredResponse;
 
 public static class OpenAiClientExtensions
 {
@@ -40,69 +41,13 @@ public static class OpenAiClientExtensions
         string? user = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         Action<ChatCompletionResponse>? rawResponseGetter = null,
-        JsonSerializerOptions? jsonSerializerOptions = null,
-        JsonSerializerOptions? jsonDeserializerOptions = null,
-        CancellationToken cancellationToken = default) where TObject: new()
-    {
-        ArgumentNullException.ThrowIfNull(client);
-        ArgumentNullException.ThrowIfNull(dialog);
-        var responseFormat = CreateResponseFormatJson<TObject>(new TObject(), jsonSerializerOptions);
-
-        return client.GetStructuredResponse<TObject>(
-            dialog: dialog,
-            responseFormat: responseFormat,
-            maxTokens: maxTokens,
-            model: model,
-            temperature: temperature,
-            user: user,
-            requestModifier: requestModifier,
-            rawResponseGetter: rawResponseGetter,
-            jsonDeserializerOptions: jsonDeserializerOptions,
-            cancellationToken: cancellationToken);
-    }
-    
-    /// <summary>
-    /// Asynchronously gets a response from the OpenAI API, and attempts to deserialize it into an instance of the specified type.
-    /// </summary>
-    /// <typeparam name="TObject">The type into which to deserialize the response.</typeparam>
-    /// <param name="client">The OpenAI client.</param>
-    /// <param name="dialog">The dialog to send to the OpenAI API.</param>
-    /// <param name="responseExample">Is used to infer the expected structure of the response if no response format is explicitly specified.</param>
-    /// <param name="maxTokens">(Optional) The maximum number of tokens for the model to generate. If null, the default is calculated.</param>
-    /// <param name="model">(Optional) The model to use. If null, the default model is used.</param>
-    /// <param name="temperature">(Optional) Controls randomness in the AI's output. Default is defined by ChatCompletionTemperatures.Default.</param>
-    /// <param name="user">(Optional) User identifier. If null, the default user is used.</param>
-    /// <param name="requestModifier">(Optional) Delegate for modifying the request.</param>
-    /// <param name="rawResponseGetter">(Optional) Delegate for processing the raw response.</param>
-    /// <param name="jsonSerializerOptions">(Optional) Options for the JSON serializer. If null, the default options are used.</param>
-    /// <param name="jsonDeserializerOptions">(Optional) Options for the JSON deserializer. If null, case-insensitive property name matching is used.</param>
-    /// <param name="cancellationToken">(Optional) A token that can be used to cancel the operation.</param>
-    /// <returns>The task object representing the asynchronous operation, containing the deserialized response,
-    /// or the default response if deserialization fails.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="client"/> or <paramref name="dialog"/> or <paramref name="responseExample"/> is null.</exception>
-    /// <remarks>
-    /// This method modifies the content of the dialog to include a message instructing the AI to respond in a certain format.
-    /// After the call to the API, the original content of the dialog is restored.
-    /// </remarks>
-    public static Task<TObject> GetStructuredResponse<TObject>(
-        this IOpenAiClient client,
-        UserOrSystemMessage dialog,
-        TObject responseExample,
-        int? maxTokens = null,
-        string? model = null,
-        float temperature = ChatCompletionTemperatures.Default,
-        string? user = null,
-        Action<ChatCompletionRequest>? requestModifier = null,
-        Action<ChatCompletionResponse>? rawResponseGetter = null,
-        JsonSerializerOptions? jsonSerializerOptions = null,
         JsonSerializerOptions? jsonDeserializerOptions = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(client);
         ArgumentNullException.ThrowIfNull(dialog);
-        ArgumentNullException.ThrowIfNull(responseExample);
+        var responseFormat = CreateResponseFormatJson<TObject>();
 
-        var responseFormat = CreateResponseFormatJson(responseExample, jsonSerializerOptions);
         return client.GetStructuredResponse<TObject>(
             dialog: dialog,
             responseFormat: responseFormat,
@@ -139,7 +84,8 @@ public static class OpenAiClientExtensions
         {
             editMsg.Content += GetAdditionalJsonResponsePrompt(responseFormat);
 
-            (model, maxTokens) = ChatCompletionMessage.FindOptimalModelAndMaxToken(dialog.GetMessages(), model, maxTokens);
+            (model, maxTokens) =
+                ChatCompletionMessage.FindOptimalModelAndMaxToken(dialog.GetMessages(), model, maxTokens);
 
             var response = await client.GetChatCompletions(
                 dialog,
@@ -169,30 +115,20 @@ public static class OpenAiClientExtensions
 
     private static string GetAdditionalJsonResponsePrompt(string responseFormat)
     {
-        return $"\n\nWrite your response in JSON format, which structure is enclosed within double backticks ``{responseFormat}``";
+        return$"\n\nWrite your response in JSON format. The response structure is enclosed within double backticks (JSON Schema) ``{responseFormat}``";
     }
 
-    internal static string CreateResponseFormatJson<TObject>(
-        TObject objectToDeserialize,
-        JsonSerializerOptions? jsonSerializerOptions)
+    internal static string CreateResponseFormatJson<TObject>()
     {
-        ArgumentNullException.ThrowIfNull(objectToDeserialize);
-        if (jsonSerializerOptions is null)
-        {
-            jsonSerializerOptions = new JsonSerializerOptions()
+        var schemaBuilder = new JsonSchemaBuilder();
+        JsonSchema schema = schemaBuilder.FromType<TObject>(new SchemaGeneratorConfiguration()
             {
-                WriteIndented = false,
-                DefaultIgnoreCondition = JsonIgnoreCondition.Never
-            };
-        }
-        else
-        {
-            jsonSerializerOptions = new JsonSerializerOptions(jsonSerializerOptions)
-            {
-                WriteIndented = false,
-                DefaultIgnoreCondition = JsonIgnoreCondition.Never
-            };
-        }
-        return JsonSerializer.Serialize(objectToDeserialize, jsonSerializerOptions);
+                Nullability = Nullability.Disabled,
+                PropertyOrder = PropertyOrder.AsDeclared,
+                PropertyNamingMethod = PropertyNamingMethods.AsDeclared
+            }
+        ).Build();
+        string schemaString = JsonSerializer.Serialize(schema, new JsonSerializerOptions() {WriteIndented = false});
+        return schemaString;
     }
 }

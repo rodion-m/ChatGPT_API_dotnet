@@ -31,4 +31,9 @@
       <ProjectReference Include="..\..\OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <Folder Include="Other\" />
+    </ItemGroup>
+
 </Project>

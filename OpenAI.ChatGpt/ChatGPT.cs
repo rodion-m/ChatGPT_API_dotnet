@@ -92,9 +92,9 @@ public class ChatGPT : IDisposable
     {
         Stop();
         _currentChat?.Dispose();
-        if (!_isClientInjected)
+        if (!_isClientInjected && _client is IDisposable disposableClient)
         {
-            _client.Dispose();
+            disposableClient.Dispose();
         }
     }
 

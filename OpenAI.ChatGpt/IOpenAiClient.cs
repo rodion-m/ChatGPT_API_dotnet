@@ -1,10 +1,9 @@
-﻿using System.Runtime.CompilerServices;
-using OpenAI.ChatGpt.Models.ChatCompletion;
+﻿using OpenAI.ChatGpt.Models.ChatCompletion;
 using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt;
 
-public interface IOpenAiClient : IDisposable
+public interface IOpenAiClient
 {
     Task<string> GetChatCompletions(
         UserOrSystemMessage dialog,
@@ -13,6 +12,7 @@ public interface IOpenAiClient : IDisposable
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
         Action<ChatCompletionRequest>? requestModifier = null,
+        Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default);
 
     Task<string> GetChatCompletions(
@@ -22,6 +22,7 @@ public interface IOpenAiClient : IDisposable
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
         Action<ChatCompletionRequest>? requestModifier = null,
+        Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default);
 
     Task<ChatCompletionResponse> GetChatCompletionsRaw(
@@ -81,8 +82,7 @@ public interface IOpenAiClient : IDisposable
         CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<string> StreamChatCompletions(
-        ChatCompletionRequest request,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default);
+        ChatCompletionRequest request,CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(
         ChatCompletionRequest request, CancellationToken cancellationToken = default);

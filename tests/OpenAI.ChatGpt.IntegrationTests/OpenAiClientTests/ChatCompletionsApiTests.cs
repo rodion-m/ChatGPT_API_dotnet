@@ -1,6 +1,4 @@
-﻿using OpenAI.Tests.Shared;
-
-namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
+﻿namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
 
 [Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ChatCompletionsApiTests

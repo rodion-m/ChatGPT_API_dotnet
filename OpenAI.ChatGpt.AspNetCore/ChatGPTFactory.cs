@@ -127,9 +127,9 @@ public class ChatGPTFactory : IDisposable
 
     public void Dispose()
     {
-        if (!_isHttpClientInjected)
+        if (!_isHttpClientInjected && _client is IDisposable disposableClient)
         {
-            _client.Dispose();
+            disposableClient.Dispose();
         }
     }
 }

@@ -19,3 +19,4 @@ global using OpenAI.ChatGpt.Interfaces;
 global using OpenAI.ChatGpt.Internal;
 global using OpenAI.ChatGpt.Models;
 global using OpenAI.ChatGpt.Exceptions;
+global using OpenAI.Tests.Shared;

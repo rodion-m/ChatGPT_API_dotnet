@@ -93,13 +93,16 @@ public class ChatService : IDisposable, IAsyncDisposable
         cancellationToken = _cts.Token;
 
         var history = await LoadHistory(cancellationToken);
-        var messages = history.Append(message);
+        var messages = history.Append(message).ToArray();
         
         IsWriting = true;
         try
         {
+            var (model, maxTokens) = FindOptimalModelAndMaxToken(messages);
             var response = await _client.GetChatCompletionsRaw(
                 messages,
+                maxTokens: maxTokens,
+                model: model,
                 user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
                 requestModifier: Topic.Config.ModifyRequest,
                 cancellationToken: cancellationToken
@@ -117,7 +120,13 @@ public class ChatService : IDisposable, IAsyncDisposable
             IsWriting = false; 
         }
     }
-    
+
+    private (string model, int maxTokens) FindOptimalModelAndMaxToken(ChatCompletionMessage[] messages)
+    {
+        return ChatCompletionMessage.FindOptimalModelAndMaxToken(
+            messages, Topic.Config.Model, Topic.Config.MaxTokens);
+    }
+
     public IAsyncEnumerable<string> StreamNextMessageResponse(
         string message,
         bool throwOnCancellation = true,
@@ -143,11 +152,14 @@ public class ChatService : IDisposable, IAsyncDisposable
         cancellationToken = _cts.Token;
 
         var history = await LoadHistory(cancellationToken);
-        var messages = history.Append(message);
+        var messages = history.Append(message).ToArray();
         var sb = new StringBuilder();
         IsWriting = true;
+        var (model, maxTokens) = FindOptimalModelAndMaxToken(messages);
         var stream = _client.StreamChatCompletions(
             messages,
+            maxTokens: maxTokens,
+            model: model,
             user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
             requestModifier: Topic.Config.ModifyRequest,
             cancellationToken: cancellationToken

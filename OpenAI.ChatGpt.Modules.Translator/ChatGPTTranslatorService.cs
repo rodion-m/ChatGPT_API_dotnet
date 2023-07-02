@@ -25,7 +25,7 @@ public class ChatGPTTranslatorService : IDisposable
     
     public ChatGPTTranslatorService(
         string apiKey, 
-        string? host,
+        string? host = null,
         string? defaultSourceLanguage = null,
         string? defaultTargetLanguage = null,
         string? extraPrompt = null)
@@ -39,9 +39,9 @@ public class ChatGPTTranslatorService : IDisposable
 
     public void Dispose()
     {
-        if (!_isHttpClientInjected)
+        if (!_isHttpClientInjected && _client is IDisposable disposableClient)
         {
-            _client.Dispose();
+            disposableClient.Dispose();
         }
     }
     
@@ -55,6 +55,14 @@ public class ChatGPTTranslatorService : IDisposable
         if (text == null) throw new ArgumentNullException(nameof(text));
         var sourceLanguageOrDefault = sourceLanguage ?? _defaultSourceLanguage;
         var targetLanguageOrDefault = targetLanguage ?? _defaultTargetLanguage;
+        if (sourceLanguageOrDefault is null)
+        {
+            throw new ArgumentNullException(nameof(sourceLanguage), "Source language is not specified");
+        }
+        if (targetLanguageOrDefault is null)
+        {
+            throw new ArgumentNullException(nameof(targetLanguage), "Target language is not specified");
+        }
         var prompt = GetPrompt(sourceLanguageOrDefault, targetLanguageOrDefault);
         var response = await _client.GetChatCompletions(
             Dialog.StartAsSystem(prompt).ThenUser(text),

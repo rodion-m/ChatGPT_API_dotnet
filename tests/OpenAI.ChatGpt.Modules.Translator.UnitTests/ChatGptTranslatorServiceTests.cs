@@ -23,7 +23,7 @@ public class ChatGptTranslatorServiceTests
     public void Initialization_with_null_client_should_throw_exception()
     {
         // Arrange & Act
-        Action act = () => new ChatGPTTranslatorService(client: null);
+        Action act = () => new ChatGPTTranslatorService(client: null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>();
@@ -33,7 +33,7 @@ public class ChatGptTranslatorServiceTests
     public void Dispose_with_injected_client_should_not_dispose_client()
     {
         // Arrange
-        var clientMock = new Mock<IOpenAiClient>();
+        var clientMock = new Mock<OpenAiClient>();
         clientMock.Setup(client => client.Dispose()).Verifiable();
         var translatorService = new ChatGPTTranslatorService(clientMock.Object);
 
@@ -59,6 +59,7 @@ public class ChatGptTranslatorServiceTests
                 It.IsAny<float>(), 
                 It.IsAny<string>(), 
                 It.IsAny<Action<ChatCompletionRequest>>(), 
+                It.IsAny<Action<ChatCompletionResponse>>(), 
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync("Привет, мир!")
             .Verifiable();
@@ -80,7 +81,8 @@ public class ChatGptTranslatorServiceTests
                 It.IsAny<string>(), 
                 It.IsAny<float>(), 
                 It.IsAny<string>(), 
-                It.IsAny<Action<ChatCompletionRequest>>(), 
+                It.IsAny<Action<ChatCompletionRequest>>(),
+                It.IsAny<Action<ChatCompletionResponse>>(), 
                 It.IsAny<CancellationToken>()), 
             Times.Once);
         translatedText.Should().Be("Привет, мир!");

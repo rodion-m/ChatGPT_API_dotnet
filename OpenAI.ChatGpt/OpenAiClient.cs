@@ -12,7 +12,7 @@ namespace OpenAI.ChatGpt;
 
 /// <summary> Thread-safe OpenAI client. </summary>
 [Fody.ConfigureAwait(false)]
-public class OpenAiClient : IDisposable, IOpenAiClient
+public class OpenAiClient : IOpenAiClient, IDisposable
 {
     private const string DefaultHost = "https://api.openai.com/v1/";
     private const string ImagesEndpoint = "images/generations";
@@ -122,6 +122,7 @@ public class OpenAiClient : IDisposable, IOpenAiClient
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
         Action<ChatCompletionRequest>? requestModifier = null,
+        Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default)
     {
         if (dialog == null) throw new ArgumentNullException(nameof(dialog));
@@ -135,6 +136,7 @@ public class OpenAiClient : IDisposable, IOpenAiClient
             requestModifier
         );
         var response = await GetChatCompletionsRaw(request, cancellationToken);
+        rawResponseGetter?.Invoke(response);
         return response.Choices[0].Message!.Content;
     }
 
@@ -145,6 +147,7 @@ public class OpenAiClient : IDisposable, IOpenAiClient
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
         Action<ChatCompletionRequest>? requestModifier = null,
+        Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default)
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
@@ -158,6 +161,7 @@ public class OpenAiClient : IDisposable, IOpenAiClient
             requestModifier
         );
         var response = await GetChatCompletionsRaw(request, cancellationToken);
+        rawResponseGetter?.Invoke(response);
         return response.GetMessageContent();
     }
     

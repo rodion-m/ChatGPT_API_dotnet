@@ -199,7 +199,7 @@ public static class ChatCompletionModels
         {
             throw new ArgumentOutOfRangeException(
                 nameof(maxTokens), 
-                $"Max tokens must be less than or equal to {limit} for model {model}"
+                $"Max tokens must be less than or equal to {limit} for model {model} but was {maxTokens}"
             );
         }
     }
@@ -210,7 +210,7 @@ public static class ChatCompletionModels
         if (maxTokens > limit)
         {
             throw new ArgumentOutOfRangeException(
-                nameof(maxTokens), $"Max tokens must be less than or equal to {limit}");
+                nameof(maxTokens), $"Max tokens must be less than or equal to {limit} but was {maxTokens}");
         }
     }
 }

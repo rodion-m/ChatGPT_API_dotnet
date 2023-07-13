@@ -3,4 +3,10 @@
         <Version>2.7.1</Version>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="OpenAI.ChatGpt.UnitTests"/>
+        <InternalsVisibleTo Include="OpenAI.ChatGpt.IntegrationTests"/>
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+    </ItemGroup>
 </Project>

@@ -88,19 +88,19 @@ public class ChatGPTTranslatorService : IDisposable
             rawResponseGetter,
             cancellationToken); 
         return response;
-        
-        string CreateTextTranslationPrompt(string sourceLanguage, string targetLanguage)
-        {
-            ArgumentNullException.ThrowIfNull(sourceLanguage);
-            ArgumentNullException.ThrowIfNull(targetLanguage);
-            return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
-                   "The user provides with a sentence and you translate it. " +
-                   "In the response write ONLY translated text." + 
-                   (_extraPrompt is not null ? "\n" + _extraPrompt : "");
-        }
     }
     
-    public async Task<TObject> TranslateObject<TObject>(
+    internal virtual string CreateTextTranslationPrompt(string sourceLanguage, string targetLanguage)
+    {
+        ArgumentNullException.ThrowIfNull(sourceLanguage);
+        ArgumentNullException.ThrowIfNull(targetLanguage);
+        return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
+               "The user provides with a sentence and you translate it. " +
+               "In the response write ONLY translated text." + 
+               (_extraPrompt is not null ? "\n" + _extraPrompt : "");
+    }
+    
+    public virtual async Task<TObject> TranslateObject<TObject>(
         TObject objectToTranslate,
         string? sourceLanguage = null,
         string? targetLanguage = null,
@@ -144,14 +144,14 @@ public class ChatGPTTranslatorService : IDisposable
             cancellationToken
         );
         return response;
-        
-        string CreateObjectTranslationPrompt(string sourceLanguage, string targetLanguage)
-        {
-            ArgumentNullException.ThrowIfNull(sourceLanguage);
-            ArgumentNullException.ThrowIfNull(targetLanguage);
-            return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
-                   "The user provides you with an object in json. You translate only the text fields that need to be translated. " +
-                   (_extraPrompt is not null ? "\n" + _extraPrompt : "");
-        }
+    }
+
+    internal string CreateObjectTranslationPrompt(string sourceLanguage, string targetLanguage)
+    {
+        ArgumentNullException.ThrowIfNull(sourceLanguage);
+        ArgumentNullException.ThrowIfNull(targetLanguage);
+        return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
+               "The user provides you with an object in json. You translate only the text fields that need to be translated. " +
+               (_extraPrompt is not null ? "\n" + _extraPrompt : "");
     }
 }

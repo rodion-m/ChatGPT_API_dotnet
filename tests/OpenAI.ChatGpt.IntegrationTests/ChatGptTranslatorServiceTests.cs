@@ -1,7 +1,6 @@
-using FluentAssertions;
-using OpenAI.Tests.Shared;
+using OpenAI.ChatGpt.Modules.Translator;
 
-namespace OpenAI.ChatGpt.Modules.Translator.IntegrationTests;
+namespace OpenAI.ChatGpt.IntegrationTests;
 
 public class ChatGptTranslatorServiceTests
 {

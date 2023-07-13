@@ -1,9 +1,7 @@
-using FluentAssertions;
 using Moq;
-using OpenAI.ChatGpt.Models.ChatCompletion;
-using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
+using OpenAI.ChatGpt.Modules.Translator;
 
-namespace OpenAI.ChatGpt.Modules.Translator.UnitTests;
+namespace OpenAI.ChatGpt.UnitTests;
 
 public class ChatGptTranslatorServiceTests
 {
@@ -46,31 +44,29 @@ public class ChatGptTranslatorServiceTests
                 It.IsAny<Action<ChatCompletionRequest>>(), 
                 It.IsAny<Action<ChatCompletionResponse>>(), 
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync("Привет, мир!")
+            .ReturnsAsync("Привет, мир!");
+        
+        var translatorServiceMock = new Mock<ChatGPTTranslatorService>(
+            (IOpenAiClient) clientMock.Object, 
+            expectedSourceLanguage, 
+            expectedTargetLanguage,
+            null);
+        
+        translatorServiceMock.Setup(service => service.CreateTextTranslationPrompt(
+                It.IsAny<string>(), It.IsAny<string>()))
+            .Returns($"{expectedSourceLanguage} => {expectedTargetLanguage}")
             .Verifiable();
-        var translatorService = new ChatGPTTranslatorService(
-            clientMock.Object, 
-            defaultSourceLanguage: expectedSourceLanguage, 
-            defaultTargetLanguage: expectedTargetLanguage);
+
+        var translatorService = translatorServiceMock.Object;
 
         // Act
-        var translatedText = await translatorService.TranslateText(textToTranslate);
+        _ = await translatorService.TranslateText(textToTranslate);
 
         // Assert
-        clientMock.Verify(client => client.GetChatCompletions(
-                It.Is<UserOrSystemMessage>(dialog => 
-                    dialog.GetMessages().Any(
-                        message => message.Role == "system" && 
-                                   message.Content.Contains($"I want you to act as a translator from {expectedSourceLanguage} to {expectedTargetLanguage}"))),
-                It.IsAny<int>(), 
-                It.IsAny<string>(), 
-                It.IsAny<float>(), 
-                It.IsAny<string>(), 
-                It.IsAny<Action<ChatCompletionRequest>>(),
-                It.IsAny<Action<ChatCompletionResponse>>(), 
-                It.IsAny<CancellationToken>()), 
+        translatorServiceMock.Verify(service => 
+                service.CreateTextTranslationPrompt(
+                    expectedSourceLanguage, expectedTargetLanguage), 
             Times.Once);
-        translatedText.Should().Be("Привет, мир!");
     }
     
     

@@ -9,7 +9,6 @@
         <PackageId>OpenAI.ChatGPT.Modules.Translator</PackageId>
         <PackageProjectUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</PackageProjectUrl>
         <Product>OpenAI ChatGPT based language translator</Product>
-        <Version>2.7.0</Version>
         <Description>OpenAI ChatGPT based language translator.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
@@ -26,7 +25,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OpenAI.ChatGpt\OpenAI.ChatGpt.csproj" />
+        <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Fody" Version="6.6.4">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj"/>
+        <ProjectReference Include="..\OpenAI.ChatGpt\OpenAI.ChatGpt.csproj"/>
     </ItemGroup>
 
 </Project>

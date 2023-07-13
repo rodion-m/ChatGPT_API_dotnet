@@ -1,7 +1,13 @@
-﻿using OpenAI.ChatGpt.Models.ChatCompletion;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using OpenAI.ChatGpt.Models.ChatCompletion;
+using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
+using OpenAI.ChatGpt.Modules.StructuredResponse;
 
 namespace OpenAI.ChatGpt.Modules.Translator;
 
+[Fody.ConfigureAwait(false)]
+// ReSharper disable once InconsistentNaming
 public class ChatGPTTranslatorService : IDisposable
 {
     private readonly IOpenAiClient _client;
@@ -45,14 +51,19 @@ public class ChatGPTTranslatorService : IDisposable
         }
     }
     
-    public async Task<string> Translate(
+    public async Task<string> TranslateText(
         string text,
         string? sourceLanguage = null,
         string? targetLanguage = null,
+        int? maxTokens = null,
+        string? model = null,
+        float temperature = ChatCompletionTemperatures.Default,
+        string? user = null,
         Action<ChatCompletionRequest>? requestModifier = null,
+        Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default)
     {
-        if (text == null) throw new ArgumentNullException(nameof(text));
+        ArgumentNullException.ThrowIfNull(text);
         var sourceLanguageOrDefault = sourceLanguage ?? _defaultSourceLanguage;
         var targetLanguageOrDefault = targetLanguage ?? _defaultTargetLanguage;
         if (sourceLanguageOrDefault is null)
@@ -63,21 +74,84 @@ public class ChatGPTTranslatorService : IDisposable
         {
             throw new ArgumentNullException(nameof(targetLanguage), "Target language is not specified");
         }
-        var prompt = GetPrompt(sourceLanguageOrDefault, targetLanguageOrDefault);
+
+        var prompt = CreateTextTranslationPrompt(sourceLanguageOrDefault, targetLanguageOrDefault);
+        var messages = Dialog.StartAsSystem(prompt).ThenUser(text).GetMessages().ToArray();
+        (model, maxTokens) = ChatCompletionMessage.FindOptimalModelAndMaxToken(messages, model, maxTokens);
         var response = await _client.GetChatCompletions(
-            Dialog.StartAsSystem(prompt).ThenUser(text),
-            user: null,
-            requestModifier: requestModifier,
-            cancellationToken: cancellationToken
+            messages,
+            maxTokens.Value,
+            model,
+            temperature,
+            user,
+            requestModifier,
+            rawResponseGetter,
+            cancellationToken); 
+        return response;
+        
+        string CreateTextTranslationPrompt(string sourceLanguage, string targetLanguage)
+        {
+            ArgumentNullException.ThrowIfNull(sourceLanguage);
+            ArgumentNullException.ThrowIfNull(targetLanguage);
+            return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
+                   "The user provides with a sentence and you translate it. " +
+                   "In the response write ONLY translated text." + 
+                   (_extraPrompt is not null ? "\n" + _extraPrompt : "");
+        }
+    }
+    
+    public async Task<TObject> TranslateObject<TObject>(
+        TObject objectToTranslate,
+        string? sourceLanguage = null,
+        string? targetLanguage = null,
+        int? maxTokens = null,
+        string? model = null,
+        float temperature = ChatCompletionTemperatures.Default,
+        string? user = null,
+        Action<ChatCompletionRequest>? requestModifier = null,
+        Action<ChatCompletionResponse>? rawResponseGetter = null,
+        JsonSerializerOptions? jsonSerializerOptions = null,
+        JsonSerializerOptions? jsonDeserializerOptions = null,
+        CancellationToken cancellationToken = default) where TObject : class
+    {
+        ArgumentNullException.ThrowIfNull(objectToTranslate);
+        var sourceLanguageOrDefault = sourceLanguage ?? _defaultSourceLanguage;
+        var targetLanguageOrDefault = targetLanguage ?? _defaultTargetLanguage;
+        if (sourceLanguageOrDefault is null)
+        {
+            throw new ArgumentNullException(nameof(sourceLanguage), "Source language is not specified");
+        }
+        if (targetLanguageOrDefault is null)
+        {
+            throw new ArgumentNullException(nameof(targetLanguage), "Target language is not specified");
+        }
+
+        var prompt = CreateObjectTranslationPrompt(sourceLanguageOrDefault, targetLanguageOrDefault);
+        jsonSerializerOptions ??= new JsonSerializerOptions() {DefaultIgnoreCondition = JsonIgnoreCondition.Never};
+        var objectJson = JsonSerializer.Serialize(objectToTranslate, jsonSerializerOptions);
+        var dialog = Dialog.StartAsSystem(prompt).ThenUser(objectJson);
+        var messages = dialog.GetMessages().ToArray();
+        (model, maxTokens) = ChatCompletionMessage.FindOptimalModelAndMaxToken(messages, model, maxTokens);
+        var response = await _client.GetStructuredResponse<TObject>(
+            dialog,
+            maxTokens.Value,
+            model,
+            temperature,
+            user,
+            requestModifier,
+            rawResponseGetter,
+            jsonDeserializerOptions,
+            cancellationToken
         );
         return response;
-    }
-
-    private string GetPrompt(string sourceLanguage, string targetLanguage)
-    {
-        return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
-               "I will provide you with an English sentence and you will translate it into Russian. " +
-               "In the response write ONLY translated text."
-            + (_extraPrompt is not null ? "\n" + _extraPrompt : "");
+        
+        string CreateObjectTranslationPrompt(string sourceLanguage, string targetLanguage)
+        {
+            ArgumentNullException.ThrowIfNull(sourceLanguage);
+            ArgumentNullException.ThrowIfNull(targetLanguage);
+            return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
+                   "The user provides you with an object in json. You translate only the text fields that need to be translated. " +
+                   (_extraPrompt is not null ? "\n" + _extraPrompt : "");
+        }
     }
 }

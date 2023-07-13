@@ -13,6 +13,7 @@ namespace OpenAI.ChatGpt;
 /// Used for communication between a user and the assistant (ChatGPT).
 /// </summary>
 /// <remarks>Not thread-safe. Use one instance per user.</remarks>
+[Fody.ConfigureAwait(false)]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class ChatService : IDisposable, IAsyncDisposable
 {

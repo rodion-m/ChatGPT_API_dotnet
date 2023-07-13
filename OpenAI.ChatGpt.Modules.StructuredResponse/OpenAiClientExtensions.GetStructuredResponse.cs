@@ -7,6 +7,7 @@ using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt.Modules.StructuredResponse;
 
+[Fody.ConfigureAwait(false)]
 public static class OpenAiClientExtensions
 {
     /// <summary>
@@ -98,6 +99,11 @@ public static class OpenAiClientExtensions
                 rawResponseGetter,
                 cancellationToken);
 
+            response = response.Trim();
+            if(response.StartsWith("```") && response.EndsWith("```"))
+            {
+                response = response[3..^3];
+            }
             jsonDeserializerOptions ??= new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -120,7 +126,8 @@ public static class OpenAiClientExtensions
 
     private static string GetAdditionalJsonResponsePrompt(string responseFormat)
     {
-        return$"\n\nWrite your response in JSON format. The response structure is enclosed within double backticks (JSON Schema) ``{responseFormat}``";
+        return$"\n\nWrite your response in compact JSON format with escaped strings. " +
+              $"Here is the response structure, it is enclosed within double backticks (JSON Schema) ``{responseFormat}``";
     }
 
     internal static string CreateResponseFormatJson<TObject>()

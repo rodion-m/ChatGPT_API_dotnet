@@ -3,7 +3,7 @@ using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt;
 
-public class TokensCounterDecorator : IOpenAiClient, IDisposable
+internal class TokensCounterDecorator : IOpenAiClient, IDisposable
 {
     private readonly IOpenAiClient _decorated;
 

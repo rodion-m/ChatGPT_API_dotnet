@@ -28,6 +28,9 @@ internal static class HttpClientExtensions
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         where TRequest : notnull
     {
+        ArgumentNullException.ThrowIfNull(httpClient);
+        ArgumentNullException.ThrowIfNull(requestUri);
+        ArgumentNullException.ThrowIfNull(request);
         var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri)
         {
             Content = JsonContent.Create(request, options: serializerOptions)

@@ -22,6 +22,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
 
     private readonly HttpClient _httpClient;
     private readonly bool _isHttpClientInjected;
+    private bool _disposed;
 
     private readonly JsonSerializerOptions _nullIgnoreSerializerOptions = new()
     {
@@ -47,19 +48,6 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         _httpClient.DefaultRequestHeaders.Authorization = header;
     }
 
-    private static Uri ValidateHost(string? host)
-    {
-        if (host is null) return DefaultHostUri;
-        if (!Uri.TryCreate(host, UriKind.Absolute, out var uri))
-        {
-            throw new ArgumentException("Host must be a valid absolute URI and end with a slash." +
-                                        $"For example: {DefaultHost}", nameof(host));
-        }
-        if(!host.EndsWith("/")) uri = new Uri(host + "/");
-
-        return uri;
-    }
-
     /// <summary>
     /// Creates a new OpenAI client from DI with given <paramref name="httpClient"/>.
     /// </summary>
@@ -76,7 +64,40 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         ValidateHttpClient(httpClient);
         _isHttpClientInjected = true;
     }
+    
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        if (!_isHttpClientInjected)
+        {
+            _httpClient.Dispose();
+        }
+        GC.SuppressFinalize(this);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().ToString());
+        }
+    }
 
+    private static Uri ValidateHost(string? host)
+    {
+        if (host is null) return DefaultHostUri;
+        if (!Uri.TryCreate(host, UriKind.Absolute, out var uri))
+        {
+            throw new ArgumentException("Host must be a valid absolute URI and end with a slash." +
+                                        $"For example: {DefaultHost}", nameof(host));
+        }
+        if(!host.EndsWith("/")) uri = new Uri(host + "/");
+
+        return uri;
+    }
+    
     private static void ValidateHttpClient(HttpClient httpClient)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
@@ -107,14 +128,6 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         }
     }
 
-    public void Dispose()
-    {
-        if (!_isHttpClientInjected)
-        {
-            _httpClient.Dispose();
-        }
-    }
-
     public async Task<string> GetChatCompletions(
         UserOrSystemMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
@@ -127,7 +140,9 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (dialog == null) throw new ArgumentNullException(nameof(dialog));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var request = CreateChatCompletionRequest(dialog.GetMessages(),
+        ThrowIfDisposed();
+        var request = CreateChatCompletionRequest(
+            dialog.GetMessages(),
             maxTokens,
             model,
             temperature,
@@ -152,7 +167,9 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var request = CreateChatCompletionRequest(messages,
+        ThrowIfDisposed();
+        var request = CreateChatCompletionRequest(
+            messages,
             maxTokens,
             model,
             temperature,
@@ -176,7 +193,9 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var request = CreateChatCompletionRequest(messages,
+        ThrowIfDisposed();
+        var request = CreateChatCompletionRequest(
+            messages,
             maxTokens,
             model,
             temperature,
@@ -193,6 +212,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         CancellationToken cancellationToken = default)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
+        ThrowIfDisposed();
         var response = await _httpClient.PostAsJsonAsync(
             ChatCompletionsEndpoint,
             request,
@@ -239,7 +259,9 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var request = CreateChatCompletionRequest(messages,
+        ThrowIfDisposed();
+        var request = CreateChatCompletionRequest(
+            messages,
             maxTokens,
             model,
             temperature,
@@ -259,6 +281,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         bool stream,
         Action<ChatCompletionRequest>? requestModifier)
     {
+        ArgumentNullException.ThrowIfNull(messages);
         var request = new ChatCompletionRequest(messages)
         {
             Model = model,
@@ -293,6 +316,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
+        ThrowIfDisposed();
         var request = CreateChatCompletionRequest(messages.GetMessages(),
             maxTokens,
             model,
@@ -309,9 +333,9 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
+        ThrowIfDisposed();
         request.Stream = true;
-        await foreach (var response in StreamChatCompletionsRaw(request, cancellationToken)
-            .WithCancellation(cancellationToken))
+        await foreach (var response in StreamChatCompletionsRaw(request, cancellationToken))
         {
             var content = response.Choices[0].Delta?.Content;
             if (content is not null)
@@ -322,6 +346,8 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     public IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(
         ChatCompletionRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        ThrowIfDisposed();
         request.Stream = true;
         return _httpClient.StreamUsingServerSentEvents<ChatCompletionRequest, ChatCompletionResponse>
         (

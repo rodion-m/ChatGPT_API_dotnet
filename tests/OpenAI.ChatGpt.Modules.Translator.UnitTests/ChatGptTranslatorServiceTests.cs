@@ -54,7 +54,7 @@ public class ChatGptTranslatorServiceTests
             defaultTargetLanguage: expectedTargetLanguage);
 
         // Act
-        var translatedText = await translatorService.Translate(textToTranslate);
+        var translatedText = await translatorService.TranslateText(textToTranslate);
 
         // Assert
         clientMock.Verify(client => client.GetChatCompletions(
@@ -72,4 +72,6 @@ public class ChatGptTranslatorServiceTests
             Times.Once);
         translatedText.Should().Be("Привет, мир!");
     }
+    
+    
 }

@@ -38,7 +38,7 @@ public class ChatGPTConfig
     /// </example>
     /// <remarks>
     /// If <see cref="InitialSystemMessage"/> and <see cref="InitialUserMessage"/> are provided,
-    /// then both messages will be send to OpenAI API.
+    /// then both messages will be sent to OpenAI API.
     /// More info about initial message: https://github.com/openai/openai-python/blob/main/chatml.md
     /// </remarks>
     public string? InitialSystemMessage { get; set; }
@@ -50,7 +50,7 @@ public class ChatGPTConfig
     /// </summary>
     /// <remarks>
     /// If <see cref="InitialSystemMessage"/> and <see cref="InitialUserMessage"/> are provided,
-    /// then both messages will be send to OpenAI API.
+    /// then both messages will be sent to OpenAI API.
     /// More info about initial message: https://github.com/openai/openai-python/blob/main/chatml.md
     /// </remarks>
     public string? InitialUserMessage { get; set; }
@@ -154,21 +154,22 @@ public class ChatGPTConfig
         ChatGPTConfig? baseConfig,
         ChatGPTConfig? config)
     {
-        if (baseConfig is null && config is null) return null;
-        if (baseConfig is null) return config;
-        if (config is null) return baseConfig;
-
-        var result = new ChatGPTConfig()
+        return (baseConfig, config) switch
         {
-            _model = config._model ?? baseConfig._model,
-            _maxTokens = config._maxTokens ?? baseConfig._maxTokens,
-            _temperature = config._temperature ?? baseConfig._temperature,
-            PassUserIdToOpenAiRequests = config.PassUserIdToOpenAiRequests ??
-                                         baseConfig.PassUserIdToOpenAiRequests,
-            InitialSystemMessage = config.InitialSystemMessage ?? baseConfig.InitialSystemMessage,
-            InitialUserMessage = config.InitialUserMessage ?? baseConfig.InitialUserMessage
+            (null, null) => null,
+            (null, not null) => config,
+            (not null, null) => baseConfig,
+            _ => new ChatGPTConfig()
+            {
+                _model = config._model ?? baseConfig._model,
+                _maxTokens = config._maxTokens ?? baseConfig._maxTokens,
+                _temperature = config._temperature ?? baseConfig._temperature,
+                PassUserIdToOpenAiRequests = config.PassUserIdToOpenAiRequests ??
+                                             baseConfig.PassUserIdToOpenAiRequests,
+                InitialSystemMessage = config.InitialSystemMessage ?? baseConfig.InitialSystemMessage,
+                InitialUserMessage = config.InitialUserMessage ?? baseConfig.InitialUserMessage
+            }
         };
-        return result;
     }
 
     /// <summary>

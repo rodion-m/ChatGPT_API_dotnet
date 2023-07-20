@@ -60,7 +60,8 @@ public static class OpenAiClientExtensions
             requestModifier: requestModifier,
             rawResponseGetter: rawResponseGetter,
             jsonDeserializerOptions: jsonDeserializerOptions,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     internal static async Task<TObject> GetStructuredResponse<TObject>(
@@ -80,7 +81,7 @@ public static class OpenAiClientExtensions
         ArgumentNullException.ThrowIfNull(dialog);
 
         var editMsg = dialog.GetMessages().FirstOrDefault(it => it is SystemMessage)
-                      ?? dialog.GetMessages().First();
+                      ?? dialog.GetMessages()[0];
         var originalContent = editMsg.Content;
         try
         {
@@ -97,25 +98,10 @@ public static class OpenAiClientExtensions
                 user,
                 requestModifier,
                 rawResponseGetter,
-                cancellationToken);
+                cancellationToken
+            );
 
-            response = response.Trim();
-            if(response.StartsWith("```") && response.EndsWith("```"))
-            {
-                response = response[3..^3];
-            }
-            jsonDeserializerOptions ??= new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() }
-            };
-            var deserialized = JsonSerializer.Deserialize<TObject>(response, jsonDeserializerOptions);
-            if (deserialized is null)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to deserialize response to {typeof(TObject)}. Response: {response}");
-            }
-
+            var deserialized = DeserializeOrThrow<TObject>(jsonDeserializerOptions, response);
             return deserialized;
         }
         finally
@@ -124,10 +110,43 @@ public static class OpenAiClientExtensions
         }
     }
 
+    private static TObject DeserializeOrThrow<TObject>(JsonSerializerOptions? jsonDeserializerOptions, string response)
+    {
+        ArgumentNullException.ThrowIfNull(response);
+        response = response.Trim();
+        if (response.StartsWith("```") && response.EndsWith("```"))
+        {
+            response = response[3..^3];
+        }
+
+        jsonDeserializerOptions ??= new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
+        TObject? deserialized;
+        try
+        {
+            deserialized = JsonSerializer.Deserialize<TObject>(response, jsonDeserializerOptions);
+            if (deserialized is null)
+            {
+                throw new InvalidJsonException(
+                    $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response);
+            }
+        }
+        catch (JsonException jsonException)
+        {
+            throw new InvalidJsonException(
+                $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response, jsonException);
+        }
+
+        return deserialized;
+    }
+
     private static string GetAdditionalJsonResponsePrompt(string responseFormat)
     {
         return$"\n\nWrite your response in compact JSON format with escaped strings. " +
-              $"Here is the response structure, it is enclosed within double backticks (JSON Schema) ``{responseFormat}``";
+              $"Here is the response structure (JSON Schema): {responseFormat}";
     }
 
     internal static string CreateResponseFormatJson<TObject>()

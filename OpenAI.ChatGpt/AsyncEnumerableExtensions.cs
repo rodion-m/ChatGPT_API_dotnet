@@ -8,7 +8,7 @@ public static class AsyncEnumerableExtensions
         bool throwOnCancellation) where T: class
     {
         ArgumentNullException.ThrowIfNull(stream);
-        var enumerator = stream.GetAsyncEnumerator();
+        await using var enumerator = stream.GetAsyncEnumerator();
         T? result = null;
         var hasResult = true;
         while (hasResult)
@@ -31,8 +31,6 @@ public static class AsyncEnumerableExtensions
                 yield return result;
             }
         }
-
-        await enumerator.DisposeAsync();
     }
     
     internal static async IAsyncEnumerable<T> ConfigureExceptions<T>(
@@ -76,6 +74,7 @@ public static class AsyncEnumerableExtensions
         }
 
         await DisposeAsyncSafe();
+        yield break;
 
         async Task DisposeAsyncSafe()
         {

@@ -68,6 +68,17 @@ public class OpenAiClientGetStructuredResponseTests
         //response.Country.Should().Be("Kazakhstan");
     }
     
+    [Fact]
+    public async void Get_structured_response_for_tic_tak_toe_from_ChatGPT_GPT4()
+    {
+        var message =
+            Dialog.StartAsSystem("This is a game of tic tac toe. X goes first. Your turn is O. What is your next move? Board: [{\"Row\":0,\"Column\":0},{\"Row\":0,\"Column\":1},{\"Row\":0,\"Column\":2},{\"Row\":1,\"Column\":0},{\"Row\":1,\"Column\":1},{\"Row\":1,\"Column\":2},{\"Row\":2,\"Column\":0},{\"Row\":2,\"Column\":1},{\"Row\":2,\"Column\":2}]");
+        var response = await _client.GetStructuredResponse<CellPosition>(message, model: ChatCompletionModels.Gpt4);
+        response.Should().NotBeNull();
+    }
+    
+    private record CellPosition(int Row, int Column);
+    
     private class Order
     {
         public UserInfo? UserInfo { get; set; }

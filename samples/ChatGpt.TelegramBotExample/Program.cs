@@ -47,15 +47,15 @@ Console.ReadLine();
 // Send cancellation request to stop bot
 cts.Cancel();
 
-ServiceProvider CreateServiceProvider(
-    string openaikey, string initialMessage, int maxTokens, string? host = null)
+static ServiceProvider CreateServiceProvider(
+    string openAiKey, string initialMessage, int maxTokens, string? host = null)
 {
     var services = new ServiceCollection();
     services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
     services.AddOptions<OpenAICredentials>()
         .Configure(cred =>
         {
-            cred.ApiKey = openaikey;
+            cred.ApiKey = openAiKey;
             if(host is not null) cred.ApiHost = host;
         });
     services.AddOptions<ChatGPTConfig>()

@@ -121,14 +121,14 @@ public static class ChatCompletionModels
     {
         { Gpt4, 8192 },
         { Gpt4_0613, 8192 },
-        { Gpt4_32k, 32768 },
-        { Gpt4_32k_0613, 32768 },
+        { Gpt4_32k, 32_768 },
+        { Gpt4_32k_0613, 32_768 },
         { Gpt3_5_Turbo, 4096 },
-        { Gpt3_5_Turbo_16k, 16384 },
+        { Gpt3_5_Turbo_16k, 16_384 },
         { Gpt3_5_Turbo_0613, 4096 },
-        { Gpt3_5_Turbo_16k_0613, 16384 },
+        { Gpt3_5_Turbo_16k_0613, 16_384 },
         { Gpt4_0314, 8192 },
-        { Gpt4_32k_0314, 32768 },
+        { Gpt4_32k_0314, 32_768 },
         { Gpt3_5_Turbo_0301, 4096 },
     };
     

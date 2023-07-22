@@ -104,7 +104,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         if (httpClient.DefaultRequestHeaders.Authorization is null)
         {
             throw new ArgumentException(
-                "HttpClient must have an Authorization header set." +
+                "HttpClient must have an Authorization header set. " +
                 "It should include OpenAI's API key.",
                 nameof(httpClient)
             );
@@ -122,7 +122,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         {
             throw new ArgumentException(
                 "HttpClient's BaseAddress must end with a slash." +
-                "It should be set to OpenAI's API endpoint.",
+                " It should be set to OpenAI's API endpoint.",
                 nameof(httpClient)
             );
         }

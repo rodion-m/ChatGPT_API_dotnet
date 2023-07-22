@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33417.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt", "OpenAI.ChatGpt\OpenAI.ChatGpt.csproj", "{A1A4460F-C7E8-48D4-B319-EADFB67A62F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt", "src\OpenAI.ChatGpt\OpenAI.ChatGpt.csproj", "{A1A4460F-C7E8-48D4-B319-EADFB67A62F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.AspNetCore", "OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj", "{F68FE4B2-DA47-496C-B129-EE875C133D2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.AspNetCore", "src\OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj", "{F68FE4B2-DA47-496C-B129-EE875C133D2D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{80DB142C-5A1B-431C-BD85-19C83C6FC0A3}"
 EndProject
@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGpt.SpectreConsoleExamp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGpt.ConsoleExample", "samples\ChatGpt.ConsoleExample\ChatGpt.ConsoleExample.csproj", "{8C2E3643-95B1-44E8-A0BD-66576DCF7E3B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.EntityFrameworkCore", "OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj", "{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAI.ChatGpt.EntityFrameworkCore", "src\OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj", "{DB6D8BCB-F003-4624-9277-3B4E1B7CDBCD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.UnitTests", "tests\OpenAI.ChatGpt.UnitTests\OpenAI.ChatGpt.UnitTests.csproj", "{7A50F277-75AA-4C4D-B0C9-08FE77A1A9E4}"
 EndProject
@@ -25,11 +25,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGpt.BlazorExample", "sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGpt.TelegramBotExample", "samples\ChatGpt.TelegramBotExample\ChatGpt.TelegramBotExample.csproj", "{8C86E60A-77C2-4204-AF36-F4B845474016}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Modules.Translator", "OpenAI.ChatGpt.Modules.Translator\OpenAI.ChatGpt.Modules.Translator.csproj", "{E155D31C-0061-40A3-AD54-93B5DD08836B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Modules.Translator", "src\modules\OpenAI.ChatGpt.Modules.Translator\OpenAI.ChatGpt.Modules.Translator.csproj", "{E155D31C-0061-40A3-AD54-93B5DD08836B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.Tests.Shared", "tests\OpenAI.Tests.Shared\OpenAI.Tests.Shared.csproj", "{E303F270-6091-47DE-9260-DAD6122005A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Modules.StructuredResponse", "OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj", "{F2968A66-5672-439E-823E-D35100CA067D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAI.ChatGpt.Modules.StructuredResponse", "src\modules\OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj", "{F2968A66-5672-439E-823E-D35100CA067D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{068E9E67-C2FC-4F8C-B27C-CB3A8FA44BD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,5 +99,7 @@ Global
 		{88213D5C-AADC-4F03-ACA3-7ADDCCE87DF4} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
 		{8C86E60A-77C2-4204-AF36-F4B845474016} = {80DB142C-5A1B-431C-BD85-19C83C6FC0A3}
 		{E303F270-6091-47DE-9260-DAD6122005A7} = {926D63B6-9F6A-45A1-B5B7-5F36352C23AB}
+		{F2968A66-5672-439E-823E-D35100CA067D} = {068E9E67-C2FC-4F8C-B27C-CB3A8FA44BD8}
+		{E155D31C-0061-40A3-AD54-93B5DD08836B} = {068E9E67-C2FC-4F8C-B27C-CB3A8FA44BD8}
 	EndGlobalSection
 EndGlobal

@@ -19,12 +19,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj" />
-        <ProjectReference Include="..\OpenAI.ChatGpt.Modules.Translator\OpenAI.ChatGpt.Modules.Translator.csproj" />
+        <ProjectReference Include="..\modules\OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj" />
+        <ProjectReference Include="..\modules\OpenAI.ChatGpt.Modules.Translator\OpenAI.ChatGpt.Modules.Translator.csproj" />
         <ProjectReference Include="..\OpenAI.ChatGpt\OpenAI.ChatGpt.csproj"/>
     </ItemGroup>
 

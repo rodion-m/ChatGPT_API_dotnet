@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj" />
+      <PackageReference Include="Spectre.Console" Version="0.47.0" />
+      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Spectre.Console" Version="0.47.0" />
-      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+      <ProjectReference Include="..\..\src\OpenAI.ChatGpt\OpenAI.ChatGpt.csproj" />
     </ItemGroup>
 
 </Project>

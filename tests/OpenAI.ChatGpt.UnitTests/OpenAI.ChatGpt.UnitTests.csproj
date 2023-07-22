@@ -28,8 +28,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj" />
-      <ProjectReference Include="..\..\OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj" />
+      <ProjectReference Include="..\..\src\modules\OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj" />
+      <ProjectReference Include="..\..\src\modules\OpenAI.ChatGpt.Modules.Translator\OpenAI.ChatGpt.Modules.Translator.csproj" />
+      <ProjectReference Include="..\..\src\OpenAI.ChatGpt.EntityFrameworkCore\OpenAI.ChatGpt.EntityFrameworkCore.csproj" />
+      <ProjectReference Include="..\..\src\OpenAI.ChatGpt.AspNetCore\OpenAI.ChatGpt.AspNetCore.csproj" />
     </ItemGroup>
 
 

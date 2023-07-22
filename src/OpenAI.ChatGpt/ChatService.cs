@@ -59,6 +59,7 @@ public class ChatService : IDisposable, IAsyncDisposable
             _chatHistoryStorage.DeleteTopic(UserId, TopicId, default)
                 .GetAwaiter().GetResult();
         }
+        GC.SuppressFinalize(this);
     }
 
     public async ValueTask DisposeAsync()
@@ -68,6 +69,7 @@ public class ChatService : IDisposable, IAsyncDisposable
         {
             await _chatHistoryStorage.DeleteTopic(UserId, TopicId, default);
         }
+        GC.SuppressFinalize(this);
     }
     
     public Task<string> GetNextMessageResponse(

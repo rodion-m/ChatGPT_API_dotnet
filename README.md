@@ -106,11 +106,11 @@ await foreach (string chunk in chatService.StreamNextMessageResponse(text, throw
 
 ## Thread safety and async
 `ChatGPTFactory`, `ChatGPT` classes thread-safety is depend on the `IChatHistoryStorage` implementation. If you use `ChatGPTFactory` with entity framework, it's NOT thread-safe. `ChatService` class is not thread-safe. \
-Anyways, this services are designed to be used safely with DI, so you don't need to worry about it. \
+Anyways, these services are designed to be used safely with DI, so you don't need to worry about it. \
 All the methods from all the packages are designed to be used in async context and use `ConfigureAwait(false)` (thanks for the `ConfigureAwait.Fody` package).
 
 ## Retries, timeouts and other policies
-Since `ChatGPTFactory` depends on `IHttpClientFactory`, you can easily use any of the available policies for it, like Polly.
+Since `ChatGPTFactory` depends on `IHttpClientFactory`, you can easily use any of the available policies for it, like `Polly`.
 
 ## Modules
 ### StructuredResponse
@@ -125,7 +125,7 @@ var message = Dialog
 City almaty = await _client.GetStructuredResponse<City>(message);
 Console.WriteLine(almaty); // Name: "Almaty", Country: "Kazakhstan", YearOfFoundation: 1854
 ```
-More complex examples with arrays, nested objects and enums are available in tests: https://github.com/rodion-m/ChatGPT_API_dotnet/blob/f50d386f0b65a4ba8c1041a28bab2a1a475c2296/tests/OpenAI.ChatGpt.IntegrationTests/OpenAiClientTests/OpenAiClient_GetStructuredResponse.cs
+More complex examples with arrays, nested objects and enums are available in tests: https://github.com/rodion-m/ChatGPT_API_dotnet/blob/f50d386f0b65a4ba8c1041a28bab2a1a475c2296/tests/OpenAI.ChatGpt.IntegrationTests/OpenAiClientTests/OpenAiClient_GetStructuredResponse.cs#L1
 
 NuGet: https://www.nuget.org/packages/OpenAI.ChatGPT.Modules.StructuredResponse
 

@@ -62,6 +62,8 @@ internal static class HttpClientExtensions
             }
         }
 
+        yield break;
+
 
         Task<HttpResponseMessage> SendAsync()
         {

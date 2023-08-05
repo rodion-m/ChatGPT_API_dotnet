@@ -72,7 +72,7 @@ public class ChatGPT : IDisposable
     }
 
     /// <summary>
-    /// If you don't have users and don't want to save messages into database use this method.
+    /// If you don't want to save messages into database use this method.
     /// </summary>
     public static Task<ChatService> CreateInMemoryChat(
         string apiKey,
@@ -80,11 +80,12 @@ public class ChatGPT : IDisposable
         UserOrSystemMessage? initialDialog = null,
         ITimeProvider? clock = null,
         string? host = null,
+        string? userId = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(apiKey);
         var chatGpt = new ChatGPT(
-            apiKey, new InMemoryChatHistoryStorage(), clock ?? new TimeProviderUtc(), null, config, host);
+            apiKey, new InMemoryChatHistoryStorage(), clock ?? new TimeProviderUtc(), userId, config, host);
         return chatGpt.StartNewTopic(initialDialog: initialDialog, cancellationToken: cancellationToken);
     }
     

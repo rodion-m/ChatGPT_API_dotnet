@@ -2,6 +2,7 @@
 # ChatGPT integration for .NET
 [![Nuget](https://img.shields.io/nuget/v/OpenAI.ChatGPT.EntityFrameworkCore)](https://www.nuget.org/packages/OpenAI.ChatGPT.EntityFrameworkCore/)[![.NET](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml) \
 OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core supporting. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.
+[NEW] `StructuredResponse` module allows you to get structured responses from the API as C# object. See: [StructuredResponse](#structuredresponse)
 
 ## Preparation
 First, you need to create an OpenAI account and get an API key. You can do this at https://platform.openai.com/account/api-keys.
@@ -85,7 +86,48 @@ Anyways, this services are designed to be used safely with DI, so you don't need
 All the methods from all the packages are designed to be used in async context and use `ConfigureAwait(false)` (thanks for the `ConfigureAwait.Fody` package).
 
 ## Retries, timeouts and other policies
-Since `ChatGPTFactory` depends on `IHttClientFactory`, you can easily use any of the available policies for it, like Polly.
+Since `ChatGPTFactory` depends on `IHttpClientFactory`, you can easily use any of the available policies for it, like Polly.
+
+## Modules
+### StructuredResponse
+This module allows you to get structured responses from the API as C# object. It's useful if you want to use the API for something more than just chat.
+
+```csharp
+record City(string Name, int YearOfFoundation, string Country);
+
+var message = Dialog
+    .StartAsSystem("Return requested data.")
+    .ThenUser("I need info about Almaty city");
+City almaty = await _client.GetStructuredResponse<City>(message);
+Console.WriteLine(almaty); // Name: "Almaty", Country: "Kazakhstan", YearOfFoundation: 1854
+```
+More complex examples with arrays, nested objects and enums are available in tests: https://github.com/rodion-m/ChatGPT_API_dotnet/blob/f50d386f0b65a4ba8c1041a28bab2a1a475c2296/tests/OpenAI.ChatGpt.IntegrationTests/OpenAiClientTests/OpenAiClient_GetStructuredResponse.cs
+
+NuGet: https://www.nuget.org/packages/OpenAI.ChatGPT.Modules.StructuredResponse
+
+### Translator
+This module allows you to translate messages from one language to another.
+```csharp
+string textToTranslate = "Hello, world!";
+string translatedText = await _client.TranslateText(textToTranslate, "English", "Russian");
+Console.WriteLine(translatedText); // "Привет, мир!"
+```
+Also, it's possible to translate entire object in pair with `StructuredResponse` module:
+```csharp
+var objectToTranslate = new Order(
+    new List<Order.Item> 
+    {
+        new(1,"Book", 5),
+        new(2,"Pen", 10),
+        new(3,"Notebook", 3)
+    }
+);
+Order translatedObject = await _client.TranslateObject(objectToTranslate, "English", "Russian");
+```
+
+See full example in tests: https://github.com/rodion-m/ChatGPT_API_dotnet/blob/11658b76b497b9cc4ac74621c91c5e22cd724f2e/tests/OpenAI.ChatGpt.IntegrationTests/ChatGptTranslatorServiceTests.cs#L36
+
+NuGet: https://www.nuget.org/packages/OpenAI.ChatGPT.Modules.Translator
 
 ## Examples
 * [Blazor Example](samples/ChatGpt.BlazorExample)

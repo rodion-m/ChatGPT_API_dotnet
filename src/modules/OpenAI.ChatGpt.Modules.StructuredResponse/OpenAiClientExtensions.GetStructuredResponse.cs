@@ -10,6 +10,17 @@ namespace OpenAI.ChatGpt.Modules.StructuredResponse;
 [Fody.ConfigureAwait(false)]
 public static class OpenAiClientExtensions
 {
+    private static readonly SchemaGeneratorConfiguration SchemaGeneratorConfiguration = new()
+    {
+        Nullability = Nullability.Disabled,
+        PropertyOrder = PropertyOrder.AsDeclared,
+        PropertyNamingMethod = PropertyNamingMethods.AsDeclared
+    };
+    private static readonly JsonSerializerOptions JsonSchemaSerializerOptions = new()
+    {
+        WriteIndented = false
+    };
+
     /// <summary>
     /// Asynchronously sends a chat completion request to the OpenAI API and deserializes the response to a specific object type.
     /// </summary>
@@ -22,7 +33,6 @@ public static class OpenAiClientExtensions
     /// <param name="user">Optional. The user who is having the conversation. If not specified, defaults to "system".</param>
     /// <param name="requestModifier">Optional. A function that can modify the chat completion request before it is sent to the API.</param>
     /// <param name="rawResponseGetter">Optional. A function that can access the raw API response.</param>
-    /// <param name="jsonSerializerOptions">Optional. Custom JSON serializer options for the response format. If not specified, default options are used.</param>
     /// <param name="jsonDeserializerOptions">Optional. Custom JSON deserializer options for the deserialization. If not specified, default options with case insensitive property names are used.</param>
     /// <param name="cancellationToken">Optional. A cancellation token that can be used to cancel the operation.</param>
     /// <returns>
@@ -152,14 +162,9 @@ public static class OpenAiClientExtensions
     internal static string CreateResponseFormatJson<TObject>()
     {
         var schemaBuilder = new JsonSchemaBuilder();
-        JsonSchema schema = schemaBuilder.FromType<TObject>(new SchemaGeneratorConfiguration()
-            {
-                Nullability = Nullability.Disabled,
-                PropertyOrder = PropertyOrder.AsDeclared,
-                PropertyNamingMethod = PropertyNamingMethods.AsDeclared
-            }
-        ).Build();
-        string schemaString = JsonSerializer.Serialize(schema, new JsonSerializerOptions() {WriteIndented = false});
+        var schema = schemaBuilder.FromType<TObject>(SchemaGeneratorConfiguration
+        ).Build();;
+        var schemaString = JsonSerializer.Serialize(schema, JsonSchemaSerializerOptions);
         return schemaString;
     }
 }

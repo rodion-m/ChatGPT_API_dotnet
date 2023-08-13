@@ -6,6 +6,7 @@ namespace OpenAI.ChatGpt.Modules.Translator;
 /// <summary>
 /// Provides a service for translating text using GPT models with economical batching.
 /// </summary>
+// ReSharper disable once InconsistentNaming
 public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
 {
     private readonly IChatGPTTranslatorService _chatGptTranslatorService;

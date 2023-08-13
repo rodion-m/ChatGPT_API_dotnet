@@ -80,4 +80,31 @@ public class ChatGptTranslatorServiceTests
     {
         public record Item(int Id, string Name, int Quantity);
     }
+
+    [Fact]
+    public async void Batch_translate()
+    {
+        string[] words = {
+            "apple", "banana", "cherry", "date", "elephant",
+            "fox", "grape", "hat", "island", "jacket",
+            "kite", "lemon", "moon", "noodle", "ocean",
+            "pineapple", "quill", "rose", "sun", "turtle"
+        };
+
+        var translationService = new ChatGPTTranslatorService(_client);
+        var service = new ChatGPTTranslatorServiceEconomical(
+            translationService, "English", "Russian", maxTokensPerRequest: 50);
+        
+        var tasks = words.Select(async word =>
+        {
+            var translated = await service.TranslateText(word);
+            return (word, translated);
+        });
+        
+        var results = await Task.WhenAll(tasks);
+        var ocean = results.Single(r => r.word == "ocean").translated;
+        ocean.Should().Be("океан");
+        var turtle = results.Single(r => r.word == "turtle").translated;
+        turtle.Should().Be("черепаха");
+    }
 }

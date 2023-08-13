@@ -23,12 +23,10 @@ public class ChatCompletionMessage
     public string Content { get; set; }
 
     private List<ChatCompletionMessage>? _messages;
+
     protected List<ChatCompletionMessage> Messages
     {
-        get
-        {
-            return _messages ??= new List<ChatCompletionMessage>() { this };
-        }
+        get { return _messages ??= new List<ChatCompletionMessage>() { this }; }
     }
 
     /// <param name="role">One of <see cref="ChatCompletionRoles"/></param>
@@ -42,7 +40,7 @@ public class ChatCompletionMessage
         Role = role;
         Content = content;
     }
-    
+
     internal ChatCompletionMessage(
         List<ChatCompletionMessage> messages,
         string role,
@@ -55,7 +53,7 @@ public class ChatCompletionMessage
     }
 
     public IReadOnlyList<ChatCompletionMessage> GetMessages() => Messages.AsReadOnly();
-    
+
     /// <summary>
     /// Calculates the approximate total token count of all messages.
     /// It's can be used to determine if the dialog messages is too long.
@@ -66,7 +64,7 @@ public class ChatCompletionMessage
     /// See: https://platform.openai.com/tokenizer
     /// </remarks>
     public int CalculateApproxTotalTokenCount() => CalculateApproxTotalTokenCount(Messages);
-    
+
     private const double AverageCharactersCountInOneToken = 4d;
 
     /// <summary>
@@ -78,27 +76,47 @@ public class ChatCompletionMessage
     /// Rule of thumb is that one token generally corresponds to ~4 characters of text for common English text
     /// See: https://platform.openai.com/tokenizer
     /// </remarks>
-    public static int CalculateApproxTotalTokenCount(IEnumerable<ChatCompletionMessage> messages)
+    public static int CalculateApproxTotalTokenCount(IEnumerable<ChatCompletionMessage> messages, bool? isEnglish = null)
     {
+        // ReSharper disable once PossibleMultipleEnumeration
         var dialogCharsCount = messages.Sum(m => m.Content.Length);
-        return (int)(dialogCharsCount / AverageCharactersCountInOneToken);
+        if (dialogCharsCount == 0)
+        {
+            return 0;
+        }
+        // ReSharper disable once PossibleMultipleEnumeration
+        return CalculateApproxTotalTokenCount(dialogCharsCount, isEnglish ?? IsEnglish(messages.First().Content));
     }
 
+    private static bool IsEnglish(string content)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+        var englishCharsCount = content.Count(c => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z');
+        return (double) englishCharsCount / content.Length >= 0.8;
+    }
+
+    public static int CalculateApproxTotalTokenCount(int totalCharsCount, bool isEnglish)
+    {
+        return isEnglish
+            ? (int)(totalCharsCount / AverageCharactersCountInOneToken)
+            : totalCharsCount;
+    }
 
     /// <summary> How many tokens in one word (0.75) </summary>
     private const double TokenToWordAverageRatio = 3d / 4d;
+
     private const double TokensAverageQuantityInOneWord = 1d / TokenToWordAverageRatio;
 
     public override string ToString()
     {
         return _messages == null
             ? $"{Role}: {Content}"
-            :  string.Join(Environment.NewLine, _messages.Select(m => $"{m.Role}: {m.Content}"));
+            : string.Join(Environment.NewLine, _messages.Select(m => $"{m.Role}: {m.Content}"));
     }
-    
+
     public static (string model, int maxTokens) FindOptimalModelAndMaxToken(
         IEnumerable<ChatCompletionMessage> messages,
-        string? model, 
+        string? model,
         int? maxTokens,
         string smallModel = ChatCompletionModels.Default,
         string bigModel = ChatCompletionModels.Gpt3_5_Turbo_16k,

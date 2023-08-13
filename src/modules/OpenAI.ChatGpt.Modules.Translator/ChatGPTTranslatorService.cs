@@ -28,9 +28,9 @@ public class ChatGPTTranslatorService : IDisposable
         _defaultTargetLanguage = defaultTargetLanguage;
         _extraPrompt = extraPrompt;
     }
-    
+
     public ChatGPTTranslatorService(
-        string apiKey, 
+        string apiKey,
         string? host = null,
         string? defaultSourceLanguage = null,
         string? defaultTargetLanguage = null,
@@ -50,7 +50,7 @@ public class ChatGPTTranslatorService : IDisposable
             disposableClient.Dispose();
         }
     }
-    
+
     public async Task<string> TranslateText(
         string text,
         string? sourceLanguage = null,
@@ -70,6 +70,7 @@ public class ChatGPTTranslatorService : IDisposable
         {
             throw new ArgumentNullException(nameof(sourceLanguage), "Source language is not specified");
         }
+
         if (targetLanguageOrDefault is null)
         {
             throw new ArgumentNullException(nameof(targetLanguage), "Target language is not specified");
@@ -86,22 +87,24 @@ public class ChatGPTTranslatorService : IDisposable
             user,
             requestModifier,
             rawResponseGetter,
-            cancellationToken); 
+            cancellationToken
+        );
         return response;
     }
-    
+
     internal virtual string CreateTextTranslationPrompt(string sourceLanguage, string targetLanguage)
     {
         ArgumentNullException.ThrowIfNull(sourceLanguage);
         ArgumentNullException.ThrowIfNull(targetLanguage);
         return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
                "The user provides with a sentence and you translate it. " +
-               "In the response write ONLY translated text." + 
+               "In the response write ONLY translated text." +
                (_extraPrompt is not null ? "\n" + _extraPrompt : "");
     }
-    
+
     public virtual async Task<TObject> TranslateObject<TObject>(
         TObject objectToTranslate,
+        bool isBatch = false,
         string? sourceLanguage = null,
         string? targetLanguage = null,
         int? maxTokens = null,
@@ -121,13 +124,17 @@ public class ChatGPTTranslatorService : IDisposable
         {
             throw new ArgumentNullException(nameof(sourceLanguage), "Source language is not specified");
         }
+
         if (targetLanguageOrDefault is null)
         {
             throw new ArgumentNullException(nameof(targetLanguage), "Target language is not specified");
         }
 
-        var prompt = CreateObjectTranslationPrompt(sourceLanguageOrDefault, targetLanguageOrDefault);
-        jsonSerializerOptions ??= new JsonSerializerOptions() {DefaultIgnoreCondition = JsonIgnoreCondition.Never};
+        var prompt =
+            isBatch
+                ? CreateObjectTranslationPrompt(sourceLanguageOrDefault, targetLanguageOrDefault)
+                : CreateBatchTranslationPrompt(sourceLanguageOrDefault, targetLanguageOrDefault);
+        jsonSerializerOptions ??= new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.Never };
         var objectJson = JsonSerializer.Serialize(objectToTranslate, jsonSerializerOptions);
         var dialog = Dialog.StartAsSystem(prompt).ThenUser(objectJson);
         var messages = dialog.GetMessages().ToArray();
@@ -146,12 +153,21 @@ public class ChatGPTTranslatorService : IDisposable
         return response;
     }
 
+    internal string CreateBatchTranslationPrompt(string sourceLanguage, string targetLanguage)
+    {
+        ArgumentNullException.ThrowIfNull(sourceLanguage);
+        ArgumentNullException.ThrowIfNull(targetLanguage);
+        return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
+               "The user provides you a batch of texts with an object in JSON. " +
+               (_extraPrompt is not null ? "\n" + _extraPrompt : "");
+    }
+
     internal string CreateObjectTranslationPrompt(string sourceLanguage, string targetLanguage)
     {
         ArgumentNullException.ThrowIfNull(sourceLanguage);
         ArgumentNullException.ThrowIfNull(targetLanguage);
         return $"I want you to act as a translator from {sourceLanguage} to {targetLanguage}. " +
-               "The user provides you with an object in json. You translate only the text fields that need to be translated. " +
+               "The user provides you with an object in JSON. You translate only the text fields that need to be translated. " +
                (_extraPrompt is not null ? "\n" + _extraPrompt : "");
     }
 }

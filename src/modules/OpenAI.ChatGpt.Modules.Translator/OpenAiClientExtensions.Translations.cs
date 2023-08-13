@@ -63,6 +63,7 @@ public static class OpenAiClientExtensions
         var translator = new ChatGPTTranslatorService(client, extraPrompt: extraPrompt);
         return translator.TranslateObject(
             objectToTranslate,
+            false,
             sourceLanguage,
             targetLanguage,
             maxTokens,

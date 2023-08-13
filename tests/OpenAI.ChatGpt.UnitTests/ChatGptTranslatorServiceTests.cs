@@ -69,5 +69,90 @@ public class ChatGptTranslatorServiceTests
             Times.Once);
     }
     
-    
+    [Fact]
+    public async Task Translating_multiple_texts_should_be_batched_together()
+    {
+        // Arrange
+        var mockTranslatorService = new Mock<IChatGPTTranslatorService>();
+        var batch = new ChatGPTTranslatorServiceEconomical.Batch();
+        batch.Add("Text 1");
+        batch.Add("Text 2");
+
+        mockTranslatorService.Setup(m 
+                => m.TranslateObject(It.IsAny<ChatGPTTranslatorServiceEconomical.Batch>(),
+                    true,
+                    "en",
+                    "fr",
+                    It.IsAny<int?>(),
+                    It.IsAny<string>(),
+                    It.IsAny<float>(),
+                    null,
+                    default,
+                    default,
+                    default,
+                    default,
+                    default)
+            ).ReturnsAsync(batch)
+            .Verifiable();
+
+        var service = new ChatGPTTranslatorServiceEconomical(
+            mockTranslatorService.Object, "en", "fr", maxTokensPerRequest: 50
+        );
+
+        // Act
+        var result1 = service.TranslateText("Text 1");
+        var result2 = service.TranslateText("Text 2");
+
+        // Assert
+        await Task.WhenAll(result1, result2);
+        mockTranslatorService.Verify(m 
+                => m.TranslateObject(It.IsAny<ChatGPTTranslatorServiceEconomical.Batch>(),
+                    true,
+                    "en",
+                    "fr",
+                    It.IsAny<int?>(),
+                    It.IsAny<string>(),
+                    It.IsAny<float>(),
+                    null,
+                    default,
+                    default,
+                    default,
+                    default,
+                    default),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task Batch_is_processed_after_inactivity_period()
+    {
+        var mockTranslatorService = new Mock<IChatGPTTranslatorService>();
+
+        var service = new ChatGPTTranslatorServiceEconomical(
+            mockTranslatorService.Object,
+            "en",
+            "fr",
+            sendRequestAfterInactivity: TimeSpan.FromMilliseconds(100)
+        );
+
+        _ = service.TranslateText("Hello");
+
+        await Task.Delay(150); // Wait for the inactivity period
+
+        mockTranslatorService.Verify(x => 
+            x.TranslateObject(It.IsAny<ChatGPTTranslatorServiceEconomical.Batch>(),
+                true,
+                "en",
+                "fr",
+                It.IsAny<int?>(),
+                It.IsAny<string>(),
+                It.IsAny<float>(),
+                null,
+                default,
+                default,
+                default,
+                default,
+                default),
+            Times.Once);
+    }
+
 }

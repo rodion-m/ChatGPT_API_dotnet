@@ -8,7 +8,7 @@ namespace OpenAI.ChatGpt.Modules.Translator;
 
 [Fody.ConfigureAwait(false)]
 // ReSharper disable once InconsistentNaming
-public class ChatGPTTranslatorService : IDisposable
+public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
 {
     private readonly IOpenAiClient _client;
     private readonly string? _defaultSourceLanguage;

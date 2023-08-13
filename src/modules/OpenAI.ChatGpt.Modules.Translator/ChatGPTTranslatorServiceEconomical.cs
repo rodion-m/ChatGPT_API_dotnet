@@ -3,9 +3,12 @@ using OpenAI.ChatGpt.Models.ChatCompletion;
 
 namespace OpenAI.ChatGpt.Modules.Translator;
 
+/// <summary>
+/// Provides a service for translating text using GPT models with economical batching.
+/// </summary>
 public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
 {
-    private readonly ChatGPTTranslatorService _chatGptTranslatorService;
+    private readonly IChatGPTTranslatorService _chatGptTranslatorService;
     private readonly string _sourceLanguage;
     private readonly string _targetLanguage;
     private readonly int? _maxTokens;
@@ -16,12 +19,24 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
     private readonly TimeSpan _sendRequestAfterInactivity;
     private static readonly TimeSpan DefaultSendRequestAfterInactivity = TimeSpan.FromMilliseconds(100);
     
-    private Buffer _buffer = new();
-    private TaskCompletionSource<Buffer> _tcs = new();
+    private Batch _batch = new();
+    private TaskCompletionSource<Batch> _tcs = new();
     private readonly object _syncLock = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChatGPTTranslatorServiceEconomical"/> class.
+    /// </summary>
+    /// <param name="chatGptTranslatorService">The GPT translation service to use.</param>
+    /// <param name="sourceLanguage">The source language code.</param>
+    /// <param name="targetLanguage">The target language code.</param>
+    /// <param name="maxTokens">The maximum number of tokens allowed. (Optional)</param>
+    /// <param name="model">The model to use for translation. (Optional)</param>
+    /// <param name="temperature">The creative temperature. (Optional)</param>
+    /// <param name="user">The user ID. (Optional)</param>
+    /// <param name="sendRequestAfterInactivity">The timespan for sending requests after inactivity. (Optional)</param>
+    /// <param name="maxTokensPerRequest">The maximum tokens per request. (Optional)</param>
     public ChatGPTTranslatorServiceEconomical(
-        ChatGPTTranslatorService chatGptTranslatorService,
+        IChatGPTTranslatorService chatGptTranslatorService,
         string sourceLanguage,
         string targetLanguage,
         int? maxTokens = null,
@@ -54,11 +69,11 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
     {
         lock (_syncLock)
         {
-            if (_buffer.Version > 0)
+            if (_batch.Version > 0)
             {
                 if (CanBeRan(_tcs))
                 {
-                    _ = SendRequestAndResetBuffer(_buffer, _tcs);
+                    _ = SendRequestAndResetBatch(_batch, _tcs);
                 }
             }
         }
@@ -68,19 +83,22 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Translates the given text.
+    /// </summary>
+    /// <param name="text">The text to translate.</param>
+    /// <returns>A task representing the translated text.</returns>
     public async Task<string> TranslateText(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
-
         int index;
-
-        TaskCompletionSource<Buffer> tcs;
+        TaskCompletionSource<Batch> tcs;
         lock (_syncLock)
         {
-            var buffer = GetBuffer();
+            var batch = GetRelevantBatch();
             tcs = _tcs;
-            index = buffer.Add(text);
-            _ = RunRequestSendingInactivityTimer(tcs, buffer);
+            index = batch.Add(text);
+            _ = RunRequestSendingInactivityTimer(tcs, batch);
         }
 
         var result = await tcs.Task;
@@ -88,31 +106,31 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
     }
 
     // Debouncer
-    private async Task RunRequestSendingInactivityTimer(TaskCompletionSource<Buffer> tcs, Buffer buffer)
+    private async Task RunRequestSendingInactivityTimer(TaskCompletionSource<Batch> tcs, Batch batch)
     {
         await Task.Delay(_sendRequestAfterInactivity);
         lock (_syncLock)
         {
-            var isBufferRelevant = ReferenceEquals(_buffer, buffer) && buffer.Version == _buffer.Version;
-            if (isBufferRelevant && CanBeRan(tcs))
+            var isBatchRelevant = ReferenceEquals(_batch, batch) && batch.Version == _batch.Version;
+            if (isBatchRelevant && CanBeRan(tcs))
             {
-                _ = SendRequestAndResetBuffer(buffer, tcs);
+                _ = SendRequestAndResetBatch(batch, tcs);
             }
         }
     }
 
-    private Buffer GetBuffer()
+    private Batch GetRelevantBatch()
     {
         var tcs = _tcs;
-        if (_buffer.GetTotalLength() > _maxTokensPerRequest)
+        if (_batch.GetTotalLength() > _maxTokensPerRequest)
         {
-            _ = SendRequestAndResetBuffer(_buffer, tcs);
+            _ = SendRequestAndResetBatch(_batch, tcs);
         }
 
-        return _buffer;
+        return _batch;
     }
 
-    private async Task SendRequestAndResetBuffer(Buffer buffer, TaskCompletionSource<Buffer> tcs)
+    private async Task SendRequestAndResetBatch(Batch batch, TaskCompletionSource<Batch> tcs)
     {
         if (!CanBeRan(tcs))
         {
@@ -122,13 +140,13 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
         lock (_syncLock)
         {
             _tcs = new();
-            _buffer = new();
+            _batch = new();
         }
 
         try
         {
             var response = await _chatGptTranslatorService.TranslateObject(
-                buffer, true, _sourceLanguage, _targetLanguage, _maxTokens, _model, _temperature, _user);
+                batch, true, _sourceLanguage, _targetLanguage, _maxTokens, _model, _temperature, _user);
 
             tcs.SetResult(response);
         }
@@ -138,12 +156,12 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
         }
     }
 
-    private static bool CanBeRan(TaskCompletionSource<Buffer> tcs)
+    private static bool CanBeRan(TaskCompletionSource<Batch> tcs)
     {
         return tcs.Task.Status is TaskStatus.Created or TaskStatus.WaitingForActivation;
     }
 
-    private class Buffer
+    internal class Batch
     {
         public IReadOnlyDictionary<int, string> Texts => _texts;
         
@@ -154,12 +172,12 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
         private int _indexer;
 
         [JsonConstructor]
-        public Buffer(IReadOnlyDictionary<int, string> texts)
+        public Batch(IReadOnlyDictionary<int, string> texts)
         {
             _texts = new Dictionary<int, string>(texts) ?? throw new ArgumentNullException(nameof(texts));
         }
 
-        public Buffer()
+        public Batch()
         {
             _texts = new();
         }

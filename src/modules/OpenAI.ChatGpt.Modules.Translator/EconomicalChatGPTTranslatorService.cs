@@ -7,7 +7,7 @@ namespace OpenAI.ChatGpt.Modules.Translator;
 /// Provides a service for translating text using GPT models with economical batching.
 /// </summary>
 // ReSharper disable once InconsistentNaming
-public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
+public class EconomicalChatGPTTranslatorService : IAsyncDisposable
 {
     private readonly IChatGPTTranslatorService _chatGptTranslatorService;
     private readonly string _sourceLanguage;
@@ -25,7 +25,7 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
     private readonly object _syncLock = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChatGPTTranslatorServiceEconomical"/> class.
+    /// Initializes a new instance of the <see cref="EconomicalChatGPTTranslatorService"/> class.
     /// </summary>
     /// <param name="chatGptTranslatorService">The GPT translation service to use.</param>
     /// <param name="sourceLanguage">The source language code.</param>
@@ -36,7 +36,7 @@ public class ChatGPTTranslatorServiceEconomical : IAsyncDisposable
     /// <param name="user">The user ID. (Optional)</param>
     /// <param name="sendRequestAfterInactivity">The timespan for sending requests after inactivity. (Optional)</param>
     /// <param name="maxTokensPerRequest">The maximum tokens per request. (Optional)</param>
-    public ChatGPTTranslatorServiceEconomical(
+    public EconomicalChatGPTTranslatorService(
         IChatGPTTranslatorService chatGptTranslatorService,
         string sourceLanguage,
         string targetLanguage,

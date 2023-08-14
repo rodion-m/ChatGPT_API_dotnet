@@ -74,12 +74,12 @@ public class ChatGptTranslatorServiceTests
     {
         // Arrange
         var mockTranslatorService = new Mock<IChatGPTTranslatorService>();
-        var batch = new ChatGPTTranslatorServiceEconomical.Batch();
+        var batch = new EconomicalChatGPTTranslatorService.Batch();
         batch.Add("Text 1");
         batch.Add("Text 2");
 
         mockTranslatorService.Setup(m 
-                => m.TranslateObject(It.IsAny<ChatGPTTranslatorServiceEconomical.Batch>(),
+                => m.TranslateObject(It.IsAny<EconomicalChatGPTTranslatorService.Batch>(),
                     true,
                     "en",
                     "fr",
@@ -95,7 +95,7 @@ public class ChatGptTranslatorServiceTests
             ).ReturnsAsync(batch)
             .Verifiable();
 
-        var service = new ChatGPTTranslatorServiceEconomical(
+        var service = new EconomicalChatGPTTranslatorService(
             mockTranslatorService.Object, "en", "fr", maxTokensPerRequest: 50
         );
 
@@ -106,7 +106,7 @@ public class ChatGptTranslatorServiceTests
         // Assert
         await Task.WhenAll(result1, result2);
         mockTranslatorService.Verify(m 
-                => m.TranslateObject(It.IsAny<ChatGPTTranslatorServiceEconomical.Batch>(),
+                => m.TranslateObject(It.IsAny<EconomicalChatGPTTranslatorService.Batch>(),
                     true,
                     "en",
                     "fr",
@@ -127,7 +127,7 @@ public class ChatGptTranslatorServiceTests
     {
         var mockTranslatorService = new Mock<IChatGPTTranslatorService>();
 
-        var service = new ChatGPTTranslatorServiceEconomical(
+        var service = new EconomicalChatGPTTranslatorService(
             mockTranslatorService.Object,
             "en",
             "fr",
@@ -139,7 +139,7 @@ public class ChatGptTranslatorServiceTests
         await Task.Delay(150); // Wait for the inactivity period
 
         mockTranslatorService.Verify(x => 
-            x.TranslateObject(It.IsAny<ChatGPTTranslatorServiceEconomical.Batch>(),
+            x.TranslateObject(It.IsAny<EconomicalChatGPTTranslatorService.Batch>(),
                 true,
                 "en",
                 "fr",

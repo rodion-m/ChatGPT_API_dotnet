@@ -92,7 +92,7 @@ public class ChatGptTranslatorServiceTests
         };
 
         var translationService = new ChatGPTTranslatorService(_client);
-        var service = new ChatGPTTranslatorServiceEconomical(
+        var service = new EconomicalChatGPTTranslatorService(
             translationService, "English", "Russian", maxTokensPerRequest: 50);
         
         var tasks = words.Select(async word =>

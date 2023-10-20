@@ -7,10 +7,7 @@ namespace OpenAI.ChatGpt.AspNetCore;
 ///  Factory for creating <see cref="ChatGPT" /> instances from DI.
 /// </summary>
 /// <example>
-/// builder.Services.AddHttpClient&lt;ChatGPTFactory&lt;(client =>
-///     {
-///         client.DefaultRequestHeaders.Authorization = builder.Configuration["OpenAICredentials:ApiKey"];
-///     })
+/// builder.Services.AddHttpClient&lt;ChatGPTFactory&lt;("OpenAiClient")
 ///     .AddPolicyHandler(GetRetryPolicy())
 ///     .AddPolicyHandler(GetCircuitBreakerPolicy());
 /// </example>
@@ -72,7 +69,7 @@ public class ChatGPTFactory : IDisposable
         IHttpClientFactory httpClientFactory, 
         IOptions<OpenAICredentials> credentials)
     {
-        var httpClient = httpClientFactory.CreateClient(nameof(ChatGPTFactory));
+        var httpClient = httpClientFactory.CreateClient(OpenAiClient.HttpClientName);
         httpClient.DefaultRequestHeaders.Authorization = credentials.Value.GetAuthHeader();
         httpClient.BaseAddress = new Uri(credentials.Value.ApiHost);
         return new OpenAiClient(httpClient);

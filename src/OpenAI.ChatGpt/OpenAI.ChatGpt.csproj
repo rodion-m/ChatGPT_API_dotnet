@@ -27,6 +27,7 @@
     <ItemGroup>
         <InternalsVisibleTo Include="OpenAI.ChatGpt.UnitTests" />
         <InternalsVisibleTo Include="OpenAI.ChatGpt.IntegrationTests" />
+        <InternalsVisibleTo Include="OpenAI.ChatGpt.AspNetCore" />
     </ItemGroup>
 
     <ItemGroup>

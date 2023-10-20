@@ -10,7 +10,8 @@ builder.Services.AddServerSideBlazor();
 // make sure that you have added the OpenAICredentials:ApiKey to your secrets.json
 // or environment variables
 builder.Services.AddChatGptEntityFrameworkIntegration(
-    options => options.UseSqlite("Data Source=chats.db"));
+    options => options.UseSqlite("Data Source=chats.db"))
+    .AddServerSideBlazor();
 
 var app = builder.Build();
 

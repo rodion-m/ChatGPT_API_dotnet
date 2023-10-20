@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 using OpenAI.ChatGpt.Exceptions;
 using OpenAI.ChatGpt.Models.ChatCompletion;
 using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
-using OpenAI.ChatGpt.Models.Images;
 
 namespace OpenAI.ChatGpt;
 
@@ -14,8 +13,8 @@ namespace OpenAI.ChatGpt;
 [Fody.ConfigureAwait(false)]
 public class OpenAiClient : IOpenAiClient, IDisposable
 {
+    internal const string HttpClientName = "OpenAiClient";
     private const string DefaultHost = "https://api.openai.com/v1/";
-    private const string ImagesEndpoint = "images/generations";
     private const string ChatCompletionsEndpoint = "chat/completions";
     
     private static readonly Uri DefaultHostUri = new(DefaultHost);

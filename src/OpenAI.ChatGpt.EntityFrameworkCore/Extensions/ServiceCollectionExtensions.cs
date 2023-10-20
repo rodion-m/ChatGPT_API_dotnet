@@ -14,7 +14,8 @@ public static class ServiceCollectionExtensions
         Action<DbContextOptionsBuilder> optionsAction,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
-        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped,
+        bool injectOpenAiClient = true)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(optionsAction);
@@ -30,7 +31,7 @@ public static class ServiceCollectionExtensions
         }
         
         services.AddChatGptIntegrationCore(
-            credentialsConfigSectionPath, completionsConfigSectionPath, serviceLifetime);
+            credentialsConfigSectionPath, completionsConfigSectionPath, serviceLifetime, injectOpenAiClient);
         services.AddDbContext<ChatGptDbContext>(optionsAction, serviceLifetime);
         switch (serviceLifetime)
         {

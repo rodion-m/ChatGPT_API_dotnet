@@ -148,7 +148,7 @@ public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
             requestModifier,
             rawResponseGetter,
             jsonDeserializerOptions,
-            cancellationToken
+            cancellationToken: cancellationToken
         );
         return response;
     }

@@ -1,19 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using OpenAI.ChatGpt.AspNetCore.Models;
 
 namespace OpenAI.ChatGpt.AspNetCore.Extensions;
 
 public static class ServiceCollectionExtensions
 {
     public const string CredentialsConfigSectionPathDefault = "OpenAICredentials";
+
     // ReSharper disable once InconsistentNaming
     public const string ChatGPTConfigSectionPathDefault = "ChatGPTConfig";
-    
-    public static IServiceCollection AddChatGptInMemoryIntegration(
+
+    public static IHttpClientBuilder AddChatGptInMemoryIntegration(
         this IServiceCollection services,
         bool injectInMemoryChatService = true,
-        bool injectOpenAiClient = true,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault)
     {
@@ -23,23 +22,23 @@ public static class ServiceCollectionExtensions
             throw new ArgumentException("Value cannot be null or whitespace.",
                 nameof(credentialsConfigSectionPath));
         }
+
         if (string.IsNullOrWhiteSpace(completionsConfigSectionPath))
         {
             throw new ArgumentException("Value cannot be null or whitespace.",
                 nameof(completionsConfigSectionPath));
         }
-        services.AddChatGptIntegrationCore(
-            credentialsConfigSectionPath,
-            completionsConfigSectionPath, 
-            injectOpenAiClient: injectOpenAiClient
-        );
+
         services.AddSingleton<IChatHistoryStorage, InMemoryChatHistoryStorage>();
-        if(injectInMemoryChatService)
+        if (injectInMemoryChatService)
         {
             services.AddScoped<ChatService>(CreateChatService);
         }
-        
-        return services;
+
+        return services.AddChatGptIntegrationCore(
+            credentialsConfigSectionPath,
+            completionsConfigSectionPath
+        );
     }
 
     private static ChatService CreateChatService(IServiceProvider provider)
@@ -47,12 +46,13 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(provider);
         var userId = Guid.Empty.ToString();
         var storage = provider.GetRequiredService<IChatHistoryStorage>();
-        if(storage is not InMemoryChatHistoryStorage)
+        if (storage is not InMemoryChatHistoryStorage)
         {
             throw new InvalidOperationException(
                 $"Chat injection is supported only with {nameof(InMemoryChatHistoryStorage)} " +
                 $"and is not supported for {storage.GetType().FullName}");
         }
+
         /*
          * .GetAwaiter().GetResult() are safe here because we use sync in memory storage
          */
@@ -64,13 +64,12 @@ public static class ServiceCollectionExtensions
         return chat;
     }
 
-    public static IServiceCollection AddChatGptIntegrationCore(
-        this IServiceCollection services, 
+    public static IHttpClientBuilder AddChatGptIntegrationCore(
+        this IServiceCollection services,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
-        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped,
-        bool injectOpenAiClient = true
-        )
+        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
+    )
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
@@ -78,6 +77,7 @@ public static class ServiceCollectionExtensions
             throw new ArgumentException("Value cannot be null or whitespace.",
                 nameof(credentialsConfigSectionPath));
         }
+
         if (string.IsNullOrWhiteSpace(completionsConfigSectionPath))
         {
             throw new ArgumentException("Value cannot be null or whitespace.",
@@ -94,33 +94,18 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        if (services.All(it => it.ServiceType != typeof(IHttpClientFactory)))
-        {
-            services.AddHttpClient(OpenAiClient.HttpClientName);
-        }
-
         services.AddSingleton<ITimeProvider, TimeProviderUtc>();
         services.Add(new ServiceDescriptor(typeof(ChatGPTFactory), typeof(ChatGPTFactory), serviceLifetime));
 
-        if (injectOpenAiClient)
-        {
-            AddOpenAiClient(services);
-        }
-        
-        return services;
+        return AddOpenAiClient(services);
     }
 
-    private static void AddOpenAiClient(IServiceCollection services)
+    private static IHttpClientBuilder AddOpenAiClient(IServiceCollection services)
     {
-        services.AddSingleton<IOpenAiClient>(provider =>
+        return services.AddHttpClient<IOpenAiClient, OpenAiClient>((provider, httpClient) =>
         {
             var credentials = provider.GetRequiredService<IOptions<OpenAICredentials>>().Value;
-            var factory = provider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = factory.CreateClient(OpenAiClient.HttpClientName);
-            httpClient.DefaultRequestHeaders.Authorization = credentials.GetAuthHeader();
-            httpClient.BaseAddress = new Uri(credentials.ApiHost);
-            var client = new OpenAiClient(httpClient);
-            return client;
+            credentials.SetupHttpClient(httpClient);
         });
     }
 }

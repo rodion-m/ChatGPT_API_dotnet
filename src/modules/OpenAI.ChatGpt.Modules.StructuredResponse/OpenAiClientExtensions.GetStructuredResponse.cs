@@ -4,6 +4,7 @@ using Json.Schema;
 using Json.Schema.Generation;
 using OpenAI.ChatGpt.Models.ChatCompletion;
 using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
+using static OpenAI.ChatGpt.Models.ChatCompletion.Messaging.ChatCompletionMessage;
 
 namespace OpenAI.ChatGpt.Modules.StructuredResponse;
 
@@ -21,6 +22,12 @@ public static class OpenAiClientExtensions
         WriteIndented = false
     };
 
+    private static readonly JsonSerializerOptions JsonDefaultSerializerOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter() },
+        WriteIndented = false
+    };
+
     /// <summary>
     /// Asynchronously sends a chat completion request to the OpenAI API and deserializes the response to a specific object type.
     /// </summary>
@@ -34,6 +41,8 @@ public static class OpenAiClientExtensions
     /// <param name="requestModifier">Optional. A function that can modify the chat completion request before it is sent to the API.</param>
     /// <param name="rawResponseGetter">Optional. A function that can access the raw API response.</param>
     /// <param name="jsonDeserializerOptions">Optional. Custom JSON deserializer options for the deserialization. If not specified, default options with case insensitive property names are used.</param>
+    /// <param name="jsonSerializerOptions">Optional. Custom JSON serializer options for the serialization.</param>
+    /// <param name="examples">Optional. Example of the models those will be serialized using <paramref name="jsonSerializerOptions"/></param>
     /// <param name="cancellationToken">Optional. A cancellation token that can be used to cancel the operation.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the deserialized object from the API response.
@@ -54,6 +63,8 @@ public static class OpenAiClientExtensions
         Action<ChatCompletionRequest>? requestModifier = null,
         Action<ChatCompletionResponse>? rawResponseGetter = null,
         JsonSerializerOptions? jsonDeserializerOptions = null,
+        JsonSerializerOptions? jsonSerializerOptions = null,
+        IEnumerable<TObject>? examples = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(client);
@@ -70,6 +81,8 @@ public static class OpenAiClientExtensions
             requestModifier: requestModifier,
             rawResponseGetter: rawResponseGetter,
             jsonDeserializerOptions: jsonDeserializerOptions,
+            jsonSerializerOptions: jsonSerializerOptions,
+            examples: examples,
             cancellationToken: cancellationToken
         );
     }
@@ -85,20 +98,22 @@ public static class OpenAiClientExtensions
         Action<ChatCompletionRequest>? requestModifier = null,
         Action<ChatCompletionResponse>? rawResponseGetter = null,
         JsonSerializerOptions? jsonDeserializerOptions = null,
+        JsonSerializerOptions? jsonSerializerOptions = null,
+        IEnumerable<TObject>? examples = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(client);
         ArgumentNullException.ThrowIfNull(dialog);
 
-        var editMsg = dialog.GetMessages().FirstOrDefault(it => it is SystemMessage)
+        var editMsg = dialog.GetMessages()
+                          .FirstOrDefault(it => it is SystemMessage)
                       ?? dialog.GetMessages()[0];
         var originalContent = editMsg.Content;
         try
         {
-            editMsg.Content += GetAdditionalJsonResponsePrompt(responseFormat);
+            editMsg.Content += GetAdditionalJsonResponsePrompt(responseFormat, examples, jsonSerializerOptions);
 
-            (model, maxTokens) =
-                ChatCompletionMessage.FindOptimalModelAndMaxToken(dialog.GetMessages(), model, maxTokens);
+            (model, maxTokens) = FindOptimalModelAndMaxToken(dialog.GetMessages(), model, maxTokens);
 
             var response = await client.GetChatCompletions(
                 dialog,
@@ -124,9 +139,18 @@ public static class OpenAiClientExtensions
     {
         ArgumentNullException.ThrowIfNull(response);
         response = response.Trim();
-        if (response.StartsWith("```") && response.EndsWith("```"))
+        if (response.StartsWith("```json") && response.EndsWith("```"))
+        {
+            response = response[7..^3];
+        }
+        else if (response.StartsWith("```") && response.EndsWith("```"))
         {
             response = response[3..^3];
+        }
+        if(!response.StartsWith('{') || !response.EndsWith('}'))
+        {
+            var (openBracketIndex, closeBracketIndex) = FindFirstAndLastBracket(response);
+            response = response[openBracketIndex..(closeBracketIndex + 1)];
         }
 
         jsonDeserializerOptions ??= new JsonSerializerOptions
@@ -151,19 +175,41 @@ public static class OpenAiClientExtensions
         }
 
         return deserialized;
+        
+        static (int openBracketIndex, int closeBracketIndex) FindFirstAndLastBracket(string response)
+        {
+            ArgumentNullException.ThrowIfNull(response);
+            var openBracketIndex = response.IndexOf('{');
+            var closeBracketIndex = response.LastIndexOf('}');
+            if (openBracketIndex < 0 || closeBracketIndex < 0)
+            {
+                throw new InvalidJsonException(
+                    $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response);
+            }
+            return (openBracketIndex, closeBracketIndex);
+        }
     }
 
-    private static string GetAdditionalJsonResponsePrompt(string responseFormat)
+    private static string GetAdditionalJsonResponsePrompt<TObject>(
+        string responseFormat, IEnumerable<TObject>? examples, JsonSerializerOptions? jsonSerializerOptions)
     {
-        return$"\n\nWrite your response in compact JSON format with escaped strings. " +
-              $"Here is the response structure (JSON Schema): {responseFormat}";
+        var res = $"\n\nYour response MUST be STRICTLY compact JSON with escaped strings. " +
+              $"Here is the response structure (JSON Schema): \n```json{responseFormat}```";
+        
+        if (examples is not null) 
+        {
+            jsonSerializerOptions ??= JsonDefaultSerializerOptions;
+            var examplesString = string.Join("\n", examples.Select(it => JsonSerializer.Serialize(it, jsonSerializerOptions)));
+            res += $"\n\nHere are some examples:\n```json\n{examplesString}\n```";
+        }
+
+        return res;
     }
 
     internal static string CreateResponseFormatJson<TObject>()
     {
         var schemaBuilder = new JsonSchemaBuilder();
-        var schema = schemaBuilder.FromType<TObject>(SchemaGeneratorConfiguration
-        ).Build();;
+        var schema = schemaBuilder.FromType<TObject>(SchemaGeneratorConfiguration).Build();
         var schemaString = JsonSerializer.Serialize(schema, JsonSchemaSerializerOptions);
         return schemaString;
     }

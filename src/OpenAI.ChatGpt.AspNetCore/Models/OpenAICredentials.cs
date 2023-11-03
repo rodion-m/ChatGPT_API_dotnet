@@ -26,4 +26,11 @@ public class OpenAICredentials
     {
         return new AuthenticationHeaderValue("Bearer", ApiKey);
     }
+
+    public void SetupHttpClient(HttpClient httpClient)
+    {
+        ArgumentNullException.ThrowIfNull(httpClient);
+        httpClient.DefaultRequestHeaders.Authorization = GetAuthHeader();
+        httpClient.BaseAddress = new Uri(ApiHost);
+    }
 }

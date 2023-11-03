@@ -26,8 +26,8 @@ public class ChatGptServicesIntegrationTests
         provider.GetRequiredService<IOptions<OpenAICredentials>>();
         provider.GetRequiredService<IOptions<ChatGPTConfig>>();
         
-        provider.GetRequiredService<IHttpClientFactory>();
         provider.GetRequiredService<ITimeProvider>();
+        provider.GetRequiredService<IOpenAiClient>();
         provider.GetRequiredService<IOpenAiClient>();
     }
     

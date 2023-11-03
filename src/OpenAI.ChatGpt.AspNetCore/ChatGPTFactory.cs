@@ -1,16 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
-using OpenAI.ChatGpt.AspNetCore.Models;
 
 namespace OpenAI.ChatGpt.AspNetCore;
 
 /// <summary>
 ///  Factory for creating <see cref="ChatGPT" /> instances from DI.
 /// </summary>
-/// <example>
-/// builder.Services.AddHttpClient&lt;ChatGPTFactory&lt;("OpenAiClient")
-///     .AddPolicyHandler(GetRetryPolicy())
-///     .AddPolicyHandler(GetCircuitBreakerPolicy());
-/// </example>
 [Fody.ConfigureAwait(false)]
 // ReSharper disable once InconsistentNaming
 public class ChatGPTFactory : IDisposable
@@ -23,18 +17,15 @@ public class ChatGPTFactory : IDisposable
     private volatile bool _ensureStorageCreatedCalled;
 
     public ChatGPTFactory(
-        IHttpClientFactory httpClientFactory,
-        IOptions<OpenAICredentials> credentials,
+        IOpenAiClient client,
         IOptions<ChatGPTConfig> config,
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock)
     {
-        if (httpClientFactory == null) throw new ArgumentNullException(nameof(httpClientFactory));
-        if (credentials?.Value == null) throw new ArgumentNullException(nameof(credentials));
         _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
         _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
-        _client = CreateOpenAiClient(httpClientFactory, credentials);
+        _client = client ?? throw new ArgumentNullException(nameof(client));
         _isHttpClientInjected = true;
     }
 
@@ -65,16 +56,6 @@ public class ChatGPTFactory : IDisposable
         _clock = clock ?? new TimeProviderUtc();
     }
     
-    private OpenAiClient CreateOpenAiClient(
-        IHttpClientFactory httpClientFactory, 
-        IOptions<OpenAICredentials> credentials)
-    {
-        var httpClient = httpClientFactory.CreateClient(OpenAiClient.HttpClientName);
-        httpClient.DefaultRequestHeaders.Authorization = credentials.Value.GetAuthHeader();
-        httpClient.BaseAddress = new Uri(credentials.Value.ApiHost);
-        return new OpenAiClient(httpClient);
-    }
-
     public static ChatGPTFactory CreateInMemory(
         string apiKey, 
         ChatGPTConfig? config = null,

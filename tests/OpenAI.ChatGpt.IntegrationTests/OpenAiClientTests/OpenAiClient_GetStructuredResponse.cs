@@ -4,12 +4,7 @@ namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
 
 public class OpenAiClientGetStructuredResponseTests
 {
-    private readonly OpenAiClient _client;
-
-    public OpenAiClientGetStructuredResponseTests()
-    {
-        _client = new OpenAiClient(Helpers.GetOpenAiKey());
-    }
+    private readonly OpenAiClient _client = new(Helpers.GetOpenAiKey());
 
     [Fact]
     public async void Get_simple_structured_response_from_ChatGPT()

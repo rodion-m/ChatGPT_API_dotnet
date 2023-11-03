@@ -9,13 +9,12 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds the <see cref="IChatHistoryStorage"/> implementation using Entity Framework Core.
     /// </summary>
-    public static IServiceCollection AddChatGptEntityFrameworkIntegration(
+    public static IHttpClientBuilder AddChatGptEntityFrameworkIntegration(
         this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
         string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
-        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped,
-        bool injectOpenAiClient = true)
+        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(optionsAction);
@@ -30,8 +29,6 @@ public static class ServiceCollectionExtensions
                 nameof(completionsConfigSectionPath));
         }
         
-        services.AddChatGptIntegrationCore(
-            credentialsConfigSectionPath, completionsConfigSectionPath, serviceLifetime, injectOpenAiClient);
         services.AddDbContext<ChatGptDbContext>(optionsAction, serviceLifetime);
         switch (serviceLifetime)
         {
@@ -48,6 +45,7 @@ public static class ServiceCollectionExtensions
                 throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
         }
         
-        return services;
+        return services.AddChatGptIntegrationCore(
+            credentialsConfigSectionPath, completionsConfigSectionPath, serviceLifetime);
     }
 }

@@ -19,7 +19,12 @@ public static class ChatCompletionModels
     public const string Default = Gpt3_5_Turbo;
 
     /// <summary>
-    /// IMPORTANT: This model is available only by request. Link for joining waitlist: https://openai.com/waitlist/gpt-4-api
+    /// Preview of the newest GPT-4 Turbo model.
+    /// </summary>
+    public const string Gpt4Turbo = "gpt-4-1106-preview";
+    
+    /// <summary>
+    /// IMPORTANT: This model is available only by special coditions. https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
     /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat.
     /// Will be updated with OpenAI's latest model iteration 2 weeks after it is released.
     /// This model has a maximum token limit of 8,192.
@@ -64,6 +69,8 @@ public static class ChatCompletionModels
     /// The model was trained with data up to September 2021.
     /// </summary>
     public const string Gpt3_5_Turbo = "gpt-3.5-turbo";
+    
+    public const string Gpt3_5_Turbo_1106 = "gpt-3.5-turbo-1106";
 
     /// <summary>
     /// Same capabilities as the standard gpt-3.5-turbo model but with 4 times the context.
@@ -119,11 +126,13 @@ public static class ChatCompletionModels
     /// </summary>
     private static readonly Dictionary<string, int> MaxTokensLimits = new()
     {
+        { Gpt4Turbo, 4096 },
         { Gpt4, 8192 },
         { Gpt4_0613, 8192 },
         { Gpt4_32k, 32_768 },
         { Gpt4_32k_0613, 32_768 },
         { Gpt3_5_Turbo, 4096 },
+        { Gpt3_5_Turbo_1106, 16385 },
         { Gpt3_5_Turbo_16k, 16_384 },
         { Gpt3_5_Turbo_0613, 4096 },
         { Gpt3_5_Turbo_16k_0613, 16_384 },

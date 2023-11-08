@@ -4,13 +4,10 @@ namespace OpenAI.ChatGpt.IntegrationTests;
 
 public class ChatGptTranslatorServiceTests
 {
-    private readonly IOpenAiClient _client;
+    private readonly IOpenAiClient _client = new OpenAiClient(Helpers.GetOpenAiKey());
 
-    public ChatGptTranslatorServiceTests()
-    {
-        _client = new OpenAiClient(Helpers.GetOpenAiKey());
-    }
-    
+    private const string GtpModel = ChatCompletionModels.Gpt4Turbo;
+
     [Fact]
     public async Task Translate_from_English_to_Russian()
     {
@@ -19,7 +16,8 @@ public class ChatGptTranslatorServiceTests
         var targetLanguage = "Russian";
         var textToTranslate = "Hello, world!";
         // Act
-        var translatedText = await _client.TranslateText(textToTranslate, sourceLanguage, targetLanguage);
+        var translatedText = await _client.TranslateText(
+            textToTranslate, sourceLanguage, targetLanguage, model: GtpModel);
 
         // Assert
         translatedText.Should().NotBeNullOrEmpty();
@@ -56,7 +54,8 @@ public class ChatGptTranslatorServiceTests
         };
 
         // Act
-        var translatedObject = await _client.TranslateObject(objectToTranslate, sourceLanguage, targetLanguage);
+        var translatedObject = await _client.TranslateObject(
+            objectToTranslate, sourceLanguage, targetLanguage, model: GtpModel);
 
         // Assert
         translatedObject.Should().NotBeNull();
@@ -93,7 +92,7 @@ public class ChatGptTranslatorServiceTests
 
         var translationService = new ChatGPTTranslatorService(_client);
         var service = new EconomicalChatGPTTranslatorService(
-            translationService, "English", "Russian", maxTokensPerRequest: 50);
+            translationService, "English", "Russian", maxTokensPerRequest: 50, model: GtpModel);
         
         var tasks = words.Select(async word =>
         {

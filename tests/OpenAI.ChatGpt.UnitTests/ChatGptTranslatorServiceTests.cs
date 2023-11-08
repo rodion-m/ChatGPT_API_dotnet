@@ -41,6 +41,8 @@ public class ChatGptTranslatorServiceTests
                 It.IsAny<string>(), 
                 It.IsAny<float>(), 
                 It.IsAny<string>(), 
+                It.IsAny<bool>(), 
+                It.IsAny<long?>(), 
                 It.IsAny<Action<ChatCompletionRequest>>(), 
                 It.IsAny<Action<ChatCompletionResponse>>(), 
                 It.IsAny<CancellationToken>()))

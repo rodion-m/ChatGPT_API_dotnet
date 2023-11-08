@@ -5,12 +5,15 @@ namespace OpenAI.ChatGpt;
 
 public interface IOpenAiClient
 {
+    
     Task<string> GetChatCompletions(
         UserOrSystemMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default);
@@ -21,6 +24,8 @@ public interface IOpenAiClient
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default);
@@ -31,6 +36,8 @@ public interface IOpenAiClient
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default);
 
@@ -49,6 +56,18 @@ public interface IOpenAiClient
     ///     A unique identifier representing your end-user, which can help OpenAI to monitor
     ///     and detect abuse.
     /// </param>
+    /// <param name="jsonMode">
+    /// If true, the response will be returned as a JSON object.
+    /// When using JSON mode, always instruct the model to produce JSON via some message in the conversation,
+    /// for example via your system message.
+    /// See: https://platform.openai.com/docs/guides/text-generation/json-mode
+    /// </param>
+    /// <param name="seed">
+    /// This feature is in Beta. 
+    /// If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same `seed` and parameters should return the same result.
+    /// Determinism is not guaranteed, and you should refer to the `system_fingerprint` response parameter to monitor changes in the backend.
+    /// See: https://platform.openai.com/docs/guides/text-generation/reproducible-outputs
+    /// </param>
     /// <param name="requestModifier">A modifier of the raw request. Allows to specify any custom properties.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Chunks of ChatGPT's response, one by one.</returns>
@@ -58,6 +77,8 @@ public interface IOpenAiClient
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default);
 
@@ -69,6 +90,18 @@ public interface IOpenAiClient
     /// <param name="model">One of <see cref="ChatCompletionModels"/></param>
     /// <param name="temperature"><see cref="ChatCompletionRequest.Temperature"/>></param>
     /// <param name="user"><see cref="ChatCompletionRequest.User"/></param>
+    /// <param name="jsonMode">
+    /// If true, the response will be returned as a JSON object.
+    /// When using JSON mode, always instruct the model to produce JSON via some message in the conversation,
+    /// for example via your system message.
+    /// See: https://platform.openai.com/docs/guides/text-generation/json-mode
+    /// </param>
+    /// <param name="seed">
+    /// This feature is in Beta. 
+    /// If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same `seed` and parameters should return the same result.
+    /// Determinism is not guaranteed, and you should refer to the `system_fingerprint` response parameter to monitor changes in the backend.
+    /// See: https://platform.openai.com/docs/guides/text-generation/reproducible-outputs
+    /// </param>
     /// <param name="requestModifier">Request modifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Chunks of ChatGPT's response, one by one</returns>
@@ -78,11 +111,13 @@ public interface IOpenAiClient
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<string> StreamChatCompletions(
-        ChatCompletionRequest request,CancellationToken cancellationToken = default);
+        ChatCompletionRequest request, CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(
         ChatCompletionRequest request, CancellationToken cancellationToken = default);

@@ -127,12 +127,15 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public async Task<string> GetChatCompletions(
         UserOrSystemMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default)
@@ -146,6 +149,8 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             model,
             temperature,
             user,
+            jsonMode,
+            seed,
             false,
             requestModifier
         );
@@ -154,12 +159,15 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         return response.Choices[0].Message!.Content;
     }
 
+    /// <inheritdoc />
     public async Task<string> GetChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         Action<ChatCompletionResponse>? rawResponseGetter = null,
         CancellationToken cancellationToken = default)
@@ -173,20 +181,25 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             model,
             temperature,
             user,
-            false,
-            requestModifier
+            jsonMode,
+            seed,
+            stream: false,
+            requestModifier: requestModifier
         );
         var response = await GetChatCompletionsRaw(request, cancellationToken);
         rawResponseGetter?.Invoke(response);
         return response.GetMessageContent();
     }
     
+    /// <inheritdoc />
     public async Task<ChatCompletionResponse> GetChatCompletionsRaw(
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
@@ -199,8 +212,10 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             model,
             temperature,
             user,
-            false,
-            requestModifier
+            jsonMode,
+            seed,
+            stream: false,
+            requestModifier: requestModifier
         );
         var response = await GetChatCompletionsRaw(request, cancellationToken);
         return response;
@@ -229,30 +244,15 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         return jsonResponse;
     }
 
-    /// <summary>
-    /// Start streaming chat completions like ChatGPT
-    /// </summary>
-    /// <param name="messages">The history of messaging</param>
-    /// <param name="maxTokens">The length of the response</param>
-    /// <param name="model">One of <see cref="ChatCompletionModels"/></param>
-    /// <param name="temperature">
-    ///     What sampling temperature to use, between 0 and 2.
-    ///     Higher values like 0.8 will make the output more random,
-    ///     while lower values like 0.2 will make it more focused and deterministic.
-    /// </param>
-    /// <param name="user">
-    ///     A unique identifier representing your end-user, which can help OpenAI to monitor
-    ///     and detect abuse.
-    /// </param>
-    /// <param name="requestModifier">A modifier of the raw request. Allows to specify any custom properties.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Chunks of ChatGPT's response, one by one.</returns>
+    /// <inheritdoc />
     public IAsyncEnumerable<string> StreamChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = 0,
         Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
@@ -265,8 +265,10 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             model,
             temperature,
             user,
-            true,
-            requestModifier
+            jsonMode,
+            seed,
+            stream: true,
+            requestModifier: requestModifier
         );
         return StreamChatCompletions(request, cancellationToken);
     }
@@ -277,6 +279,8 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         string model,
         float temperature,
         string? user,
+        bool jsonMode,
+        long? seed,
         bool stream,
         Action<ChatCompletionRequest>? requestModifier)
     {
@@ -287,29 +291,26 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             MaxTokens = maxTokens,
             Stream = stream,
             User = user,
-            Temperature = temperature
+            Temperature = temperature,
+            ResponseFormat = new ChatCompletionRequest.ChatCompletionResponseFormat()
+            {
+                Type = jsonMode ? "json_object" : "text"
+            },
+            Seed = seed,
         };
         requestModifier?.Invoke(request);
         return request;
     }
 
-    /// <summary>
-    /// Start streaming chat completions like ChatGPT
-    /// </summary>
-    /// <param name="messages">The history of messaging</param>
-    /// <param name="maxTokens">The length of the response</param>
-    /// <param name="model">One of <see cref="ChatCompletionModels"/></param>
-    /// <param name="temperature"><see cref="ChatCompletionRequest.Temperature"/>></param>
-    /// <param name="user"><see cref="ChatCompletionRequest.User"/></param>
-    /// <param name="requestModifier">Request modifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Chunks of ChatGPT's response, one by one</returns>
+    /// <inheritdoc />
     public IAsyncEnumerable<string> StreamChatCompletions(
         UserOrSystemMessage messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
+        bool jsonMode = false,
+        long? seed = null,
         Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
@@ -321,12 +322,15 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             model,
             temperature,
             user,
-            true,
-            requestModifier
+            jsonMode,
+            seed,
+            stream: true,
+            requestModifier: requestModifier
         );
         return StreamChatCompletions(request, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async IAsyncEnumerable<string> StreamChatCompletions(
         ChatCompletionRequest request,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -342,6 +346,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(
         ChatCompletionRequest request, CancellationToken cancellationToken = default)
     {

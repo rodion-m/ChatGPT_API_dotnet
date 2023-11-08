@@ -121,6 +121,8 @@ public static class OpenAiClientExtensions
                 model,
                 temperature,
                 user,
+                true,
+                null,
                 requestModifier,
                 rawResponseGetter,
                 cancellationToken
@@ -139,14 +141,18 @@ public static class OpenAiClientExtensions
     {
         ArgumentNullException.ThrowIfNull(response);
         response = response.Trim();
-        if (response.StartsWith("```json") && response.EndsWith("```"))
+        if (response[0] == '`')
         {
-            response = response[7..^3];
+            if (response.StartsWith("```json") && response.EndsWith("```"))
+            {
+                response = response[7..^3];
+            }
+            else if (response.StartsWith("```") && response.EndsWith("```"))
+            {
+                response = response[3..^3];
+            }
         }
-        else if (response.StartsWith("```") && response.EndsWith("```"))
-        {
-            response = response[3..^3];
-        }
+
         if(!response.StartsWith('{') || !response.EndsWith('}'))
         {
             var (openBracketIndex, closeBracketIndex) = FindFirstAndLastBracket(response);

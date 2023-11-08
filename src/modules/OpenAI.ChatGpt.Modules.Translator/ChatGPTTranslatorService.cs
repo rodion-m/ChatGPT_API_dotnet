@@ -85,6 +85,8 @@ public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
             model,
             temperature,
             user,
+            false,
+            null,
             requestModifier,
             rawResponseGetter,
             cancellationToken

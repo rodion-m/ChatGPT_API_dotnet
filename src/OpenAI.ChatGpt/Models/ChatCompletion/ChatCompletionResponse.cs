@@ -14,11 +14,21 @@ public class ChatCompletionResponse
     [JsonPropertyName("object")]
     public string Object { get; set; }
 
+    /// <summary>
+    /// The Unix timestamp (in seconds) of when the chat completion was created.
+    /// </summary>
     [JsonPropertyName("created")]
     public long Created { get; set; }
     
     [JsonPropertyName("model")]
     public string Model { get; set; }
+
+    /// <summary>
+    /// This fingerprint represents the backend configuration that the model runs with.
+    /// Can be used in conjunction with the <see cref="ChatCompletionRequest.Seed"/> request parameter to understand when backend changes have been made that might impact determinism.
+    /// </summary>
+    [JsonPropertyName("system_fingerprint")]
+    public string SystemFingerprint { get; set; }
 
     [JsonPropertyName("choices")]
     public Choice[] Choices { get; set; }

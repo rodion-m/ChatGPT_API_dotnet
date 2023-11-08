@@ -193,14 +193,14 @@ public static class OpenAiClientExtensions
     private static string GetAdditionalJsonResponsePrompt<TObject>(
         string responseFormat, IEnumerable<TObject>? examples, JsonSerializerOptions? jsonSerializerOptions)
     {
-        var res = $"\n\nYour response MUST be STRICTLY compact JSON with escaped strings. " +
-              $"Here is the response structure (JSON Schema): \n```json{responseFormat}```";
+        var res = $"\n\nYour output must be strictly in valid, readable, iterable RFC8259 compliant JSON without any extra text. " +
+              $"Here is the output structure (JSON Schema):\n```json\n{responseFormat}\n```";
         
         if (examples is not null) 
         {
             jsonSerializerOptions ??= JsonDefaultSerializerOptions;
             var examplesString = string.Join("\n", examples.Select(it => JsonSerializer.Serialize(it, jsonSerializerOptions)));
-            res += $"\n\nHere are some examples:\n```json\n{examplesString}\n```";
+            res += $"\n\nExamples:\n```json\n{examplesString}\n```";
         }
 
         return res;

@@ -35,14 +35,14 @@ public static class OpenAiClientExtensions
     /// <param name="client">The OpenAI client.</param>
     /// <param name="dialog">The chat dialog, including a user message and any system messages that set the behavior of the assistant.</param>
     /// <param name="maxTokens">Optional. The maximum number of tokens in the response. Defaults to the limit of the model, minus the number of input tokens, minus 500.</param>
-    /// <param name="model">Optional. The name of the model to use. Defaults to "text-davinci-002" unless the message input is longer than 6000 tokens, in which case it defaults to "text-davinci-003".</param>
+    /// <param name="model">Optional. The name of the model to use. Defaults to <see cref="ChatCompletionModels.Gpt4"/>. It's recommended to use GPT4+.</param>
     /// <param name="temperature">Controls the randomness of the assistant’s output. Ranges from 0.0 to 1.0, where 0.0 is deterministic and 1.0 is highly random. Default value is the default for the OpenAI API.</param>
-    /// <param name="user">Optional. The user who is having the conversation. If not specified, defaults to "system".</param>
+    /// <param name="user">Optional. The user ID who is having the conversation.</param>
     /// <param name="requestModifier">Optional. A function that can modify the chat completion request before it is sent to the API.</param>
     /// <param name="rawResponseGetter">Optional. A function that can access the raw API response.</param>
     /// <param name="jsonDeserializerOptions">Optional. Custom JSON deserializer options for the deserialization. If not specified, default options with case insensitive property names are used.</param>
     /// <param name="jsonSerializerOptions">Optional. Custom JSON serializer options for the serialization.</param>
-    /// <param name="examples">Optional. Example of the models those will be serialized using <paramref name="jsonSerializerOptions"/></param>
+    /// <param name="examples">Optional. Example of the models those will be serialized using <paramref name="jsonSerializerOptions"/>.</param>
     /// <param name="cancellationToken">Optional. A cancellation token that can be used to cancel the operation.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the deserialized object from the API response.
@@ -114,7 +114,13 @@ public static class OpenAiClientExtensions
         {
             editMsg.Content += GetAdditionalJsonResponsePrompt(responseFormat, examples, jsonSerializerOptions);
 
-            (model, maxTokens) = FindOptimalModelAndMaxToken(dialog.GetMessages(), model, maxTokens);
+            (model, maxTokens) = FindOptimalModelAndMaxToken(
+                dialog.GetMessages(), 
+                model, 
+                maxTokens,
+                smallModel: ChatCompletionModels.Gpt4,
+                bigModel: ChatCompletionModels.Gpt4
+            );
 
             var response = await client.GetChatCompletions(
                 dialog,

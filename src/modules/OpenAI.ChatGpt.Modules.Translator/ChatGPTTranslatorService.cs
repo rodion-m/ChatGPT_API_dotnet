@@ -103,7 +103,7 @@ public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
                "In the response write ONLY translated text." +
                (_extraPrompt is not null ? "\n" + _extraPrompt : "");
     }
-
+    
     public virtual async Task<TObject> TranslateObject<TObject>(
         TObject objectToTranslate,
         bool isBatch = false,
@@ -140,7 +140,13 @@ public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
         var objectJson = JsonSerializer.Serialize(objectToTranslate, jsonSerializerOptions);
         var dialog = Dialog.StartAsSystem(prompt).ThenUser(objectJson);
         var messages = dialog.GetMessages().ToArray();
-        (model, maxTokens) = ChatCompletionMessage.FindOptimalModelAndMaxToken(messages, model, maxTokens);
+        (model, maxTokens) = ChatCompletionMessage.FindOptimalModelAndMaxToken(
+            messages, 
+            model, 
+            maxTokens,
+            smallModel: ChatCompletionModels.Gpt4,
+            bigModel: ChatCompletionModels.Gpt4
+        );
         var response = await _client.GetStructuredResponse<TObject>(
             dialog,
             maxTokens.Value,

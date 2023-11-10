@@ -85,6 +85,7 @@ public static class ChatCompletionModels
     /// This model has a maximum token limit of 4,096.
     /// The model was trained with data up to September 2021.
     /// </summary>
+    [Obsolete("Legacy. Snapshot of gpt-3.5-turbo from June 13th 2023. Will be deprecated on June 13, 2024.")]
     public const string Gpt3_5_Turbo_0613 = "gpt-3.5-turbo-0613";
 
     /// <summary>
@@ -93,6 +94,7 @@ public static class ChatCompletionModels
     /// This model has a maximum token limit of 16,384.
     /// The model was trained with data up to September 2021.
     /// </summary>
+    [Obsolete("Legacy. Snapshot of gpt-3.5-16k-turbo from June 13th 2023. Will be deprecated on June 13, 2024.")]
     public const string Gpt3_5_Turbo_16k_0613 = "gpt-3.5-turbo-16k-0613";
     
     /// <summary>
@@ -101,7 +103,7 @@ public static class ChatCompletionModels
     /// Unlike gpt-4, this model will not receive updates,
     /// and will only be supported for a three month period ending on June 14th 2023.
     /// </summary>
-    [Obsolete("DISCONTINUATION DATE 09/13/2023")]
+    [Obsolete("Legacy. Snapshot of gpt-4 from March 14th 2023 with function calling support. This model version will be deprecated on June 13th 2024. Use Gpt4 instead.")]
     public const string Gpt4_0314 = "gpt-4-0314";
 
     /// <summary>
@@ -109,8 +111,7 @@ public static class ChatCompletionModels
     /// Unlike gpt-4-32k, this model will not receive updates,
     /// and will only be supported for a three month period ending on June 14th 2023.
     /// </summary>
-    [Obsolete("DISCONTINUATION DATE 09/13/2023. This model is available only by request. " +
-              "Link for joining waitlist: https://openai.com/waitlist/gpt-4-api")]
+    [Obsolete("Legacy. Snapshot of gpt-4-32k from March 14th 2023 with function calling support. This model version will be deprecated on June 13th 2024. Use Gpt432k instead.")]
     public const string Gpt4_32k_0314 = "gpt-4-32k-0314";
 
     /// <summary>
@@ -118,9 +119,13 @@ public static class ChatCompletionModels
     /// Unlike gpt-3.5-turbo, this model will not receive updates,
     /// and will only be supported for a three month period ending on June 1st 2023.
     /// </summary>
-    [Obsolete("DISCONTINUATION DATE 09/13/2023")]
+    [Obsolete("Snapshot of gpt-3.5-turbo from March 1st 2023. Will be deprecated on June 13th 2024. Use Gpt3_5_Turbo instead.")]
     public const string Gpt3_5_Turbo_0301 = "gpt-3.5-turbo-0301";
 
+    private static readonly string[] ModelsSupportedJson = {
+        Gpt4Turbo, Gpt3_5_Turbo_1106
+    };
+    
     /// <summary>
     /// The maximum number of tokens that can be processed by the model.
     /// </summary>
@@ -132,10 +137,10 @@ public static class ChatCompletionModels
         { Gpt4_32k, 32_768 },
         { Gpt4_32k_0613, 32_768 },
         { Gpt3_5_Turbo, 4096 },
-        { Gpt3_5_Turbo_1106, 16385 },
-        { Gpt3_5_Turbo_16k, 16_384 },
+        { Gpt3_5_Turbo_1106, 4096 },
+        { Gpt3_5_Turbo_16k, 16_385 },
         { Gpt3_5_Turbo_0613, 4096 },
-        { Gpt3_5_Turbo_16k_0613, 16_384 },
+        { Gpt3_5_Turbo_16k_0613, 16_385 },
         { Gpt4_0314, 8192 },
         { Gpt4_32k_0314, 32_768 },
         { Gpt3_5_Turbo_0301, 4096 },
@@ -221,5 +226,21 @@ public static class ChatCompletionModels
             throw new ArgumentOutOfRangeException(
                 nameof(maxTokens), $"Max tokens must be less than or equal to {limit} but was {maxTokens}");
         }
+    }
+
+    /// <summary>
+    /// Checks if the model name is supported for JSON mode
+    /// </summary>
+    /// <param name="model">GPT model name</param>
+    /// <returns>True if the model is supported for JSON mode</returns>
+    public static bool IsJsonModeSupported(string model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        return Array.IndexOf(ModelsSupportedJson, model) != -1;
+    }
+
+    internal static IReadOnlyList<string> GetModelsThatSupportJsonMode()
+    {
+        return ModelsSupportedJson;
     }
 }

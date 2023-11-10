@@ -9,11 +9,11 @@ using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 
 namespace OpenAI.ChatGpt;
 
-/// <summary> Thread-safe OpenAI client. </summary>
+/// <summary>Thread-safe OpenAI client.</summary>
+/// <remarks>https://github.com/openai/openai-openapi/blob/master/openapi.yaml</remarks>
 [Fody.ConfigureAwait(false)]
 public class OpenAiClient : IOpenAiClient, IDisposable
 {
-    internal const string HttpClientName = "OpenAiClient";
     private const string DefaultHost = "https://api.openai.com/v1/";
     private const string ChatCompletionsEndpoint = "chat/completions";
     
@@ -142,6 +142,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (dialog == null) throw new ArgumentNullException(nameof(dialog));
         if (model == null) throw new ArgumentNullException(nameof(model));
+        EnsureJsonModeIsSupported(model, jsonMode);
         ThrowIfDisposed();
         var request = CreateChatCompletionRequest(
             dialog.GetMessages(),
@@ -174,6 +175,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
+        EnsureJsonModeIsSupported(model, jsonMode);
         ThrowIfDisposed();
         var request = CreateChatCompletionRequest(
             messages,
@@ -205,6 +207,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
+        EnsureJsonModeIsSupported(model, jsonMode);
         ThrowIfDisposed();
         var request = CreateChatCompletionRequest(
             messages,
@@ -225,7 +228,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         ChatCompletionRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         ThrowIfDisposed();
         var response = await _httpClient.PostAsJsonAsync(
             ChatCompletionsEndpoint,
@@ -258,6 +261,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
+        EnsureJsonModeIsSupported(model, jsonMode);
         ThrowIfDisposed();
         var request = CreateChatCompletionRequest(
             messages,
@@ -292,10 +296,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             Stream = stream,
             User = user,
             Temperature = temperature,
-            ResponseFormat = new ChatCompletionRequest.ChatCompletionResponseFormat()
-            {
-                Type = jsonMode ? "json_object" : "text"
-            },
+            ResponseFormat = new ChatCompletionRequest.ChatCompletionResponseFormat(jsonMode),
             Seed = seed,
         };
         requestModifier?.Invoke(request);
@@ -316,6 +317,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         if (messages == null) throw new ArgumentNullException(nameof(messages));
         if (model == null) throw new ArgumentNullException(nameof(model));
+        EnsureJsonModeIsSupported(model, jsonMode);
         ThrowIfDisposed();
         var request = CreateChatCompletionRequest(messages.GetMessages(),
             maxTokens,
@@ -335,7 +337,9 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         ChatCompletionRequest request,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
         if (request == null) throw new ArgumentNullException(nameof(request));
+        EnsureJsonModeIsSupported(request.Model, request.ResponseFormat.Type == ChatCompletionRequest.ResponseTypes.JsonObject);
         ThrowIfDisposed();
         request.Stream = true;
         await foreach (var response in StreamChatCompletionsRaw(request, cancellationToken))
@@ -351,6 +355,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         ChatCompletionRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
+        EnsureJsonModeIsSupported(request.Model, request.ResponseFormat.Type == ChatCompletionRequest.ResponseTypes.JsonObject);
         ThrowIfDisposed();
         request.Stream = true;
         return _httpClient.StreamUsingServerSentEvents<ChatCompletionRequest, ChatCompletionResponse>
@@ -360,5 +365,16 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             _nullIgnoreSerializerOptions,
             cancellationToken
         );
+    }
+    
+    private static void EnsureJsonModeIsSupported(string model, bool jsonMode)
+    {
+        if(jsonMode && !ChatCompletionModels.IsJsonModeSupported(model))
+        {
+            throw new NotSupportedException(
+                $"Model {model} does not support JSON mode. " +
+                $"Supported models are: {string.Join(", ", ChatCompletionModels.GetModelsThatSupportJsonMode())}"
+            );
+        }
     }
 }

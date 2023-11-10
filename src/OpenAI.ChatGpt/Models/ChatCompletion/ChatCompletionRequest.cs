@@ -145,7 +145,7 @@ public class ChatCompletionRequest
     /// An object specifying the format that the model must output.
     /// </summary>
     [JsonPropertyName("response_format")]
-    public ChatCompletionResponseFormat ResponseFormat { get; set; } = new();
+    public ChatCompletionResponseFormat ResponseFormat { get; set; } = new(false);
 
     /// <summary>
     /// This feature is in Beta.
@@ -158,6 +158,11 @@ public class ChatCompletionRequest
     
     public class ChatCompletionResponseFormat
     {
+        public ChatCompletionResponseFormat(bool jsonMode)
+        {
+            Type = jsonMode ? ResponseTypes.JsonObject : ResponseTypes.Text;
+        }
+
         /// <summary>
         /// Setting to `json_object` enables JSON mode. This guarantees that the message the model generates is valid JSON.
         /// Note that your system prompt must still instruct the model to produce JSON, and to help ensure you don't forget,
@@ -167,6 +172,12 @@ public class ChatCompletionRequest
         /// Must be one of `text` or `json_object`.
         /// </summary>
         [JsonPropertyName("type")]
-        public string Type { get; set; } = "text";
+        public string Type { get; set; }
+    }
+
+    internal static class ResponseTypes
+    {
+        public const string Text = "text";
+        public const string JsonObject = "json_object";
     }
 }

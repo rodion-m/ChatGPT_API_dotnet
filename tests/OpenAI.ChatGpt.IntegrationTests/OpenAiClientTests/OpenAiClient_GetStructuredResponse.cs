@@ -6,27 +6,35 @@ public class OpenAiClientGetStructuredResponseTests
 {
     private readonly OpenAiClient _client = new(Helpers.GetOpenAiKey());
 
-    [Fact]
-    public async void Get_simple_structured_response_from_ChatGPT()
+    [Theory]
+    [InlineData(ChatCompletionModels.Gpt3_5_Turbo)]
+    [InlineData(ChatCompletionModels.Gpt4Turbo)]
+    [InlineData(ChatCompletionModels.Gpt4)]
+    [InlineData(ChatCompletionModels.Gpt3_5_Turbo_1106)]
+    public async void Get_simple_structured_response_from_ChatGPT(string model)
     {
         var message =
             Dialog.StartAsSystem("What did user input?")
                 .ThenUser("My name is John, my age is 30, my email is john@gmail.com");
-        var response = await _client.GetStructuredResponse<UserInfo>(message, model: ChatCompletionModels.Gpt4Turbo);
+        var examples = new []{ new UserInfo() {Age = 0, Email = "i@rodion-m.ru", Name = "Rodion"} };
+        var response = await _client.GetStructuredResponse<UserInfo>(message, model: model, examples: examples);
         response.Should().NotBeNull();
         response.Name.Should().Be("John");
         response.Age.Should().Be(30);
         response.Email.Should().Be("john@gmail.com");
     }
 
-    [Fact]
-    public async void Get_structured_response_with_ARRAY_from_ChatGPT()
+    [Theory]
+    [InlineData(ChatCompletionModels.Gpt4Turbo)]
+    [InlineData(ChatCompletionModels.Gpt4)]
+    [InlineData(ChatCompletionModels.Gpt3_5_Turbo_1106)]
+    public async void Get_structured_response_with_ARRAY_from_ChatGPT(string model)
     {
         var message = Dialog
             .StartAsSystem("What did user input?")
             .ThenUser("My name is John, my age is 30, my email is john@gmail.com. " +
                       "I want to buy 2 apple and 3 orange.");
-        var response = await _client.GetStructuredResponse<Order>(message, model: ChatCompletionModels.Gpt4Turbo);
+        var response = await _client.GetStructuredResponse<Order>(message, model: model);
         response.Should().NotBeNull();
         response.UserInfo.Should().NotBeNull();
         response.UserInfo!.Name.Should().Be("John");
@@ -40,24 +48,30 @@ public class OpenAiClientGetStructuredResponseTests
         response.Items[1].Quantity.Should().Be(3);
     }
 
-    [Fact]
-    public async void Get_structured_response_with_ENUM_from_ChatGPT()
+    [Theory]
+    [InlineData(ChatCompletionModels.Gpt4Turbo)]
+    [InlineData(ChatCompletionModels.Gpt4)]
+    [InlineData(ChatCompletionModels.Gpt3_5_Turbo_1106)]
+    public async void Get_structured_response_with_ENUM_from_ChatGPT(string model)
     {
         var message = Dialog
             .StartAsSystem("What did user input?")
             .ThenUser("Мой любимый цвет - красный");
-        var response = await _client.GetStructuredResponse<Thing>(message, model: ChatCompletionModels.Gpt4Turbo);
+        var response = await _client.GetStructuredResponse<Thing>(message, model: model);
         response.Should().NotBeNull();
         response.Color.Should().Be(Thing.Colors.Red);
     }
 
-    [Fact]
-    public async void Get_structured_response_with_extra_data_from_ChatGPT()
+    [Theory]
+    [InlineData(ChatCompletionModels.Gpt4Turbo)]
+    [InlineData(ChatCompletionModels.Gpt4)]
+    [InlineData(ChatCompletionModels.Gpt3_5_Turbo_1106)]
+    public async void Get_structured_response_with_extra_data_from_ChatGPT(string model)
     {
         var message = Dialog
             .StartAsSystem("Return requested data.")
             .ThenUser("I need info about Almaty city");
-        var response = await _client.GetStructuredResponse<City>(message, model: ChatCompletionModels.Gpt4Turbo);
+        var response = await _client.GetStructuredResponse<City>(message, model: model);
         response.Should().NotBeNull();
         response.Name.Should().Be("Almaty");
         response.Country.Should().Be("Kazakhstan");

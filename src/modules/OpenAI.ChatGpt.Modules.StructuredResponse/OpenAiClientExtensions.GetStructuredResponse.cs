@@ -71,7 +71,8 @@ public static class OpenAiClientExtensions
         ArgumentNullException.ThrowIfNull(dialog);
         var responseFormat = CreateResponseFormatJson<TObject>();
 
-        return client.GetStructuredResponse<TObject>(
+        return GetStructuredResponse<TObject>(
+            client,
             dialog: dialog,
             responseFormat: responseFormat,
             maxTokens: maxTokens,
@@ -121,7 +122,7 @@ public static class OpenAiClientExtensions
                 model,
                 temperature,
                 user,
-                true,
+                ChatCompletionModels.IsJsonModeSupported(model),
                 null,
                 requestModifier,
                 rawResponseGetter,

@@ -19,26 +19,32 @@ public static class ChatCompletionModels
     public const string Default = Gpt3_5_Turbo;
 
     /// <summary>
-    /// Preview of the newest GPT-4 Turbo model.
+    /// The latest GPT-4 model with improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more.
+    /// Returns a maximum of 4,096 output tokens.
+    /// The model was trained with data up to April 2023.
     /// </summary>
     public const string Gpt4Turbo = "gpt-4-1106-preview";
     
     /// <summary>
-    /// IMPORTANT: This model is available only by special coditions. https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
     /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat.
     /// Will be updated with OpenAI's latest model iteration 2 weeks after it is released.
     /// This model has a maximum token limit of 8,192.
     /// The model was trained with data up to September 2021.
     /// </summary>
+    /// <remarks>
+    /// See: https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
+    /// </remarks>
     public const string Gpt4 = "gpt-4";
 
     /// <summary>
-    /// IMPORTANT: This model is available only by request. Link for joining waitlist: https://openai.com/waitlist/gpt-4-api
     /// Snapshot of gpt-4 from June 13th 2023 with function calling data.
     /// Unlike gpt-4, this model will not receive updates, and will be deprecated 3 months after a new version is released.
     /// This model has a maximum token limit of 8,192.
     /// The model was trained with data up to September 2021.
     /// </summary>
+    /// <remarks>
+    /// See: https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
+    /// </remarks>
     public const string Gpt4_0613 = "gpt-4-0613";
 
 
@@ -48,8 +54,7 @@ public static class ChatCompletionModels
     /// This model has a maximum token limit of 32,768.
     /// The model was trained with data up to September 2021.
     /// </summary>
-    [Obsolete("This model is available only by request. " +
-                  "Link for joining waitlist: https://openai.com/waitlist/gpt-4-api")]
+    [Obsolete("This model is not available for all.")]
     public const string Gpt4_32k = "gpt-4-32k";
 
     /// <summary>
@@ -58,8 +63,7 @@ public static class ChatCompletionModels
     /// This model has a maximum token limit of 32,768.
     /// The model was trained with data up to September 2021.
     /// </summary>
-    [Obsolete("This model is available only by request. " +
-              "Link for joining waitlist: https://openai.com/waitlist/gpt-4-api")]
+    [Obsolete("This model is not available for all.")]
     public const string Gpt4_32k_0613 = "gpt-4-32k-0613";
 
     /// <summary>
@@ -146,7 +150,7 @@ public static class ChatCompletionModels
         { Gpt3_5_Turbo_0301, 4096 },
     };
     
-    private static volatile bool _validateModelName = true;
+    private static int _validateModelName = 1;
     
     
     /// <summary>
@@ -184,7 +188,7 @@ public static class ChatCompletionModels
         {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(model));
         }
-        if (_validateModelName && !MaxTokensLimits.ContainsKey(model))
+        if (_validateModelName == 1 && !MaxTokensLimits.ContainsKey(model))
         {
             throw new ArgumentException($"Invalid model: {model}", nameof(model));
         }
@@ -193,12 +197,12 @@ public static class ChatCompletionModels
 
     public static void DisableModelNameValidation()
     {
-        _validateModelName = false;
+        Interlocked.CompareExchange(ref _validateModelName, 0, 1);
     }
     
     public static void EnableModelNameValidation()
     {
-        _validateModelName = true;
+        Interlocked.CompareExchange(ref _validateModelName, 1, 0);
     }
 
     public static void EnsureMaxTokensIsSupported(string model, int maxTokens)

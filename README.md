@@ -123,7 +123,7 @@ record City(string Name, int YearOfFoundation, string Country);
 var message = Dialog
     .StartAsSystem("Return requested data.")
     .ThenUser("I need info about Almaty city");
-City almaty = await _client.GetStructuredResponse<City>(message);
+City almaty = await _client.GetStructuredResponse<City>(message, model: ChatCompletionModels.Gpt4Turbo);
 Console.WriteLine(almaty); // Name: "Almaty", Country: "Kazakhstan", YearOfFoundation: 1854
 ```
 Under the hood, it uses the new [json mode](https://platform.openai.com/docs/guides/text-generation/json-mode) of the API for GPT4Turbo and for the `gpt-3.5-turbo-1106`. Regular GPT4 and GPT3.5Turbo models are also supported, but GPT3.5 responses may be unstable (for GPT3.5 it's strictly recommended to provide `examples` parameter).
@@ -167,15 +167,23 @@ Some of them are taken from this article: https://towardsdatascience.com/gpt-3-p
 Below listed parameters for ChatCompletions API.
 
 ### Model
-The prediction-generating AI model is specified by the engine parameter. The available models are:
-*   `ChatCompletionModels.Gpt3_5_Turbo` (Default): Most capable GPT-3.5 model and optimized for chat at 1/10th the cost of text-davinci-003. Will be updated with OpenAI's latest model iteration.
-*   `ChatCompletionModels.Gpt3_5_Turbo_0301`: Snapshot of gpt-3.5-turbo from March 1st 2023. Unlike gpt-3.5-turbo, this model will not receive updates, and will only be supported for a three month period ending on June 1st 2023.
-*   `ChatCompletionModels.Gpt4`: More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat. Will be updated with OpenAI's latest model iteration. \*
-*   `ChatCompletionModels.Gpt4_0314`: Snapshot of gpt-4 from March 14th 2023. Unlike gpt-4, this model will not receive updates, and will only be supported for a three month period ending on June 14th 2023. \*
-*   `ChatCompletionModels.Gpt4_32k`: Same capabilities as the base gpt-4 mode but with 4x the context length. Will be updated with OpenAI's latest model iteration. \*
-*   `ChatCompletionModels.Gpt4_32k_0314`: Snapshot of gpt-4-32 from March 14th 2023. Unlike gpt-4-32k, this model will not receive updates, and will only be supported for a three month period ending on June 14th 2023. \* \
-    Note that training data for all models is up to Sep 2021. \
-    \* These models are currently in beta and are not yet available to all users. Here is the link for joining waitlist: https://openai.com/waitlist/gpt-4-api
+The prediction-generating AI model is specified by the engine parameter. The available models are described below: https://platform.openai.com/docs/models
+
+| C# Model                                   | API Model              |
+|--------------------------------------------|------------------------|
+| ChatCompletionModels.Gpt4Turbo             | gpt-4-1106-preview     |
+| ChatCompletionModels.Gpt4                  | gpt-4                  |
+| ChatCompletionModels.Gpt4_0613             | gpt-4-0613             |
+| ChatCompletionModels.Gpt4_32k              | gpt-4-32k              |
+| ChatCompletionModels.Gpt4_32k_0613         | gpt-4-32k-0613         |
+| ChatCompletionModels.Gpt3_5_Turbo          | gpt-3.5-turbo          |
+| ChatCompletionModels.Gpt3_5_Turbo_1106     | gpt-3.5-turbo-1106     |
+| ChatCompletionModels.Gpt3_5_Turbo_16k      | gpt-3.5-turbo-16k      |
+| ChatCompletionModels.Gpt3_5_Turbo_0613     | gpt-3.5-turbo-0613     |
+| ChatCompletionModels.Gpt3_5_Turbo_16k_0613 | gpt-3.5-turbo-16k-0613 |
+| ChatCompletionModels.Gpt4_0314             | gpt-4-0314             |
+| ChatCompletionModels.Gpt4_32k_0314         | gpt-4-32k-0314         |
+| ChatCompletionModels.Gpt3_5_Turbo_0301     | gpt-3.5-turbo-0301     |
 
 ### MaxTokens
 The maximum number of tokens allowed for the generated answer. Defaults to `ChatCompletionRequest.MaxTokensDefault` (64).

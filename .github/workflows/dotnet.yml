@@ -29,6 +29,6 @@ jobs:
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-        AZURE_OPENAI_ENDPOINT_URL: ${{ secrets.AZURE_OPENAI_ENDPOINT_URL }}
-        AZURE_OPENAI_DEPLOYMENT_NAME: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_NAME }}
+        AZURE_OPENAI_ENDPOINT_URL: ${{ env.AZURE_OPENAI_ENDPOINT_URL }}
+        AZURE_OPENAI_DEPLOYMENT_NAME: ${{ env.AZURE_OPENAI_DEPLOYMENT_NAME }}
       run: dotnet test --no-build --verbosity normal

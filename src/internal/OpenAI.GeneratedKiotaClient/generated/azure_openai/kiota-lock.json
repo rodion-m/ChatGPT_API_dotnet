@@ -1,0 +1,27 @@
+{
+  "descriptionHash": "06D2A3F53A44B5F0DC31D99F750D72D89F16D0A9B10962029864C7F2AD8A75D037883CD5FDFEAF701D00DF00EDA582E7774EA93A233CC955ADA05BFD20562D75",
+  "descriptionLocation": "https://github.com/Azure/azure-rest-api-specs/raw/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference/preview/2023-12-01-preview/inference.yaml",
+  "lockFileVersion": "1.0.0",
+  "kiotaVersion": "1.8.2",
+  "clientClassName": "GeneratedAzureOpenAiClient",
+  "clientNamespaceName": "OpenAI.Azure.GeneratedKiotaClient",
+  "language": "CSharp",
+  "usesBackingStore": false,
+  "excludeBackwardCompatible": false,
+  "includeAdditionalData": true,
+  "serializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory"
+  ],
+  "deserializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory"
+  ],
+  "structuredMimeTypes": [
+    "application/json",
+    "text/plain;q=0.9",
+    "application/x-www-form-urlencoded;q=0.2",
+    "multipart/form-data;q=0.1"
+  ],
+  "includePatterns": [],
+  "excludePatterns": [],
+  "disabledValidationRules": []
+}

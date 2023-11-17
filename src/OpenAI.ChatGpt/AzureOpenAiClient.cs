@@ -12,8 +12,6 @@ public class AzureOpenAiClient : OpenAiClient
     private readonly string _apiVersion;
     private const string DefaultApiVersion = "2023-12-01-preview";
 
-    //https://github.com/Azure/azure-rest-api-specs/tree/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference
-    
     /// <summary>
     /// Creates Azure OpenAI services client
     /// </summary>
@@ -23,6 +21,7 @@ public class AzureOpenAiClient : OpenAiClient
     /// <param name="apiVersion">Azure OpenAI API version</param>
     /// <remarks>
     /// See currently available API versions: https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#completions
+    /// Specifications: https://github.com/Azure/azure-rest-api-specs/tree/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference
     /// </remarks>
     public AzureOpenAiClient(
         string endpointUrl, 

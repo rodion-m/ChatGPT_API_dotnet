@@ -144,8 +144,8 @@ public class ChatCompletionRequest
     /// <summary>
     /// An object specifying the format that the model must output.
     /// </summary>
-    [JsonPropertyName("response_format")]
-    public ChatCompletionResponseFormat ResponseFormat { get; set; } = new(false);
+    [JsonPropertyName("response_format"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public ChatCompletionResponseFormat? ResponseFormat { get; set; }
 
     /// <summary>
     /// This feature is in Beta.

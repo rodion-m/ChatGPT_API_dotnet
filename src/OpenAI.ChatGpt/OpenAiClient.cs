@@ -19,14 +19,20 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     
     private static readonly Uri DefaultHostUri = new(DefaultHost);
 
-    private readonly HttpClient _httpClient;
-    private readonly bool _isHttpClientInjected;
+    protected HttpClient HttpClient;
+    protected bool IsHttpClientInjected;
     private bool _disposed;
 
     private readonly JsonSerializerOptions _nullIgnoreSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    protected OpenAiClient()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    {
+    }
 
     /// <summary>
     ///  Creates a new OpenAI client with given <paramref name="apiKey"/>.
@@ -39,19 +45,19 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             throw new ArgumentException("API key cannot be null or whitespace.", nameof(apiKey));
         var uri = ValidateHost(host);
         
-        _httpClient = new HttpClient()
+        HttpClient = new HttpClient()
         {
             BaseAddress = uri
         };
         var header = new AuthenticationHeaderValue("Bearer", apiKey);
-        _httpClient.DefaultRequestHeaders.Authorization = header;
+        HttpClient.DefaultRequestHeaders.Authorization = header;
     }
 
     /// <summary>
     /// Creates a new OpenAI client from DI with given <paramref name="httpClient"/>.
     /// </summary>
     /// <param name="httpClient">
-    /// <see cref="HttpClient"/> from DI. It should have an Authorization header set with OpenAI API key.
+    /// <see cref="System.Net.Http.HttpClient"/> from DI. It should have an Authorization header set with OpenAI API key.
     /// </param>
     /// <exception cref="ArgumentException">
     /// Indicates that OpenAI API key is not set in
@@ -59,18 +65,18 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     /// </exception>
     public OpenAiClient(HttpClient httpClient)
     {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         ValidateHttpClient(httpClient);
-        _isHttpClientInjected = true;
+        IsHttpClientInjected = true;
     }
     
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
-        if (!_isHttpClientInjected)
+        if (!IsHttpClientInjected)
         {
-            _httpClient.Dispose();
+            HttpClient.Dispose();
         }
         GC.SuppressFinalize(this);
     }
@@ -89,8 +95,9 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         if (host is null) return DefaultHostUri;
         if (!Uri.TryCreate(host, UriKind.Absolute, out var uri))
         {
-            throw new ArgumentException("Host must be a valid absolute URI and end with a slash." +
-                                        $"For example: {DefaultHost}", nameof(host));
+            throw new ArgumentException(
+                $"Host must be a valid absolute URI and end with a slash. Provided: {host}" +
+                        $"\nCorrect example: {DefaultHost}", nameof(host));
         }
         if(!host.EndsWith("/")) uri = new Uri(host + "/");
 
@@ -230,8 +237,8 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         ArgumentNullException.ThrowIfNull(request);
         ThrowIfDisposed();
-        var response = await _httpClient.PostAsJsonAsync(
-            ChatCompletionsEndpoint,
+        var response = await HttpClient.PostAsJsonAsync(
+            GetChatCompletionsEndpoint(),
             request,
             cancellationToken: cancellationToken,
             options: _nullIgnoreSerializerOptions
@@ -245,6 +252,11 @@ public class OpenAiClient : IOpenAiClient, IDisposable
 
         var jsonResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseContent)!;
         return jsonResponse;
+    }
+
+    protected virtual string GetChatCompletionsEndpoint()
+    {
+        return ChatCompletionsEndpoint;
     }
 
     /// <inheritdoc />
@@ -296,7 +308,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
             Stream = stream,
             User = user,
             Temperature = temperature,
-            ResponseFormat = new ChatCompletionRequest.ChatCompletionResponseFormat(jsonMode),
+            ResponseFormat = jsonMode ? new ChatCompletionRequest.ChatCompletionResponseFormat(jsonMode) : null,
             Seed = seed,
         };
         requestModifier?.Invoke(request);
@@ -339,7 +351,7 @@ public class OpenAiClient : IOpenAiClient, IDisposable
     {
         ArgumentNullException.ThrowIfNull(request);
         if (request == null) throw new ArgumentNullException(nameof(request));
-        EnsureJsonModeIsSupported(request.Model, request.ResponseFormat.Type == ChatCompletionRequest.ResponseTypes.JsonObject);
+        EnsureJsonModeIsSupported(request.Model, request.ResponseFormat?.Type == ChatCompletionRequest.ResponseTypes.JsonObject);
         ThrowIfDisposed();
         request.Stream = true;
         await foreach (var response in StreamChatCompletionsRaw(request, cancellationToken))
@@ -355,10 +367,10 @@ public class OpenAiClient : IOpenAiClient, IDisposable
         ChatCompletionRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        EnsureJsonModeIsSupported(request.Model, request.ResponseFormat.Type == ChatCompletionRequest.ResponseTypes.JsonObject);
+        EnsureJsonModeIsSupported(request.Model, request.ResponseFormat?.Type == ChatCompletionRequest.ResponseTypes.JsonObject);
         ThrowIfDisposed();
         request.Stream = true;
-        return _httpClient.StreamUsingServerSentEvents<ChatCompletionRequest, ChatCompletionResponse>
+        return HttpClient.StreamUsingServerSentEvents<ChatCompletionRequest, ChatCompletionResponse>
         (
             ChatCompletionsEndpoint,
             request,

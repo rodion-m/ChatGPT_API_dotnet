@@ -15,7 +15,7 @@ public static class OpenAiClientExtensions
     {
         Nullability = Nullability.Disabled,
         PropertyOrder = PropertyOrder.AsDeclared,
-        PropertyNamingMethod = PropertyNamingMethods.AsDeclared
+        PropertyNameResolver = PropertyNameResolvers.AsDeclared
     };
     private static readonly JsonSerializerOptions JsonSchemaSerializerOptions = new()
     {

@@ -1,23 +1,36 @@
-﻿namespace OpenAI.Tests.Shared;
+﻿using Microsoft.Extensions.Configuration;
 
-public static class Helpers
+namespace OpenAI.Tests.Shared
 {
-    public static string GetOpenAiKey() => GetKeyFromEnvironment("OPENAI_API_KEY");
-    
-    public static string? NullIfEmpty(this string? str)
+    public static class Helpers
     {
-        return string.IsNullOrEmpty(str) ? null : str;
-    }
-    
-    public static string GetKeyFromEnvironment(string keyName)
-    {
-        if (keyName == null) throw new ArgumentNullException(nameof(keyName));
-        var value = Environment.GetEnvironmentVariable(keyName);
-        if (value is null)
+        private static IConfiguration Configuration { get; set; }
+
+        static Helpers()
         {
-            throw new InvalidOperationException($"{keyName} is not set as environment variable");
+            Configuration = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .AddUserSecrets(typeof(Helpers).Assembly)
+                .Build();
         }
 
-        return value;
+        public static string GetOpenAiKey() => GetValueFromConfiguration("OPENAI_API_KEY");
+
+        public static string? NullIfEmpty(this string? str)
+        {
+            return string.IsNullOrEmpty(str) ? null : str;
+        }
+
+        public static string GetValueFromConfiguration(string key)
+        {
+            ArgumentNullException.ThrowIfNull(key);
+            var value = Configuration[key];
+            if (value is null)
+            {
+                throw new InvalidOperationException($"{key} is not set in configuration");
+            }
+
+            return value;
+        }
     }
 }

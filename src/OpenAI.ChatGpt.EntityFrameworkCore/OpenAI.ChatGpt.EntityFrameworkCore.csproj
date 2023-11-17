@@ -3,7 +3,6 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>11</LangVersion>
         <Authors>Rodion Mostovoi</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>OpenAI.ChatGPT.EntityFrameworkCore</PackageId>
@@ -11,7 +10,6 @@
         <Product>OpenAI ChatGPT integration for .NET with EF Core storage</Product>
         <Description>OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core supporting. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4, di, entityframework, ef</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Title>ChatGPT easy DI with EF Core storage</Title>
@@ -31,8 +29,8 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

@@ -3,7 +3,6 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>11</LangVersion>
         <Authors>Rodion Mostovoi</Authors>
         <Title>OpenAI ChatGPT integration for .NET</Title>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -13,7 +12,6 @@
         <Description>.NET integration for ChatGPT with streaming responses supporting (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <RootNamespace>OpenAI.ChatGpt</RootNamespace>
         <Copyright>Rodion Mostovoi</Copyright>
         <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4</PackageTags>

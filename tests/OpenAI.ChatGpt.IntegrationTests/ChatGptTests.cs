@@ -1,6 +1,4 @@
-﻿using OpenAI.Tests.Shared;
-
-namespace OpenAI.ChatGpt.IntegrationTests;
+﻿namespace OpenAI.ChatGpt.IntegrationTests;
 
 public class ChatGptTests
 {

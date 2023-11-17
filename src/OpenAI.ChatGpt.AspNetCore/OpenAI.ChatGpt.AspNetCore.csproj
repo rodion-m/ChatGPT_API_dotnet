@@ -2,7 +2,6 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>11</LangVersion>
         <Authors>Rodion Mostovoi</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>OpenAI.ChatGPT.AspNetCore</PackageId>
@@ -10,7 +9,6 @@
         <Product>OpenAI ChatGPT integration for .NET with DI</Product>
         <Description>OpenAI Chat Completions API (ChatGPT) integration with easy DI supporting (Microsoft.Extensions.DependencyInjection). It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4, aspnetcore</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Title>ChatGPT easy DI for ASP.NET Core</Title>
@@ -36,11 +34,11 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -52,7 +52,7 @@ public class ChatGptTranslatorServiceTests
             (IOpenAiClient) clientMock.Object, 
             expectedSourceLanguage, 
             expectedTargetLanguage,
-            null);
+            (string) null!);
         
         translatorServiceMock.Setup(service => service.CreateTextTranslationPrompt(
                 It.IsAny<string>(), It.IsAny<string>()))

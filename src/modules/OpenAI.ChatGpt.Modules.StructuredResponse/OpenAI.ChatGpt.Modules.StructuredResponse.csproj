@@ -2,7 +2,6 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>11</LangVersion>
         <Authors>Rodion Mostovoi</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>OpenAI.ChatGPT.Modules.StructuredResponse</PackageId>
@@ -10,7 +9,6 @@
         <Product>OpenAI ChatGPT structured response module</Product>
         <Description>The module for OpenAI ChatGPT that allows to retrive a structured response from ChatGPT.</Description>
         <RepositoryUrl>https://github.com/rodion-m/ChatGPT_API_dotnet</RepositoryUrl>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <PackageTags>chatgpt, openai, sdk, api, chatcompletions, gpt3, gpt4, json, structured</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Title>OpenAI ChatGPT structured response</Title>
@@ -31,7 +29,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-      <PackageReference Include="JsonSchema.Net.Generation" Version="3.3.1" />
+      <PackageReference Include="JsonSchema.Net.Generation" Version="3.5.0" />
     </ItemGroup>
 
 

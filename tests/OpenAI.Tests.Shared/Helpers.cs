@@ -25,7 +25,7 @@ namespace OpenAI.Tests.Shared
         {
             ArgumentNullException.ThrowIfNull(key);
             var value = Configuration[key];
-            if (value is null)
+            if (value is null or { Length: 0 })
             {
                 throw new InvalidOperationException($"{key} is not set in configuration");
             }

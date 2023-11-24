@@ -1,36 +1,39 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace OpenAI.Tests.Shared
+namespace OpenAI.Tests.Shared;
+
+public static class Helpers
 {
-    public static class Helpers
+    private static IConfiguration Configuration { get; set; }
+
+    static Helpers()
     {
-        private static IConfiguration Configuration { get; set; }
+        Configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
+            .AddUserSecrets(typeof(Helpers).Assembly)
+            .Build();
+    }
 
-        static Helpers()
+    public static string GetOpenAiKey() 
+        => GetRequiredValueFromConfiguration("OPENAI_API_KEY");
+    public static string GetOpenRouterKey() 
+        => GetRequiredValueFromConfiguration("OPENROUTER_API_KEY");
+
+
+    public static string? NullIfEmpty(this string? str)
+    {
+        return string.IsNullOrEmpty(str) ? null : str;
+    }
+
+    public static string GetRequiredValueFromConfiguration(string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        var value = Configuration[key];
+        if (value is null or { Length: 0 })
         {
-            Configuration = new ConfigurationBuilder()
-                .AddEnvironmentVariables()
-                .AddUserSecrets(typeof(Helpers).Assembly)
-                .Build();
+            throw new InvalidOperationException($"{key} is not set in configuration");
         }
 
-        public static string GetOpenAiKey() => GetValueFromConfiguration("OPENAI_API_KEY");
-
-        public static string? NullIfEmpty(this string? str)
-        {
-            return string.IsNullOrEmpty(str) ? null : str;
-        }
-
-        public static string GetValueFromConfiguration(string key)
-        {
-            ArgumentNullException.ThrowIfNull(key);
-            var value = Configuration[key];
-            if (value is null or { Length: 0 })
-            {
-                throw new InvalidOperationException($"{key} is not set in configuration");
-            }
-
-            return value;
-        }
+        return value;
     }
 }

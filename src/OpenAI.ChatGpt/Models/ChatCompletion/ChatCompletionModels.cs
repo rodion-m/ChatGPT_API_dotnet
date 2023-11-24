@@ -195,11 +195,15 @@ public static class ChatCompletionModels
         return model;
     }
 
+    // TODO move to IOpenAiClient
+    [Obsolete("This method will be removed in the next major version. Use DisableModelNameValidation from IOpenAiClient instead.")]
     public static void DisableModelNameValidation()
     {
         Interlocked.CompareExchange(ref _validateModelName, 0, 1);
     }
     
+    // TODO move to IOpenAiClient
+    [Obsolete("This method will be removed in the next major version. Use EnableModelNameValidation from IOpenAiClient instead.")]
     public static void EnableModelNameValidation()
     {
         Interlocked.CompareExchange(ref _validateModelName, 1, 0);
@@ -211,8 +215,13 @@ public static class ChatCompletionModels
         if (maxTokens < 1) throw new ArgumentOutOfRangeException(nameof(maxTokens));
         if (!MaxTokensLimits.TryGetValue(model, out var limit))
         {
-            throw new ArgumentException($"Invalid model: {model}", nameof(model));
+            if (_validateModelName == 1)
+            {
+                throw new ArgumentException($"Invalid model: {model}", nameof(model));
+            }
+            return;
         }
+
         if (maxTokens > limit)
         {
             throw new ArgumentOutOfRangeException(

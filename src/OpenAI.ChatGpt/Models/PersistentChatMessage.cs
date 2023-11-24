@@ -2,39 +2,32 @@
 
 namespace OpenAI.ChatGpt.Models;
 
-public class PersistentChatMessage : ChatCompletionMessage
+public class PersistentChatMessage(Guid id,
+        string userId,
+        Guid topicId,
+        DateTimeOffset createdAt,
+        string role,
+        string content)
+    : ChatCompletionMessage(role, content)
 {
-    public Guid Id { get; init; }
-    public string UserId { get; set; }
-    public Guid TopicId { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
+    public Guid Id { get; init; } = id;
+    public string UserId { get; set; } = userId ?? throw new ArgumentNullException(nameof(userId));
+    public Guid TopicId { get; set; } = topicId;
+    public DateTimeOffset CreatedAt { get; set; } = createdAt;
 
     public PersistentChatMessage(
         Guid id,
         string userId,
         Guid topicId,
         DateTimeOffset createdAt,
-        string role,
-        string content) : base(role, content)
+        ChatCompletionMessage message) 
+        : this(
+            id, 
+            userId ?? throw new ArgumentNullException(nameof(userId)), 
+            topicId, 
+            createdAt, 
+            message.Role, 
+            message.Content)
     {
-        if (role == null) throw new ArgumentNullException(nameof(role));
-        if (content == null) throw new ArgumentNullException(nameof(content));
-        Id = id;
-        UserId = userId ?? throw new ArgumentNullException(nameof(userId));
-        TopicId = topicId;
-        CreatedAt = createdAt;
-    }
-    
-    public PersistentChatMessage(
-        Guid id,
-        string userId,
-        Guid topicId,
-        DateTimeOffset createdAt,
-        ChatCompletionMessage message) : base(message.Role, message.Content)
-    {
-        Id = id;
-        UserId = userId ?? throw new ArgumentNullException(nameof(userId));
-        TopicId = topicId;
-        CreatedAt = createdAt;
     }
 }

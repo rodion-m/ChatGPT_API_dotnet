@@ -1,15 +1,17 @@
-﻿namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
+﻿using OpenAI.ChatGpt.IntegrationTests.ClientTests.Fixtures;
+
+namespace OpenAI.ChatGpt.IntegrationTests.ClientTests;
 
 [Collection("OpenAiTestCollection")] //to prevent parallel execution
-public class ChatCompletionsApiTests
+public class ChatCompletionsApiTests : IClassFixture<OpenAiClientFixture>
 {
     private readonly ITestOutputHelper _outputHelper;
-    private readonly OpenAiClient _client;
+    private readonly IOpenAiClient _client;
 
-    public ChatCompletionsApiTests(ITestOutputHelper outputHelper)
+    public ChatCompletionsApiTests(ITestOutputHelper outputHelper, OpenAiClientFixture fixture)
     {
         _outputHelper = outputHelper;
-        _client = new OpenAiClient(Helpers.GetOpenAiKey());
+        _client = fixture.Client;
     }
 
     [Fact]

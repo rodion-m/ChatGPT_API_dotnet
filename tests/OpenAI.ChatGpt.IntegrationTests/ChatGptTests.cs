@@ -1,5 +1,6 @@
 ﻿namespace OpenAI.ChatGpt.IntegrationTests;
 
+[Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ChatGptTests
 {
     [Fact]

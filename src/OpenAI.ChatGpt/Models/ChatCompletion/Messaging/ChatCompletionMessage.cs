@@ -19,7 +19,7 @@ public class ChatCompletionMessage
     public string Role { get; init; }
 
     /// <summary>The message text</summary>
-    [JsonPropertyName("content")]
+    [JsonPropertyName("content"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Content { get; set; }
 
     private List<ChatCompletionMessage>? _messages;

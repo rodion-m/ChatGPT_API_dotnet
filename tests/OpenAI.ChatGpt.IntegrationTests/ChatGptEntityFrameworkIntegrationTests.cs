@@ -5,6 +5,7 @@ using static OpenAI.ChatGpt.AspNetCore.Extensions.ServiceCollectionExtensions;
 
 namespace OpenAI.ChatGpt.IntegrationTests;
 
+[Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ChatGptEntityFrameworkIntegrationTests
 {
     [Fact]

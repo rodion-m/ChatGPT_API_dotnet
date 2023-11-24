@@ -1,13 +1,20 @@
+using OpenAI.ChatGpt.IntegrationTests.ClientTests.Fixtures;
 using OpenAI.ChatGpt.Modules.Translator;
 
 namespace OpenAI.ChatGpt.IntegrationTests;
 
-public class ChatGptTranslatorServiceTests
+[Collection("OpenAiTestCollection")] //to prevent parallel execution
+public class ChatGptTranslatorServiceTests : IClassFixture<OpenAiClientFixture>
 {
-    private readonly IOpenAiClient _client = new OpenAiClient(Helpers.GetOpenAiKey());
-
+    private readonly IOpenAiClient _client;
+    
     private const string GtpModel = ChatCompletionModels.Gpt4Turbo;
 
+    public ChatGptTranslatorServiceTests(OpenAiClientFixture fixture)
+    {
+        _client = fixture.Client;
+    }
+    
     [Fact]
     public async Task Translate_from_English_to_Russian()
     {

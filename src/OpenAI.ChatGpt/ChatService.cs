@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
+using OpenAI.ChatGpt.Extensions;
 using OpenAI.ChatGpt.Interfaces;
 using OpenAI.ChatGpt.Internal;
 using OpenAI.ChatGpt.Models;

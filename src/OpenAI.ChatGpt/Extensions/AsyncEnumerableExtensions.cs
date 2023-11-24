@@ -1,7 +1,7 @@
-﻿namespace OpenAI.ChatGpt;
+﻿namespace OpenAI.ChatGpt.Extensions;
 
 [Fody.ConfigureAwait(false)]
-public static class AsyncEnumerableExtensions
+internal static class AsyncEnumerableExtensions
 {
     internal static async IAsyncEnumerable<T> ConfigureExceptions<T>(
         this IAsyncEnumerable<T> stream, 

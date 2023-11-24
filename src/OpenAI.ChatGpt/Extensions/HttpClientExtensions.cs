@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using OpenAI.ChatGpt.Exceptions;
 
-namespace OpenAI.ChatGpt;
+namespace OpenAI.ChatGpt.Extensions;
 
 [Fody.ConfigureAwait(false)]
 internal static class HttpClientExtensions

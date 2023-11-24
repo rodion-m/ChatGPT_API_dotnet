@@ -1,10 +1,17 @@
-﻿using OpenAI.ChatGpt.Modules.StructuredResponse;
+﻿using OpenAI.ChatGpt.IntegrationTests.ClientTests.Fixtures;
+using OpenAI.ChatGpt.Modules.StructuredResponse;
 
-namespace OpenAI.ChatGpt.IntegrationTests.OpenAiClientTests;
+namespace OpenAI.ChatGpt.IntegrationTests.ClientTests;
 
-public class OpenAiClientGetStructuredResponseTests
+[Collection("OpenAiTestCollection")] //to prevent parallel execution
+public class OpenAiClientGetStructuredResponseTests : IClassFixture<OpenAiClientFixture>
 {
-    private readonly OpenAiClient _client = new(Helpers.GetOpenAiKey());
+    private readonly IOpenAiClient _client;
+
+    public OpenAiClientGetStructuredResponseTests(OpenAiClientFixture clientFixture)
+    {
+        _client = clientFixture.Client;
+    }
 
     [Theory]
     [InlineData(ChatCompletionModels.Gpt3_5_Turbo)]

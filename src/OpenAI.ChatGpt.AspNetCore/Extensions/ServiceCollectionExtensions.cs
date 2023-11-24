@@ -90,7 +90,7 @@ public static class ServiceCollectionExtensions
             .ValidateOnStart();
         services.AddOptions<ChatGPTConfig>()
             .BindConfiguration(completionsConfigSectionPath)
-            .Configure(_ => { }) //optional
+            .Configure(_ => { }) //make optional
             .ValidateDataAnnotations()
             .ValidateOnStart();
 

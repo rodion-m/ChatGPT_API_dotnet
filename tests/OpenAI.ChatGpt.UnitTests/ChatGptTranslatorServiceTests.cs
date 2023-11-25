@@ -34,7 +34,7 @@ public class ChatGptTranslatorServiceTests
         var expectedSourceLanguage = "English";
         var expectedTargetLanguage = "Russian";
         var textToTranslate = "Hello, world!";
-        var clientMock = new Mock<IOpenAiClient>();
+        var clientMock = new Mock<IAiClient>();
         clientMock.Setup(client => client.GetChatCompletions(
                 It.IsAny<UserOrSystemMessage>(), 
                 It.IsAny<int>(), 
@@ -49,7 +49,7 @@ public class ChatGptTranslatorServiceTests
             .ReturnsAsync("Привет, мир!");
         
         var translatorServiceMock = new Mock<ChatGPTTranslatorService>(
-            (IOpenAiClient) clientMock.Object, 
+            (IAiClient) clientMock.Object, 
             expectedSourceLanguage, 
             expectedTargetLanguage,
             (string) null!);

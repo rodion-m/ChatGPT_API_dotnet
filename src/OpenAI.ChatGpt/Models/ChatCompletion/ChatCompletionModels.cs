@@ -150,7 +150,7 @@ public static class ChatCompletionModels
         { Gpt3_5_Turbo_0301, 4096 },
     };
     
-    private static int _validateModelName = 1;
+    private static int _validateModelName = 0;
     
     
     /// <summary>
@@ -186,27 +186,13 @@ public static class ChatCompletionModels
         if (model == null) throw new ArgumentNullException(nameof(model));
         if (string.IsNullOrWhiteSpace(model))
         {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(model));
+            throw new ArgumentException("Model cannot be empty or whitespace.", nameof(model));
         }
         if (_validateModelName == 1 && !MaxTokensLimits.ContainsKey(model))
         {
             throw new ArgumentException($"Invalid model: {model}", nameof(model));
         }
         return model;
-    }
-
-    // TODO move to IOpenAiClient
-    [Obsolete("This method will be removed in the next major version. Use DisableModelNameValidation from IOpenAiClient instead.")]
-    public static void DisableModelNameValidation()
-    {
-        Interlocked.CompareExchange(ref _validateModelName, 0, 1);
-    }
-    
-    // TODO move to IOpenAiClient
-    [Obsolete("This method will be removed in the next major version. Use EnableModelNameValidation from IOpenAiClient instead.")]
-    public static void EnableModelNameValidation()
-    {
-        Interlocked.CompareExchange(ref _validateModelName, 1, 0);
     }
 
     public static void EnsureMaxTokensIsSupported(string model, int maxTokens)

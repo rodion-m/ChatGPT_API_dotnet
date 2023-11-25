@@ -10,20 +10,19 @@ namespace OpenAI.ChatGpt;
 /// </remarks>
 public class OpenRouterClient : OpenAiClient
 {
-    private const string DefaultHost = "https://openrouter.ai/api/v1/";
+    internal new const string DefaultHost = "https://openrouter.ai/api/v1/";
     
+    /// <summary>
+    /// Creates a new instance of <see cref="OpenRouterClient"/>
+    /// </summary>
+    /// <param name="apiKey">OpenRouter API key. Can be issued here: https://openrouter.ai/keys</param>
+    /// <param name="host">OpenRouter API host. Default is: <see cref="DefaultHost"/></param>
     public OpenRouterClient(string apiKey, string? host = DefaultHost) 
         : base(apiKey, host ?? DefaultHost)
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        ChatCompletionModels.DisableModelNameValidation();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     public OpenRouterClient(HttpClient httpClient) : base(httpClient)
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        ChatCompletionModels.DisableModelNameValidation();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

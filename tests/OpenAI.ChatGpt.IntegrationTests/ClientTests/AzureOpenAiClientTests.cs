@@ -5,7 +5,7 @@ namespace OpenAI.ChatGpt.IntegrationTests.ClientTests;
 public class AzureOpenAiClientTests : IClassFixture<AzureOpenAiClientFixture>
 {
     private readonly ITestOutputHelper _outputHelper;
-    private readonly IOpenAiClient _client;
+    private readonly IAiClient _client;
 
     public AzureOpenAiClientTests(ITestOutputHelper outputHelper, AzureOpenAiClientFixture fixture)
     {
@@ -14,10 +14,12 @@ public class AzureOpenAiClientTests : IClassFixture<AzureOpenAiClientFixture>
     }
 
     [Fact]
-    public async void Get_chatgpt_response_for_one_message_works()
+    public async void Get_response_from_gpt4_32k_model_for_one_message_works()
     {
         string text = "Who are you? In two words.";
-        string response = await _client.GetChatCompletions(new UserMessage(text), 64);
+#pragma warning disable CS0618 // Type or member is obsolete
+        string response = await _client.GetChatCompletions(new UserMessage(text), 64, model: ChatCompletionModels.Gpt4_32k);
+#pragma warning restore CS0618 // Type or member is obsolete
         _outputHelper.WriteLine(response);
         response.Should().NotBeNullOrEmpty();
     }

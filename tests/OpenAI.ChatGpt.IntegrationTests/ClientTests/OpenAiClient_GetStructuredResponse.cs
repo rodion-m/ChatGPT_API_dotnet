@@ -6,7 +6,7 @@ namespace OpenAI.ChatGpt.IntegrationTests.ClientTests;
 [Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class OpenAiClientGetStructuredResponseTests : IClassFixture<OpenAiClientFixture>
 {
-    private readonly IOpenAiClient _client;
+    private readonly IAiClient _client;
 
     public OpenAiClientGetStructuredResponseTests(OpenAiClientFixture clientFixture)
     {

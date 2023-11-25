@@ -9,7 +9,7 @@ namespace OpenAI.ChatGpt.AspNetCore;
 // ReSharper disable once InconsistentNaming
 public class ChatGPTFactory : IDisposable
 {
-    private readonly IOpenAiClient _client;
+    private readonly IAiClient _client;
     private readonly ChatGPTConfig _config;
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;
@@ -17,7 +17,7 @@ public class ChatGPTFactory : IDisposable
     private volatile bool _ensureStorageCreatedCalled;
 
     public ChatGPTFactory(
-        IOpenAiClient client,
+        IAiClient client,
         IOptions<ChatGPTConfig> config,
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock)
@@ -27,19 +27,6 @@ public class ChatGPTFactory : IDisposable
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _isHttpClientInjected = true;
-    }
-
-    internal ChatGPTFactory(
-        IOptions<OpenAICredentials> credentials,
-        IOptions<ChatGPTConfig> config,
-        IChatHistoryStorage chatHistoryStorage,
-        ITimeProvider clock)
-    {
-        if (credentials?.Value == null) throw new ArgumentNullException(nameof(credentials));
-        _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
-        _chatHistoryStorage = chatHistoryStorage ?? throw new ArgumentNullException(nameof(chatHistoryStorage));
-        _clock = clock ?? throw new ArgumentNullException(nameof(clock));
-        _client = new OpenAiClient(credentials.Value.ApiKey);
     }
 
     public ChatGPTFactory(

@@ -7,7 +7,7 @@ namespace OpenAI.ChatGpt.Modules.Translator;
 public static class OpenAiClientExtensions
 {
     public static Task<string> TranslateText(
-        this IOpenAiClient client,
+        this IAiClient client,
         string text,
         string sourceLanguage,
         string targetLanguage,
@@ -40,7 +40,7 @@ public static class OpenAiClientExtensions
     }
     
     public static Task<TObject> TranslateObject<TObject>(
-        this IOpenAiClient client,
+        this IAiClient client,
         TObject objectToTranslate,
         string sourceLanguage,
         string targetLanguage,

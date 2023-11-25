@@ -6,7 +6,7 @@ namespace OpenAI.ChatGpt.IntegrationTests;
 [Collection("OpenAiTestCollection")] //to prevent parallel execution
 public class ChatGptTranslatorServiceTests : IClassFixture<OpenAiClientFixture>
 {
-    private readonly IOpenAiClient _client;
+    private readonly IAiClient _client;
     
     private const string GtpModel = ChatCompletionModels.Gpt4Turbo;
 

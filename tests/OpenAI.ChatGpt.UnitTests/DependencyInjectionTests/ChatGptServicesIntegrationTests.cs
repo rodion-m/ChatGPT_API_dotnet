@@ -27,8 +27,8 @@ public class ChatGptServicesIntegrationTests
         provider.GetRequiredService<IOptions<ChatGPTConfig>>();
         
         provider.GetRequiredService<ITimeProvider>();
-        provider.GetRequiredService<IOpenAiClient>();
-        provider.GetRequiredService<IOpenAiClient>();
+        provider.GetRequiredService<IAiClient>();
+        provider.GetRequiredService<IAiClient>();
     }
     
     [Fact]
@@ -101,7 +101,7 @@ public class ChatGptServicesIntegrationTests
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>()
                 {
-                    { $"{CredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
+                    { $"{OpenAiCredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
                     { ChatGPTConfigSectionPathDefault, ""},
                 });
             return builder.Build();

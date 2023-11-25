@@ -96,7 +96,7 @@ public class ChatGPTConfig
     public string? Model
     {
         get => _model;
-        set => _model = value != null ? ChatCompletionModels.FromString(value) : null;
+        set => _model = value;
     }
 
     /// <summary>
@@ -167,7 +167,7 @@ public class ChatGPTConfig
                 PassUserIdToOpenAiRequests = config.PassUserIdToOpenAiRequests ??
                                              baseConfig.PassUserIdToOpenAiRequests,
                 InitialSystemMessage = config.InitialSystemMessage ?? baseConfig.InitialSystemMessage,
-                InitialUserMessage = config.InitialUserMessage ?? baseConfig.InitialUserMessage
+                InitialUserMessage = config.InitialUserMessage ?? baseConfig.InitialUserMessage,
             }
         };
     }

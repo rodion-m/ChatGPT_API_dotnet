@@ -2,6 +2,6 @@
 
 public class OpenAiClientFixture
 {
-    public IOpenAiClient Client { get; private set; } 
+    public IAiClient Client { get; private set; } 
         = new OpenAiClient(Helpers.GetOpenAiKey());
 }

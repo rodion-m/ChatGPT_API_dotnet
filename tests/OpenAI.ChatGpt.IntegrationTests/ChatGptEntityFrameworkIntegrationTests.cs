@@ -42,7 +42,7 @@ public class ChatGptEntityFrameworkIntegrationTests
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>()
                 {
-                    { $"{CredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
+                    { $"{OpenAiCredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
                     { ChatGPTConfigSectionPathDefault, ""},
                 });
             

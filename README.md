@@ -84,7 +84,7 @@ If you want to configure request parameters, you can do it in `appsettings.json`
 ```json
 {
   "ChatGPTConfig": {
-      "InitialSystemMessage": null,
+      "InitialSystemMessage": "You are a helpful and kind assistant.",
       "InitialUserMessage": null,
       "MaxTokens": null,
       "Model": null,

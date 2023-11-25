@@ -7,7 +7,7 @@ public class OpenRouterClientTests
     public class ChatCompletionsApiTests : IClassFixture<OpenRouterClientFixture>
     {
         private readonly ITestOutputHelper _outputHelper;
-        private readonly IOpenAiClient _client;
+        private readonly IAiClient _client;
 
         public ChatCompletionsApiTests(ITestOutputHelper outputHelper, OpenRouterClientFixture fixture)
         {

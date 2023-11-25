@@ -54,7 +54,7 @@ public static class OpenAiClientExtensions
     /// The original message content is restored after the API call.
     /// </remarks>
     public static Task<TObject> GetStructuredResponse<TObject>(
-        this IOpenAiClient client,
+        this IAiClient client,
         UserOrSystemMessage dialog,
         int? maxTokens = null,
         string? model = null,
@@ -89,7 +89,7 @@ public static class OpenAiClientExtensions
     }
 
     internal static async Task<TObject> GetStructuredResponse<TObject>(
-        this IOpenAiClient client,
+        this IAiClient client,
         UserOrSystemMessage dialog,
         string responseFormat,
         int? maxTokens = null,

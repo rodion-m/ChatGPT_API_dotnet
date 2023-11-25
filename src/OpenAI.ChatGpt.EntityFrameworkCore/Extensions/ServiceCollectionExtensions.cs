@@ -9,12 +9,14 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds the <see cref="IChatHistoryStorage"/> implementation using Entity Framework Core.
     /// </summary>
-    public static IHttpClientBuilder AddChatGptEntityFrameworkIntegration(
-        this IServiceCollection services,
+    public static IServiceCollection AddChatGptEntityFrameworkIntegration(this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
-        string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
+        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
-        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+        string azureOpenAiCredentialsConfigSectionPath = AzureOpenAiCredentialsConfigSectionPathDefault,
+        string openRouterCredentialsConfigSectionPath = OpenRouterCredentialsConfigSectionPathDefault,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped,
+        bool validateAiClientProviderOnStart = true)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(optionsAction);
@@ -23,12 +25,13 @@ public static class ServiceCollectionExtensions
             throw new ArgumentException("Value cannot be null or whitespace.",
                 nameof(credentialsConfigSectionPath));
         }
+
         if (string.IsNullOrWhiteSpace(completionsConfigSectionPath))
         {
             throw new ArgumentException("Value cannot be null or whitespace.",
                 nameof(completionsConfigSectionPath));
         }
-        
+
         services.AddDbContext<ChatGptDbContext>(optionsAction, serviceLifetime);
         switch (serviceLifetime)
         {
@@ -44,8 +47,13 @@ public static class ServiceCollectionExtensions
             default:
                 throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
         }
-        
-        return services.AddChatGptIntegrationCore(
-            credentialsConfigSectionPath, completionsConfigSectionPath, serviceLifetime);
+
+        return services.AddChatGptIntegrationCore(credentialsConfigSectionPath: credentialsConfigSectionPath,
+            completionsConfigSectionPath: completionsConfigSectionPath,
+            azureOpenAiCredentialsConfigSectionPath: azureOpenAiCredentialsConfigSectionPath,
+            openRouterCredentialsConfigSectionPath: openRouterCredentialsConfigSectionPath,
+            serviceLifetime,
+            validateAiClientProviderOnStart: validateAiClientProviderOnStart
+        );
     }
 }

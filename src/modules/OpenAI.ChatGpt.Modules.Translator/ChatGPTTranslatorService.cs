@@ -10,14 +10,14 @@ namespace OpenAI.ChatGpt.Modules.Translator;
 // ReSharper disable once InconsistentNaming
 public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
 {
-    private readonly IOpenAiClient _client;
+    private readonly IAiClient _client;
     private readonly string? _defaultSourceLanguage;
     private readonly string? _defaultTargetLanguage;
     private readonly string? _extraPrompt;
     private readonly bool _isHttpClientInjected;
 
     public ChatGPTTranslatorService(
-        IOpenAiClient client,
+        IAiClient client,
         string? defaultSourceLanguage = null,
         string? defaultTargetLanguage = null,
         string? extraPrompt = null)

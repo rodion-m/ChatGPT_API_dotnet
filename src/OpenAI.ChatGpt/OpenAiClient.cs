@@ -13,9 +13,9 @@ namespace OpenAI.ChatGpt;
 /// <summary>Thread-safe OpenAI client.</summary>
 /// <remarks>https://github.com/openai/openai-openapi/blob/master/openapi.yaml</remarks>
 [Fody.ConfigureAwait(false)]
-public class OpenAiClient : IOpenAiClient, IDisposable
+public class OpenAiClient : IAiClient, IDisposable
 {
-    private const string DefaultHost = "https://api.openai.com/v1/";
+    internal const string DefaultHost = "https://api.openai.com/v1/";
     private const string ChatCompletionsEndpoint = "chat/completions";
     
     private static readonly Uri DefaultHostUri = new(DefaultHost);

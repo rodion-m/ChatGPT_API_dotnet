@@ -5,16 +5,19 @@ namespace OpenAI.ChatGpt.AspNetCore.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public const string CredentialsConfigSectionPathDefault = "OpenAICredentials";
+    public const string OpenAiCredentialsConfigSectionPathDefault = "OpenAICredentials";
+    public const string AzureOpenAiCredentialsConfigSectionPathDefault = "AzureOpenAICredentials";
+    public const string OpenRouterCredentialsConfigSectionPathDefault = "OpenRouterCredentials";
 
     // ReSharper disable once InconsistentNaming
     public const string ChatGPTConfigSectionPathDefault = "ChatGPTConfig";
 
-    public static IHttpClientBuilder AddChatGptInMemoryIntegration(
+    public static IServiceCollection AddChatGptInMemoryIntegration(
         this IServiceCollection services,
         bool injectInMemoryChatService = true,
-        string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
-        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault)
+        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
+        string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
+        bool validateAiClientProviderOnStart = true)
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
@@ -36,8 +39,9 @@ public static class ServiceCollectionExtensions
         }
 
         return services.AddChatGptIntegrationCore(
-            credentialsConfigSectionPath,
-            completionsConfigSectionPath
+            credentialsConfigSectionPath: credentialsConfigSectionPath,
+            completionsConfigSectionPath: completionsConfigSectionPath,
+            validateAiClientProviderOnStart: validateAiClientProviderOnStart
         );
     }
 
@@ -64,12 +68,13 @@ public static class ServiceCollectionExtensions
         return chat;
     }
 
-    public static IHttpClientBuilder AddChatGptIntegrationCore(
-        this IServiceCollection services,
-        string credentialsConfigSectionPath = CredentialsConfigSectionPathDefault,
+    public static IServiceCollection AddChatGptIntegrationCore(this IServiceCollection services,
+        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
-        ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
-    )
+        string azureOpenAiCredentialsConfigSectionPath = AzureOpenAiCredentialsConfigSectionPathDefault,
+        string openRouterCredentialsConfigSectionPath = OpenRouterCredentialsConfigSectionPathDefault,
+        ServiceLifetime gptFactoryLifetime = ServiceLifetime.Scoped,
+        bool validateAiClientProviderOnStart = true)
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
@@ -84,10 +89,23 @@ public static class ServiceCollectionExtensions
                 nameof(completionsConfigSectionPath));
         }
 
+        
         services.AddOptions<OpenAICredentials>()
             .BindConfiguration(credentialsConfigSectionPath)
+            .Configure(_ => { }) //make optional
+            .ValidateDataAnnotations()
+            .ValidateOnStart();  
+        services.AddOptions<AzureOpenAICredentials>()
+            .BindConfiguration(azureOpenAiCredentialsConfigSectionPath)
+            .Configure(_ => { }) //make optional
             .ValidateDataAnnotations()
             .ValidateOnStart();
+        services.AddOptions<OpenRouterCredentials>()
+            .BindConfiguration(openRouterCredentialsConfigSectionPath)
+            .Configure(_ => { }) //make optional
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
         services.AddOptions<ChatGPTConfig>()
             .BindConfiguration(completionsConfigSectionPath)
             .Configure(_ => { }) //make optional
@@ -95,17 +113,22 @@ public static class ServiceCollectionExtensions
             .ValidateOnStart();
 
         services.AddSingleton<ITimeProvider, TimeProviderUtc>();
-        services.Add(new ServiceDescriptor(typeof(ChatGPTFactory), typeof(ChatGPTFactory), serviceLifetime));
+        services.Add(new ServiceDescriptor(typeof(ChatGPTFactory), typeof(ChatGPTFactory), gptFactoryLifetime));
 
-        return AddOpenAiClient(services);
-    }
+        services.AddHttpClient(nameof(OpenAiClient));
+        services.AddHttpClient(nameof(AzureOpenAiClient));
+        services.AddHttpClient(nameof(OpenRouterClient));
 
-    private static IHttpClientBuilder AddOpenAiClient(IServiceCollection services)
-    {
-        return services.AddHttpClient<IOpenAiClient, OpenAiClient>((provider, httpClient) =>
+        services.AddSingleton<IAiClient, AiClientFromConfiguration>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddSingleton<IOpenAiClient, AiClientFromConfiguration>();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        if (validateAiClientProviderOnStart)
         {
-            var credentials = provider.GetRequiredService<IOptions<OpenAICredentials>>().Value;
-            credentials.SetupHttpClient(httpClient);
-        });
+            services.AddHostedService<AiClientStartupValidationBackgroundService>();
+        }
+        
+        return services;
     }
 }

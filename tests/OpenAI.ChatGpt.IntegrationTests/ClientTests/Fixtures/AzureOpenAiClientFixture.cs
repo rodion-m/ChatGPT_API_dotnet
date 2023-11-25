@@ -2,7 +2,7 @@ namespace OpenAI.ChatGpt.IntegrationTests.ClientTests.Fixtures;
 
 public class AzureOpenAiClientFixture
 {
-    public IOpenAiClient Client { get; }
+    public IAiClient Client { get; }
 
     public AzureOpenAiClientFixture()
     {

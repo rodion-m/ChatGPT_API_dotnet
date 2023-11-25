@@ -6,7 +6,7 @@ namespace OpenAI.ChatGpt.IntegrationTests.ClientTests;
 public class ChatCompletionsApiTests : IClassFixture<OpenAiClientFixture>
 {
     private readonly ITestOutputHelper _outputHelper;
-    private readonly IOpenAiClient _client;
+    private readonly IAiClient _client;
 
     public ChatCompletionsApiTests(ITestOutputHelper outputHelper, OpenAiClientFixture fixture)
     {

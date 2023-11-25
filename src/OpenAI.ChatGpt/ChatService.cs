@@ -28,7 +28,7 @@ public class ChatService : IDisposable, IAsyncDisposable
 
     private readonly IChatHistoryStorage _chatHistoryStorage;
     private readonly ITimeProvider _clock;
-    private readonly IOpenAiClient _client;
+    private readonly IAiClient _client;
     private readonly bool _clearOnDisposal;
     private CancellationTokenSource? _cts;
     private bool _isNew;
@@ -36,7 +36,7 @@ public class ChatService : IDisposable, IAsyncDisposable
     internal ChatService(
         IChatHistoryStorage chatHistoryStorage,
         ITimeProvider clock,
-        IOpenAiClient client,
+        IAiClient client,
         string userId,
         Topic topic,
         bool isNew,

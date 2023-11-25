@@ -33,20 +33,29 @@ public class AzureOpenAiClient : OpenAiClient
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(azureKey));
         
         _apiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
-        HttpClient = new HttpClient()
-        {
-            BaseAddress = new Uri($"{endpointUrl}/openai/deployments/{deploymentName}/"),
-            DefaultRequestHeaders =
-            {
-                { "api-key", azureKey }
-            }
-        };
+        HttpClient = new HttpClient();
+        SetupHttpClient(HttpClient, endpointUrl, deploymentName, azureKey);
         IsHttpClientInjected = false;
+    }
+
+    internal static void SetupHttpClient(HttpClient httpClient, string endpointUrl, string deploymentName, string azureKey)
+    {
+        ArgumentNullException.ThrowIfNull(httpClient);
+        ArgumentNullException.ThrowIfNull(endpointUrl);
+        ArgumentNullException.ThrowIfNull(deploymentName);
+        ArgumentNullException.ThrowIfNull(azureKey);
+        httpClient.BaseAddress = new Uri($"{endpointUrl}/openai/deployments/{deploymentName}/");
+        httpClient.DefaultRequestHeaders.Add("api-key", azureKey);
     }
 
     public AzureOpenAiClient(HttpClient httpClient, string apiVersion) : base(httpClient)
     {
         _apiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
+    }
+    
+    public AzureOpenAiClient(HttpClient httpClient) : base(httpClient)
+    {
+        _apiVersion = DefaultApiVersion;
     }
 
     protected override string GetChatCompletionsEndpoint()

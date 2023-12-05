@@ -80,8 +80,9 @@ public class ChatGptServicesIntegrationTests
 
         // Act
         services.AddChatGptEntityFrameworkIntegration(
-            options => options.UseInMemoryDatabase("ChatGptInMemoryDb"),
-            configuration);
+            configuration,
+            options => options.UseInMemoryDatabase("ChatGptInMemoryDb")
+        );
 
         // Assert
         await using var provider = services.BuildServiceProvider();

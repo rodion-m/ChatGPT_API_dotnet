@@ -16,8 +16,8 @@ public class ChatGptEntityFrameworkIntegrationTests
 
         // Act
         services.AddChatGptEntityFrameworkIntegration(
-            options => options.UseInMemoryDatabase("chats"),
-            configuration
+            configuration,
+            options => options.UseInMemoryDatabase("chats")
         );
 
         // Assert

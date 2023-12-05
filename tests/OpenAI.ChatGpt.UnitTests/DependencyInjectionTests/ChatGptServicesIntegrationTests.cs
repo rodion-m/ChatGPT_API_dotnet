@@ -12,33 +12,34 @@ public class ChatGptServicesIntegrationTests
     public void AddChatGptCoreIntegration_added_expected_services()
     {
         // Arrange
-        var services = CreateServiceCollection();
+        var configuration = CreateConfiguration();
+        var services = CreateServiceCollection(configuration);
 
         var initialServiceCount = services.Count;
 
         // Act
-        services.AddChatGptIntegrationCore();
+        services.AddChatGptIntegrationCore(configuration);
 
         // Assert
         services.Count.Should().BeGreaterThan(initialServiceCount);
         
         using var provider = services.BuildServiceProvider();
-        provider.GetRequiredService<IOptions<OpenAICredentials>>();
-        provider.GetRequiredService<IOptions<ChatGPTConfig>>();
+        _ = provider.GetRequiredService<IOptions<OpenAICredentials>>();
+        _ = provider.GetRequiredService<IOptions<ChatGPTConfig>>();
         
-        provider.GetRequiredService<ITimeProvider>();
-        provider.GetRequiredService<IAiClient>();
-        provider.GetRequiredService<IAiClient>();
+        _ = provider.GetRequiredService<ITimeProvider>();
+        _ = provider.GetRequiredService<IAiClient>();
     }
     
     [Fact]
     public async void AddChatGptInMemoryIntegration_works()
     {
         // Arrange
-        var services = CreateServiceCollection();
+        var configuration = CreateConfiguration();
+        var services = CreateServiceCollection(configuration);
 
         // Act
-        services.AddChatGptInMemoryIntegration();
+        services.AddChatGptInMemoryIntegration(configuration);
 
         // Assert
         await using var provider = services.BuildServiceProvider();
@@ -55,10 +56,11 @@ public class ChatGptServicesIntegrationTests
     public async void AddChatGptInMemoryIntegration_with_Chat_injection_works()
     {
         // Arrange
-        var services = CreateServiceCollection();
+        var configuration = CreateConfiguration();
+        var services = CreateServiceCollection(configuration);
 
         // Act
-        services.AddChatGptInMemoryIntegration(injectInMemoryChatService: true);
+        services.AddChatGptInMemoryIntegration(configuration, injectInMemoryChatService: true);
 
         // Assert
         await using var provider = services.BuildServiceProvider();
@@ -73,11 +75,13 @@ public class ChatGptServicesIntegrationTests
     public async void AddChatGptEntityFrameworkIntegration_works()
     {
         // Arrange
-        var services = CreateServiceCollection();
+        var configuration = CreateConfiguration();
+        var services = CreateServiceCollection(configuration);
 
         // Act
         services.AddChatGptEntityFrameworkIntegration(
-            options => options.UseInMemoryDatabase("ChatGptInMemoryDb"));
+            options => options.UseInMemoryDatabase("ChatGptInMemoryDb"),
+            configuration);
 
         // Assert
         await using var provider = services.BuildServiceProvider();
@@ -90,21 +94,21 @@ public class ChatGptServicesIntegrationTests
         await factory.Create("test-user-id", ensureStorageCreated: true);
     }
 
-    private static ServiceCollection CreateServiceCollection()
+    private static ServiceCollection CreateServiceCollection(IConfiguration configuration)
     {
         var services = new ServiceCollection();
-        services.AddSingleton(CreateConfiguration());
+        services.AddSingleton(configuration);
         return services;
-
-        IConfiguration CreateConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string?>()
-                {
-                    { $"{OpenAiCredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
-                    { ChatGPTConfigSectionPathDefault, ""},
-                });
-            return builder.Build();
-        }
+    }
+    
+    private IConfiguration CreateConfiguration()
+    {
+        var builder = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>()
+            {
+                { $"{OpenAiCredentialsConfigSectionPathDefault}:{nameof(OpenAICredentials.ApiKey)}", "test-api-key" },
+                { ChatGPTConfigSectionPathDefault, ""},
+            });
+        return builder.Build();
     }
 }

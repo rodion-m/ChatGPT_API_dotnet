@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using static OpenAI.ChatGpt.AspNetCore.Extensions.ServiceCollectionExtensions;
 
@@ -9,10 +10,12 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds the <see cref="IChatHistoryStorage"/> implementation using Entity Framework Core.
     /// </summary>
-    public static IServiceCollection AddChatGptEntityFrameworkIntegration(this IServiceCollection services,
+    public static IServiceCollection AddChatGptEntityFrameworkIntegration(
+        this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
-        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
+        IConfiguration configuration,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
+        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
         string azureOpenAiCredentialsConfigSectionPath = AzureOpenAiCredentialsConfigSectionPathDefault,
         string openRouterCredentialsConfigSectionPath = OpenRouterCredentialsConfigSectionPathDefault,
         ServiceLifetime serviceLifetime = ServiceLifetime.Scoped,
@@ -20,6 +23,7 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(optionsAction);
+        ArgumentNullException.ThrowIfNull(configuration);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
         {
             throw new ArgumentException("Value cannot be null or whitespace.",
@@ -48,8 +52,10 @@ public static class ServiceCollectionExtensions
                 throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
         }
 
-        return services.AddChatGptIntegrationCore(credentialsConfigSectionPath: credentialsConfigSectionPath,
+        return services.AddChatGptIntegrationCore(
+            configuration,
             completionsConfigSectionPath: completionsConfigSectionPath,
+            credentialsConfigSectionPath: credentialsConfigSectionPath,
             azureOpenAiCredentialsConfigSectionPath: azureOpenAiCredentialsConfigSectionPath,
             openRouterCredentialsConfigSectionPath: openRouterCredentialsConfigSectionPath,
             serviceLifetime,

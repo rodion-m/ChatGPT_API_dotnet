@@ -4,11 +4,9 @@ namespace OpenAI.ChatGpt.AspNetCore;
 
 internal class AiClientStartupValidationBackgroundService : BackgroundService
 {
-    private readonly AiClientFromConfiguration _aiClient;
 
-    public AiClientStartupValidationBackgroundService(AiClientFromConfiguration aiClient)
+    public AiClientStartupValidationBackgroundService(AiClientFromConfiguration _)
     {
-        _aiClient = aiClient ?? throw new ArgumentNullException(nameof(aiClient));
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.CompletedTask;

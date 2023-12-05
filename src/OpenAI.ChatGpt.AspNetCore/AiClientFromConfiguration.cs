@@ -45,7 +45,8 @@ internal class AiClientFromConfiguration : IAiClient, IOpenAiClient
     }
 
     /// <inheritdoc />
-    public Task<string> GetChatCompletions(UserOrSystemMessage dialog,
+    public Task<string> GetChatCompletions(
+        UserOrSystemMessage dialog,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default, float temperature = ChatCompletionTemperatures.Default,
         string? user = null, bool jsonMode = false, long? seed = null,
@@ -57,7 +58,8 @@ internal class AiClientFromConfiguration : IAiClient, IOpenAiClient
     }
 
     /// <inheritdoc />
-    public Task<string> GetChatCompletions(IEnumerable<ChatCompletionMessage> messages,
+    public Task<string> GetChatCompletions(
+        IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default, float temperature = ChatCompletionTemperatures.Default,
         string? user = null, bool jsonMode = false, long? seed = null,
@@ -69,7 +71,8 @@ internal class AiClientFromConfiguration : IAiClient, IOpenAiClient
     }
 
     /// <inheritdoc />
-    public Task<ChatCompletionResponse> GetChatCompletionsRaw(IEnumerable<ChatCompletionMessage> messages,
+    public Task<ChatCompletionResponse> GetChatCompletionsRaw(
+        IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default, float temperature = ChatCompletionTemperatures.Default,
         string? user = null, bool jsonMode = false, long? seed = null,
@@ -81,7 +84,8 @@ internal class AiClientFromConfiguration : IAiClient, IOpenAiClient
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<string> StreamChatCompletions(IEnumerable<ChatCompletionMessage> messages,
+    public IAsyncEnumerable<string> StreamChatCompletions(
+        IEnumerable<ChatCompletionMessage> messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault,
         string model = ChatCompletionModels.Default, float temperature = ChatCompletionTemperatures.Default,
         string? user = null, bool jsonMode = false, long? seed = null,
@@ -93,27 +97,32 @@ internal class AiClientFromConfiguration : IAiClient, IOpenAiClient
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<string> StreamChatCompletions(UserOrSystemMessage messages,
+    public IAsyncEnumerable<string> StreamChatCompletions(
+        UserOrSystemMessage messages,
         int maxTokens = ChatCompletionRequest.MaxTokensDefault, string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default, string? user = null, bool jsonMode = false,
         long? seed = null, Action<ChatCompletionRequest>? requestModifier = null,
         CancellationToken cancellationToken = default)
     {
-        return _client.StreamChatCompletions(messages, maxTokens, model, temperature, user, jsonMode, seed,
-            requestModifier, cancellationToken);
+        return _client.StreamChatCompletions(
+            messages, maxTokens, model, temperature, user, jsonMode, seed, requestModifier, cancellationToken);
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<string> StreamChatCompletions(ChatCompletionRequest request,
+    public IAsyncEnumerable<string> StreamChatCompletions(
+        ChatCompletionRequest request,
         CancellationToken cancellationToken = default)
     {
         return _client.StreamChatCompletions(request, cancellationToken);
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(ChatCompletionRequest request,
+    public IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(
+        ChatCompletionRequest request,
         CancellationToken cancellationToken = default)
     {
         return _client.StreamChatCompletionsRaw(request, cancellationToken);
     }
+
+    internal IAiClient GetInnerClient() => _client;
 }

@@ -64,10 +64,18 @@ public class OpenAiClient : IAiClient, IDisposable
     /// Indicates that OpenAI API key is not set in
     /// <paramref name="httpClient"/>.<see cref="HttpClient.DefaultRequestHeaders"/>.<see cref="HttpRequestHeaders.Authorization"/> header.
     /// </exception>
-    public OpenAiClient(HttpClient httpClient)
+    public OpenAiClient(HttpClient httpClient) 
+        : this(httpClient, true, true)
+    {
+    }
+    
+    internal OpenAiClient(
+        HttpClient httpClient,         
+        bool validateAuthorizationHeader, 
+        bool validateBaseAddress)
     {
         HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        ValidateHttpClient(httpClient);
+        ValidateHttpClient(httpClient, validateAuthorizationHeader, validateBaseAddress);
         IsHttpClientInjected = true;
     }
     
@@ -105,10 +113,13 @@ public class OpenAiClient : IAiClient, IDisposable
         return uri;
     }
     
-    private static void ValidateHttpClient(HttpClient httpClient)
+    private static void ValidateHttpClient(
+        HttpClient httpClient, 
+        bool validateAuthorizationHeader, 
+        bool validateBaseAddress)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
-        if (httpClient.DefaultRequestHeaders.Authorization is null)
+        if (validateAuthorizationHeader && httpClient.DefaultRequestHeaders.Authorization is null)
         {
             throw new ArgumentException(
                 "HttpClient must have an Authorization header set. " +
@@ -117,21 +128,24 @@ public class OpenAiClient : IAiClient, IDisposable
             );
         }
 
-        if (httpClient.BaseAddress is null)
+        if (validateBaseAddress)
         {
-            throw new ArgumentException(
-                "HttpClient must have a BaseAddress set." +
-                "It should be set to OpenAI's API endpoint.",
-                nameof(httpClient)
-            );
-        }
-        if(!httpClient.BaseAddress.AbsoluteUri.EndsWith("/"))
-        {
-            throw new ArgumentException(
-                "HttpClient's BaseAddress must end with a slash." +
-                " It should be set to OpenAI's API endpoint.",
-                nameof(httpClient)
-            );
+            if (httpClient.BaseAddress is null)
+            {
+                throw new ArgumentException(
+                    "HttpClient must have a BaseAddress set." +
+                    "It should be set to AI service API endpoint.",
+                    nameof(httpClient)
+                );
+            }
+
+            if (!httpClient.BaseAddress.AbsoluteUri.EndsWith("/"))
+            {
+                throw new ArgumentException(
+                    "HttpClient's BaseAddress must end with a slash.",
+                    nameof(httpClient)
+                );
+            }
         }
     }
 

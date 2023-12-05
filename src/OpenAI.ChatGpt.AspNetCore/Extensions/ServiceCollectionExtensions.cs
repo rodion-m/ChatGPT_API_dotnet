@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace OpenAI.ChatGpt.AspNetCore.Extensions;
 
@@ -14,12 +14,16 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddChatGptInMemoryIntegration(
         this IServiceCollection services,
+        IConfiguration configuration,
         bool injectInMemoryChatService = true,
-        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
+        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
+        string azureOpenAiCredentialsConfigSectionPath = AzureOpenAiCredentialsConfigSectionPathDefault,
+        string openRouterCredentialsConfigSectionPath = OpenRouterCredentialsConfigSectionPathDefault,
         bool validateAiClientProviderOnStart = true)
     {
         ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configuration);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
         {
             throw new ArgumentException("Value cannot be null or whitespace.",
@@ -32,6 +36,17 @@ public static class ServiceCollectionExtensions
                 nameof(completionsConfigSectionPath));
         }
 
+        if (string.IsNullOrWhiteSpace(azureOpenAiCredentialsConfigSectionPath))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.",
+                nameof(azureOpenAiCredentialsConfigSectionPath));
+        }
+        if (string.IsNullOrWhiteSpace(openRouterCredentialsConfigSectionPath))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.",
+                nameof(openRouterCredentialsConfigSectionPath));
+        }
+
         services.AddSingleton<IChatHistoryStorage, InMemoryChatHistoryStorage>();
         if (injectInMemoryChatService)
         {
@@ -39,8 +54,11 @@ public static class ServiceCollectionExtensions
         }
 
         return services.AddChatGptIntegrationCore(
-            credentialsConfigSectionPath: credentialsConfigSectionPath,
+            configuration,
             completionsConfigSectionPath: completionsConfigSectionPath,
+            credentialsConfigSectionPath: credentialsConfigSectionPath,
+            azureOpenAiCredentialsConfigSectionPath,
+            openRouterCredentialsConfigSectionPath,
             validateAiClientProviderOnStart: validateAiClientProviderOnStart
         );
     }
@@ -69,14 +87,16 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection AddChatGptIntegrationCore(this IServiceCollection services,
-        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
+        IConfiguration configuration,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
+        string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
         string azureOpenAiCredentialsConfigSectionPath = AzureOpenAiCredentialsConfigSectionPathDefault,
         string openRouterCredentialsConfigSectionPath = OpenRouterCredentialsConfigSectionPathDefault,
         ServiceLifetime gptFactoryLifetime = ServiceLifetime.Scoped,
         bool validateAiClientProviderOnStart = true)
     {
         ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configuration);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
         {
             throw new ArgumentException("Value cannot be null or whitespace.",
@@ -89,22 +109,16 @@ public static class ServiceCollectionExtensions
                 nameof(completionsConfigSectionPath));
         }
 
-        
-        services.AddOptions<OpenAICredentials>()
-            .BindConfiguration(credentialsConfigSectionPath)
-            .Configure(_ => { }) //make optional
-            .ValidateDataAnnotations()
-            .ValidateOnStart();  
-        services.AddOptions<AzureOpenAICredentials>()
-            .BindConfiguration(azureOpenAiCredentialsConfigSectionPath)
-            .Configure(_ => { }) //make optional
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-        services.AddOptions<OpenRouterCredentials>()
-            .BindConfiguration(openRouterCredentialsConfigSectionPath)
-            .Configure(_ => { }) //make optional
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+        if (string.IsNullOrWhiteSpace(azureOpenAiCredentialsConfigSectionPath))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.",
+                nameof(azureOpenAiCredentialsConfigSectionPath));
+        }
+        if (string.IsNullOrWhiteSpace(openRouterCredentialsConfigSectionPath))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.",
+                nameof(openRouterCredentialsConfigSectionPath));
+        }
         
         services.AddOptions<ChatGPTConfig>()
             .BindConfiguration(completionsConfigSectionPath)
@@ -115,12 +129,54 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITimeProvider, TimeProviderUtc>();
         services.Add(new ServiceDescriptor(typeof(ChatGPTFactory), typeof(ChatGPTFactory), gptFactoryLifetime));
 
+        services.AddAiClient(configuration, credentialsConfigSectionPath, azureOpenAiCredentialsConfigSectionPath, openRouterCredentialsConfigSectionPath, validateAiClientProviderOnStart);
+
+        return services;
+    }
+
+    internal static void AddAiClient(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string credentialsConfigSectionPath,
+        string azureOpenAiCredentialsConfigSectionPath, 
+        string openRouterCredentialsConfigSectionPath,
+        bool validateAiClientProviderOnStart)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configuration);
+        if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(credentialsConfigSectionPath));
+        if (string.IsNullOrWhiteSpace(azureOpenAiCredentialsConfigSectionPath))
+            throw new ArgumentException("Value cannot be null or whitespace.",
+                nameof(azureOpenAiCredentialsConfigSectionPath));
+        if (string.IsNullOrWhiteSpace(openRouterCredentialsConfigSectionPath))
+            throw new ArgumentException("Value cannot be null or whitespace.",
+                nameof(openRouterCredentialsConfigSectionPath));
+
+        services.AddOptions<OpenAICredentials>()
+            .BindConfiguration(credentialsConfigSectionPath)
+            .Configure(_ => { }) //make optional
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddOptions<AzureOpenAICredentials>()
+            .BindConfiguration(azureOpenAiCredentialsConfigSectionPath)
+            .Configure(_ => { }) //make optional
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddOptions<OpenRouterCredentials>()
+            .BindConfiguration(openRouterCredentialsConfigSectionPath)
+            .Configure(_ => { }) //make optional
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddHttpClient(nameof(OpenAiClient));
         services.AddHttpClient(nameof(AzureOpenAiClient));
         services.AddHttpClient(nameof(OpenRouterClient));
 
         services.AddSingleton<IAiClient, AiClientFromConfiguration>();
+        services.AddSingleton<AiClientFactory>();
 #pragma warning disable CS0618 // Type or member is obsolete
+        // will be removed in 5.0
         services.AddSingleton<IOpenAiClient, AiClientFromConfiguration>();
 #pragma warning restore CS0618 // Type or member is obsolete
 
@@ -128,7 +184,5 @@ public static class ServiceCollectionExtensions
         {
             services.AddHostedService<AiClientStartupValidationBackgroundService>();
         }
-        
-        return services;
     }
 }

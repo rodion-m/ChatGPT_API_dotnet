@@ -48,12 +48,14 @@ public class AzureOpenAiClient : OpenAiClient
         httpClient.DefaultRequestHeaders.Add("api-key", azureKey);
     }
 
-    public AzureOpenAiClient(HttpClient httpClient, string apiVersion) : base(httpClient)
+    public AzureOpenAiClient(HttpClient httpClient, string apiVersion) 
+        : base(httpClient, validateAuthorizationHeader: false, validateBaseAddress: true)
     {
         _apiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
     }
     
-    public AzureOpenAiClient(HttpClient httpClient) : base(httpClient)
+    public AzureOpenAiClient(HttpClient httpClient) 
+        : base(httpClient, validateAuthorizationHeader: false, validateBaseAddress: true)
     {
         _apiVersion = DefaultApiVersion;
     }

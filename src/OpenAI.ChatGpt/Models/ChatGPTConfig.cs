@@ -14,7 +14,6 @@ public class ChatGPTConfig
     };
 
     private int? _maxTokens;
-    private string? _model;
     private float? _temperature;
 
     /// <summary>
@@ -75,7 +74,7 @@ public class ChatGPTConfig
         {
             if (value is { } maxTokens)
             {
-                if (_model is { } model)
+                if (Model is { } model)
                 {
                     ChatCompletionModels.EnsureMaxTokensIsSupported(model, maxTokens);
                 }
@@ -93,11 +92,7 @@ public class ChatGPTConfig
     /// ID of the model to use. One of: <see cref="ChatCompletionModels"/>
     /// Maps to: <see cref="ChatCompletionRequest.Model"/>
     /// </summary>
-    public string? Model
-    {
-        get => _model;
-        set => _model = value;
-    }
+    public string? Model { get; set; }
 
     /// <summary>
     /// What sampling temperature to use, between 0 and 2.
@@ -161,7 +156,7 @@ public class ChatGPTConfig
             (not null, null) => baseConfig,
             _ => new ChatGPTConfig()
             {
-                _model = config._model ?? baseConfig._model,
+                Model = config.Model ?? baseConfig.Model,
                 _maxTokens = config._maxTokens ?? baseConfig._maxTokens,
                 _temperature = config._temperature ?? baseConfig._temperature,
                 PassUserIdToOpenAiRequests = config.PassUserIdToOpenAiRequests ??

@@ -1,4 +1,6 @@
-﻿namespace ChatGpt.TelegramBotExample;
+﻿using OpenAI.ChatGpt;
+
+namespace ChatGpt.TelegramBotExample;
 
 public static class Helpers
 {

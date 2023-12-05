@@ -22,7 +22,8 @@ public class OpenRouterClient : OpenAiClient
     {
     }
 
-    public OpenRouterClient(HttpClient httpClient) : base(httpClient)
+    public OpenRouterClient(HttpClient httpClient) 
+        : base(httpClient, validateAuthorizationHeader: true, validateBaseAddress: true)
     {
     }
 }

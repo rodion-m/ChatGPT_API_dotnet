@@ -12,8 +12,8 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddChatGptEntityFrameworkIntegration(
         this IServiceCollection services,
-        Action<DbContextOptionsBuilder> optionsAction,
         IConfiguration configuration,
+        Action<DbContextOptionsBuilder> optionsAction,
         string completionsConfigSectionPath = ChatGPTConfigSectionPathDefault,
         string credentialsConfigSectionPath = OpenAiCredentialsConfigSectionPathDefault,
         string azureOpenAiCredentialsConfigSectionPath = AzureOpenAiCredentialsConfigSectionPathDefault,
@@ -22,8 +22,8 @@ public static class ServiceCollectionExtensions
         bool validateAiClientProviderOnStart = true)
     {
         ArgumentNullException.ThrowIfNull(services);
-        ArgumentNullException.ThrowIfNull(optionsAction);
         ArgumentNullException.ThrowIfNull(configuration);
+        ArgumentNullException.ThrowIfNull(optionsAction);
         if (string.IsNullOrWhiteSpace(credentialsConfigSectionPath))
         {
             throw new ArgumentException("Value cannot be null or whitespace.",

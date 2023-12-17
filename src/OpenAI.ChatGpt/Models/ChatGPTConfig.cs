@@ -56,7 +56,6 @@ public class ChatGPTConfig
 
     /// <summary>
     /// The maximum number of tokens allowed for the generated answer.
-    /// Defaults to <see cref="ChatCompletionRequest.MaxTokensDefault"/>.
     /// This value is validated and limited with <see cref="ChatCompletionModels.GetMaxTokensLimitForModel"/> method.
     /// It's possible to calculate approximately tokens count using <see cref="ChatCompletionMessage.CalculateApproxTotalTokenCount()"/> method.
     /// Maps to: <see cref="ChatCompletionRequest.MaxTokens"/>

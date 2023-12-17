@@ -113,34 +113,4 @@ public class ChatCompletionMessage
             ? $"{Role}: {Content}"
             : string.Join(Environment.NewLine, _messages.Select(m => $"{m.Role}: {m.Content}"));
     }
-
-    public static (string model, int maxTokens) FindOptimalModelAndMaxToken(
-        IEnumerable<ChatCompletionMessage> messages,
-        string? model,
-        int? maxTokens,
-        string smallModel = ChatCompletionModels.Default,
-        string bigModel = ChatCompletionModels.Gpt3_5_Turbo_16k,
-        bool useMaxPossibleTokens = true)
-    {
-        var tokenCount = CalculateApproxTotalTokenCount(messages);
-        switch (model, maxTokens)
-        {
-            case (null, null):
-            {
-                model = tokenCount > 6000 ? bigModel : smallModel;
-                maxTokens = GetMaxPossibleTokens(model);
-                break;
-            }
-            case (null, _):
-                model = smallModel;
-                break;
-            case (_, null):
-                maxTokens = useMaxPossibleTokens ? GetMaxPossibleTokens(model) : ChatCompletionRequest.MaxTokensDefault;
-                break;
-        }
-
-        return (model, maxTokens.Value);
-
-        int GetMaxPossibleTokens(string s) => ChatCompletionModels.GetMaxTokensLimitForModel(s) - tokenCount - 500;
-    }
 }

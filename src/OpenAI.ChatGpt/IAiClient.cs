@@ -9,6 +9,17 @@ namespace OpenAI.ChatGpt;
 public interface IAiClient
 {
     /// <summary>
+    /// Retrieves the default maximum number of tokens for a given model.
+    /// </summary>
+    /// <param name="model">
+    /// The model name for which to retrieve the maximum number of tokens.
+    /// </param>
+    /// <returns>
+    /// The default maximum number of tokens as an integer or just null if it's reqired to delegate it to the AI service.
+    /// </returns>
+    int? GetDefaultMaxTokens(string model);
+    
+    /// <summary>
     /// Get a chat completion response as a string
     /// </summary>
     /// <param name="dialog">The dialog history</param>
@@ -41,7 +52,7 @@ public interface IAiClient
     /// <returns>The chat completion response as a string</returns>
     Task<string> GetChatCompletions(
         UserOrSystemMessage dialog,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -84,7 +95,7 @@ public interface IAiClient
     /// <returns>The chat completion response as a string</returns>
     Task<string> GetChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -126,7 +137,7 @@ public interface IAiClient
     /// <returns>The raw chat completion response</returns>
     Task<ChatCompletionResponse> GetChatCompletionsRaw(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -167,7 +178,7 @@ public interface IAiClient
     /// <returns>Chunks of LLM's response, one by one.</returns>
     IAsyncEnumerable<string> StreamChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -201,7 +212,7 @@ public interface IAiClient
     /// <returns>Chunks of LLM's response, one by one</returns>
     IAsyncEnumerable<string> StreamChatCompletions(
         UserOrSystemMessage messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -227,4 +238,7 @@ public interface IAiClient
     /// <returns>A stream of raw chat completion responses</returns>
     IAsyncEnumerable<ChatCompletionResponse> StreamChatCompletionsRaw(
         ChatCompletionRequest request, CancellationToken cancellationToken = default);
+
+    string GetOptimalModel(ChatCompletionMessage[] messages);
+    string GetOptimalModel(UserOrSystemMessage dialog) => GetOptimalModel(dialog.GetMessages().ToArray());
 }

@@ -102,11 +102,10 @@ public class ChatService : IDisposable, IAsyncDisposable
         IsWriting = true;
         try
         {
-            var (model, maxTokens) = FindOptimalModelAndMaxToken(messages);
             var response = await _client.GetChatCompletionsRaw(
                 messages,
-                maxTokens: maxTokens,
-                model: model,
+                maxTokens: Topic.Config.MaxTokens,
+                model:Topic.Config.Model ?? _client.GetOptimalModel(message),
                 user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
                 requestModifier: Topic.Config.ModifyRequest,
                 cancellationToken: cancellationToken
@@ -123,12 +122,6 @@ public class ChatService : IDisposable, IAsyncDisposable
         {
             IsWriting = false; 
         }
-    }
-
-    private (string model, int maxTokens) FindOptimalModelAndMaxToken(ChatCompletionMessage[] messages)
-    {
-        return ChatCompletionMessage.FindOptimalModelAndMaxToken(
-            messages, Topic.Config.Model, Topic.Config.MaxTokens);
     }
 
     public IAsyncEnumerable<string> StreamNextMessageResponse(
@@ -159,11 +152,10 @@ public class ChatService : IDisposable, IAsyncDisposable
         var messages = history.Append(message).ToArray();
         var sb = new StringBuilder();
         IsWriting = true;
-        var (model, maxTokens) = FindOptimalModelAndMaxToken(messages);
         var stream = _client.StreamChatCompletions(
             messages,
-            maxTokens: maxTokens,
-            model: model,
+            maxTokens: Topic.Config.MaxTokens,
+            model:Topic.Config.Model ?? _client.GetOptimalModel(message),
             user: Topic.Config.PassUserIdToOpenAiRequests is true ? UserId : null,
             requestModifier: Topic.Config.ModifyRequest,
             cancellationToken: cancellationToken

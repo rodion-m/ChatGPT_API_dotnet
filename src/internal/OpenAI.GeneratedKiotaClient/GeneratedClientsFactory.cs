@@ -11,7 +11,8 @@ internal static class GeneratedClientsFactory
         ArgumentNullException.ThrowIfNull(httpClient);
         var authProvider = new AnonymousAuthenticationProvider();
         var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
-        return new GeneratedOpenAiClient(adapter);
+        var openAiClient = new GeneratedOpenAiClient(adapter);
+        return openAiClient;
     }
     
     public static GeneratedAzureOpenAiClient CreateGeneratedAzureOpenAiClient(HttpClient httpClient)

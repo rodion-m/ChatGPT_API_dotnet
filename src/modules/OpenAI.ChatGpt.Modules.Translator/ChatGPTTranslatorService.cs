@@ -78,10 +78,10 @@ public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
 
         var prompt = CreateTextTranslationPrompt(sourceLanguageOrDefault, targetLanguageOrDefault);
         var messages = Dialog.StartAsSystem(prompt).ThenUser(text).GetMessages().ToArray();
-        (model, maxTokens) = ChatCompletionMessage.FindOptimalModelAndMaxToken(messages, model, maxTokens);
+        model ??= _client.GetOptimalModel(messages);
         var response = await _client.GetChatCompletions(
             messages,
-            maxTokens.Value,
+            maxTokens,
             model,
             temperature,
             user,
@@ -140,16 +140,11 @@ public class ChatGPTTranslatorService : IDisposable, IChatGPTTranslatorService
         var objectJson = JsonSerializer.Serialize(objectToTranslate, jsonSerializerOptions);
         var dialog = Dialog.StartAsSystem(prompt).ThenUser(objectJson);
         var messages = dialog.GetMessages().ToArray();
-        (model, maxTokens) = ChatCompletionMessage.FindOptimalModelAndMaxToken(
-            messages, 
-            model, 
-            maxTokens,
-            smallModel: ChatCompletionModels.Gpt4,
-            bigModel: ChatCompletionModels.Gpt4
-        );
+        model ??= _client.GetOptimalModel(messages);
+        
         var response = await _client.GetStructuredResponse<TObject>(
             dialog,
-            maxTokens.Value,
+            maxTokens,
             model,
             temperature,
             user,

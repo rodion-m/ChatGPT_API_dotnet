@@ -114,17 +114,11 @@ public static class OpenAiClientExtensions
         {
             editMsg.Content += GetAdditionalJsonResponsePrompt(responseFormat, examples, jsonSerializerOptions);
 
-            (model, maxTokens) = FindOptimalModelAndMaxToken(
-                dialog.GetMessages(), 
-                model, 
-                maxTokens,
-                smallModel: ChatCompletionModels.Gpt4,
-                bigModel: ChatCompletionModels.Gpt4
-            );
+            model ??= client.GetOptimalModel(dialog);
 
             var response = await client.GetChatCompletions(
                 dialog,
-                maxTokens.Value,
+                maxTokens,
                 model,
                 temperature,
                 user,

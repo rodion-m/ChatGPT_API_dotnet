@@ -14,9 +14,6 @@ namespace OpenAI.ChatGpt.Models.ChatCompletion;
 /// </remarks>
 public class ChatCompletionRequest
 {
-    public const int MaxTokensDefault = 64;
-    
-    private int _maxTokens = MaxTokensDefault;
     private string _model = ChatCompletionModels.Default;
     private float _temperature = ChatCompletionTemperatures.Default;
     private IEnumerable<ChatCompletionMessage> _messages;
@@ -87,7 +84,6 @@ public class ChatCompletionRequest
 
     /// <summary>
     /// The maximum number of tokens allowed for the generated answer.
-    /// Defaults to <see cref="MaxTokensDefault"/>.
     /// This value is validated and limited with <see cref="ChatCompletionModels.GetMaxTokensLimitForModel"/> method.
     /// It's possible to calculate approximately tokens count using <see cref="ChatCompletionMessage.CalculateApproxTotalTokenCount()"/> method.
     /// </summary>
@@ -98,15 +94,7 @@ public class ChatCompletionRequest
     /// Encoding algorithm can be found here: https://github.com/latitudegames/GPT-3-Encoder
     /// </remarks>
     [JsonPropertyName("max_tokens")]
-    public int MaxTokens
-    {
-        get => _maxTokens;
-        set
-        {
-            ChatCompletionModels.EnsureMaxTokensIsSupported(Model, value);
-            _maxTokens = value;
-        }
-    }
+    public int? MaxTokens { get; set; } = null;
 
     /// <summary>
     /// Number between -2.0 and 2.0.

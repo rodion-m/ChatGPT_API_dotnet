@@ -152,7 +152,7 @@ public class OpenAiClient : IAiClient, IDisposable
     /// <inheritdoc />
     public async Task<string> GetChatCompletions(
         UserOrSystemMessage dialog,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -185,7 +185,7 @@ public class OpenAiClient : IAiClient, IDisposable
     /// <inheritdoc />
     public async Task<string> GetChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -218,7 +218,7 @@ public class OpenAiClient : IAiClient, IDisposable
     /// <inheritdoc />
     public async Task<ChatCompletionResponse> GetChatCompletionsRaw(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -277,7 +277,7 @@ public class OpenAiClient : IAiClient, IDisposable
     /// <inheritdoc />
     public IAsyncEnumerable<string> StreamChatCompletions(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -304,9 +304,9 @@ public class OpenAiClient : IAiClient, IDisposable
         return StreamChatCompletions(request, cancellationToken);
     }
 
-    private static ChatCompletionRequest CreateChatCompletionRequest(
+    private ChatCompletionRequest CreateChatCompletionRequest(
         IEnumerable<ChatCompletionMessage> messages,
-        int maxTokens,
+        int? maxTokens,
         string model,
         float temperature,
         string? user,
@@ -316,6 +316,7 @@ public class OpenAiClient : IAiClient, IDisposable
         Action<ChatCompletionRequest>? requestModifier)
     {
         ArgumentNullException.ThrowIfNull(messages);
+        maxTokens ??= GetDefaultMaxTokens(model);
         var request = new ChatCompletionRequest(messages)
         {
             Model = model,
@@ -330,10 +331,15 @@ public class OpenAiClient : IAiClient, IDisposable
         return request;
     }
 
+    public int? GetDefaultMaxTokens(string model)
+    {
+        return null;
+    }
+
     /// <inheritdoc />
     public IAsyncEnumerable<string> StreamChatCompletions(
         UserOrSystemMessage messages,
-        int maxTokens = ChatCompletionRequest.MaxTokensDefault,
+        int? maxTokens = null,
         string model = ChatCompletionModels.Default,
         float temperature = ChatCompletionTemperatures.Default,
         string? user = null,
@@ -346,7 +352,8 @@ public class OpenAiClient : IAiClient, IDisposable
         if (model == null) throw new ArgumentNullException(nameof(model));
         EnsureJsonModeIsSupported(model, jsonMode);
         ThrowIfDisposed();
-        var request = CreateChatCompletionRequest(messages.GetMessages(),
+        var request = CreateChatCompletionRequest(
+            messages.GetMessages(),
             maxTokens,
             model,
             temperature,
@@ -393,7 +400,12 @@ public class OpenAiClient : IAiClient, IDisposable
             cancellationToken
         );
     }
-    
+
+    public string GetOptimalModel(ChatCompletionMessage[] messages)
+    {
+        return ChatCompletionModels.Gpt4Turbo;
+    }
+
     private static void EnsureJsonModeIsSupported(string model, bool jsonMode)
     {
         if(jsonMode && !ChatCompletionModels.IsJsonModeSupported(model))

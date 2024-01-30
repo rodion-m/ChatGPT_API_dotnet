@@ -23,6 +23,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AsyncKeyedLock" Version="6.3.4" />
         <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -33,7 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj"/>
+        <ProjectReference Include="..\OpenAI.ChatGpt.Modules.StructuredResponse\OpenAI.ChatGpt.Modules.StructuredResponse.csproj" />
     </ItemGroup>
 
 </Project>

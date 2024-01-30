@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using AsyncKeyedLock;
 using OpenAI.ChatGpt.Models.ChatCompletion;
 
 namespace OpenAI.ChatGpt.Modules.Translator;
@@ -22,7 +23,7 @@ public class EconomicalChatGPTTranslatorService : IAsyncDisposable
     
     private Batch _batch = new();
     private TaskCompletionSource<Batch> _tcs = new();
-    private readonly object _syncLock = new();
+    private readonly AsyncNonKeyedLocker _syncLock = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EconomicalChatGPTTranslatorService"/> class.
@@ -68,7 +69,7 @@ public class EconomicalChatGPTTranslatorService : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        lock (_syncLock)
+        using (await _syncLock.LockAsync())
         {
             if (_batch.Version > 0)
             {
@@ -94,7 +95,7 @@ public class EconomicalChatGPTTranslatorService : IAsyncDisposable
         ArgumentNullException.ThrowIfNull(text);
         int index;
         TaskCompletionSource<Batch> tcs;
-        lock (_syncLock)
+        using (await _syncLock.LockAsync())
         {
             var batch = GetRelevantBatch();
             tcs = _tcs;
@@ -110,7 +111,7 @@ public class EconomicalChatGPTTranslatorService : IAsyncDisposable
     private async Task RunRequestSendingInactivityTimer(TaskCompletionSource<Batch> tcs, Batch batch)
     {
         await Task.Delay(_sendRequestAfterInactivity);
-        lock (_syncLock)
+        using (await _syncLock.LockAsync())
         {
             var isBatchRelevant = ReferenceEquals(_batch, batch) && batch.Version == _batch.Version;
             if (isBatchRelevant && CanBeRan(tcs))

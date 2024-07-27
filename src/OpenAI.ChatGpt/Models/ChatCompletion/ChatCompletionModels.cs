@@ -8,126 +8,139 @@ namespace OpenAI.ChatGpt.Models.ChatCompletion;
 /// Provides access to OpenAI GPT models as string constants.
 /// </summary>
 /// <remarks>
-/// Training data for all models is up to Sep 2021.
 /// See:
-/// https://platform.openai.com/docs/models/gpt-3-5
-/// https://platform.openai.com/docs/models/gpt-4
+/// https://platform.openai.com/docs/models/
 /// </remarks>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public static class ChatCompletionModels
 {
-    public const string Default = Gpt3_5_Turbo;
+    public const string Default = Gpt4o;
 
     /// <summary>
-    /// The latest GPT-4 model with improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more.
+    /// GPT-4o ("o" for "omni") is the most advanced model. It is multimodal, accepting text or image inputs and outputting text.
+    /// It has the same high intelligence as GPT-4 Turbo but is more efficient, generating text 2x faster and being 50% cheaper.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to October 2023.
+    /// </summary>
+    public const string Gpt4o = "gpt-4o";
+
+    /// <summary>
+    /// The specific version of GPT-4o that gpt-4o currently points to.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to October 2023.
+    /// </summary>
+    public const string Gpt4o_2024_05_13 = "gpt-4o-2024-05-13";
+
+    /// <summary>
+    /// GPT-4o mini is the most advanced model in the small models category and the cheapest model.
+    /// It is multimodal, accepting text or image inputs and outputting text.
+    /// It has higher intelligence than gpt-3.5-turbo but is just as fast.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to October 2023.
+    /// </summary>
+    public const string Gpt4o_Mini = "gpt-4o-mini";
+
+    /// <summary>
+    /// The specific version of GPT-4o mini that gpt-4o-mini currently points to.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to October 2023.
+    /// </summary>
+    public const string Gpt4o_Mini_2024_07_18 = "gpt-4o-mini-2024-07-18";
+
+    /// <summary>
+    /// The latest GPT-4 Turbo model with vision capabilities.
+    /// Vision requests can now use JSON mode and function calling.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to December 2023.
+    /// </summary>
+    public const string Gpt4Turbo = "gpt-4-turbo";
+
+    /// <summary>
+    /// GPT-4 Turbo with Vision model. Vision requests can now use JSON mode and function calling.
+    /// gpt-4-turbo currently points to this version.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to December 2023.
+    /// </summary>
+    public const string Gpt4Turbo_2024_04_09 = "gpt-4-turbo-2024-04-09";
+
+    /// <summary>
+    /// GPT-4 Turbo preview model. Currently points to gpt-4-0125-preview.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to December 2023.
+    /// </summary>
+    public const string Gpt4TurboPreview = "gpt-4-turbo-preview";
+
+    /// <summary>
+    /// GPT-4 Turbo preview model intended to reduce cases of "laziness" where the model doesn't complete a task.
     /// Returns a maximum of 4,096 output tokens.
+    /// This model has a maximum token limit of 128,000.
+    /// The model was trained with data up to December 2023.
+    /// </summary>
+    public const string Gpt4_0125_Preview = "gpt-4-0125-preview";
+
+    /// <summary>
+    /// GPT-4 Turbo preview model featuring improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more.
+    /// Returns a maximum of 4,096 output tokens.
+    /// This model has a maximum token limit of 128,000.
     /// The model was trained with data up to April 2023.
     /// </summary>
-    public const string Gpt4Turbo = "gpt-4-1106-preview";
-    
+    public const string Gpt4_1106_Preview = "gpt-4-1106-preview";
+
     /// <summary>
-    /// More capable than any GPT-3.5 model, able to do more complex tasks, and optimized for chat.
-    /// Will be updated with OpenAI's latest model iteration 2 weeks after it is released.
+    /// Currently points to gpt-4-0613.
     /// This model has a maximum token limit of 8,192.
     /// The model was trained with data up to September 2021.
     /// </summary>
-    /// <remarks>
-    /// See: https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
-    /// </remarks>
     public const string Gpt4 = "gpt-4";
 
     /// <summary>
-    /// Snapshot of gpt-4 from June 13th 2023 with function calling data.
-    /// Unlike gpt-4, this model will not receive updates, and will be deprecated 3 months after a new version is released.
+    /// Snapshot of gpt-4 from June 13th 2023 with improved function calling support.
     /// This model has a maximum token limit of 8,192.
     /// The model was trained with data up to September 2021.
     /// </summary>
-    /// <remarks>
-    /// See: https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
-    /// </remarks>
     public const string Gpt4_0613 = "gpt-4-0613";
 
-
     /// <summary>
-    /// Same capabilities as the base gpt-4 mode but with 4x the context length.
-    /// Will be updated with our latest model iteration.
-    /// This model has a maximum token limit of 32,768.
+    /// Legacy Snapshot of gpt-4 from March 14th 2023.
+    /// This model has a maximum token limit of 8,192.
     /// The model was trained with data up to September 2021.
     /// </summary>
-    [Obsolete("This model is not available for all.")]
-    public const string Gpt4_32k = "gpt-4-32k";
-
-    /// <summary>
-    /// Snapshot of gpt-4-32 from June 13th 2023.
-    /// Unlike gpt-4-32k, this model will not receive updates, and will be deprecated 3 months after a new version is released.
-    /// This model has a maximum token limit of 32,768.
-    /// The model was trained with data up to September 2021.
-    /// </summary>
-    [Obsolete("This model is not available for all.")]
-    public const string Gpt4_32k_0613 = "gpt-4-32k-0613";
-
-    /// <summary>
-    /// Most capable GPT-3.5 model and optimized for chat at 1/10th the cost of text-davinci-003.
-    /// Will be updated with our latest model iteration 2 weeks after it is released.
-    /// This model has a maximum token limit of 4,096.
-    /// The model was trained with data up to September 2021.
-    /// </summary>
-    public const string Gpt3_5_Turbo = "gpt-3.5-turbo";
-    
-    public const string Gpt3_5_Turbo_1106 = "gpt-3.5-turbo-1106";
-
-    /// <summary>
-    /// Same capabilities as the standard gpt-3.5-turbo model but with 4 times the context.
-    /// This model has a maximum token limit of 16,384.
-    /// The model was trained with data up to September 2021.
-    /// </summary>
-    public const string Gpt3_5_Turbo_16k = "gpt-3.5-turbo-16k";
-
-    /// <summary>
-    /// Snapshot of gpt-3.5-turbo from June 13th 2023 with function calling data.
-    /// Unlike gpt-3.5-turbo, this model will not receive updates, and will be deprecated 3 months after a new version is released.
-    /// This model has a maximum token limit of 4,096.
-    /// The model was trained with data up to September 2021.
-    /// </summary>
-    [Obsolete("Legacy. Snapshot of gpt-3.5-turbo from June 13th 2023. Will be deprecated on June 13, 2024.")]
-    public const string Gpt3_5_Turbo_0613 = "gpt-3.5-turbo-0613";
-
-    /// <summary>
-    /// Snapshot of gpt-3.5-turbo-16k from June 13th 2023.
-    /// Unlike gpt-3.5-turbo-16k, this model will not receive updates, and will be deprecated 3 months after a new version is released.
-    /// This model has a maximum token limit of 16,384.
-    /// The model was trained with data up to September 2021.
-    /// </summary>
-    [Obsolete("Legacy. Snapshot of gpt-3.5-16k-turbo from June 13th 2023. Will be deprecated on June 13, 2024.")]
-    public const string Gpt3_5_Turbo_16k_0613 = "gpt-3.5-turbo-16k-0613";
-    
-    /// <summary>
-    /// IMPORTANT: This model is available only by request. Link for joining waitlist: https://openai.com/waitlist/gpt-4-api
-    /// Snapshot of gpt-4 from March 14th 2023.
-    /// Unlike gpt-4, this model will not receive updates,
-    /// and will only be supported for a three month period ending on June 14th 2023.
-    /// </summary>
-    [Obsolete("Legacy. Snapshot of gpt-4 from March 14th 2023 with function calling support. This model version will be deprecated on June 13th 2024. Use Gpt4 instead.")]
+    [Obsolete("Legacy. Snapshot of gpt-4 from March 14th 2023. Use Gpt4 instead.")]
     public const string Gpt4_0314 = "gpt-4-0314";
 
     /// <summary>
-    /// Snapshot of gpt-4-32 from March 14th 2023.
-    /// Unlike gpt-4-32k, this model will not receive updates,
-    /// and will only be supported for a three month period ending on June 14th 2023.
+    /// Currently points to gpt-3.5-turbo-0125.
+    /// This model has a maximum token limit of 16,385.
+    /// The model was trained with data up to September 2021.
     /// </summary>
-    [Obsolete("Legacy. Snapshot of gpt-4-32k from March 14th 2023 with function calling support. This model version will be deprecated on June 13th 2024. Use Gpt432k instead.")]
-    public const string Gpt4_32k_0314 = "gpt-4-32k-0314";
+    public const string Gpt3_5_Turbo = "gpt-3.5-turbo";
 
     /// <summary>
-    /// Snapshot of gpt-3.5-turbo from March 1st 2023.
-    /// Unlike gpt-3.5-turbo, this model will not receive updates,
-    /// and will only be supported for a three month period ending on June 1st 2023.
+    /// The latest GPT-3.5 Turbo model with higher accuracy at responding in requested formats and a fix for a bug which caused a text encoding issue for non-English language function calls.
+    /// Returns a maximum of 4,096 output tokens.
+    /// This model has a maximum token limit of 16,385.
+    /// The model was trained with data up to September 2021.
     /// </summary>
-    [Obsolete("Snapshot of gpt-3.5-turbo from March 1st 2023. Will be deprecated on June 13th 2024. Use Gpt3_5_Turbo instead.")]
-    public const string Gpt3_5_Turbo_0301 = "gpt-3.5-turbo-0301";
+    public const string Gpt3_5_Turbo_0125 = "gpt-3.5-turbo-0125";
+
+    /// <summary>
+    /// GPT-3.5 Turbo model with improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more.
+    /// Returns a maximum of 4,096 output tokens.
+    /// This model has a maximum token limit of 16,385.
+    /// The model was trained with data up to September 2021.
+    /// </summary>
+    public const string Gpt3_5_Turbo_1106 = "gpt-3.5-turbo-1106";
+
+    /// <summary>
+    /// Similar capabilities as GPT-3 era models. Compatible with legacy Completions endpoint and not Chat Completions.
+    /// This model has a maximum token limit of 4,096.
+    /// The model was trained with data up to September 2021.
+    /// </summary>
+    public const string Gpt3_5_Turbo_Instruct = "gpt-3.5-turbo-instruct";
 
     private static readonly string[] ModelsSupportedJson = {
-        Gpt4Turbo, Gpt3_5_Turbo_1106
+        Gpt4Turbo, Gpt4Turbo_2024_04_09, Gpt4TurboPreview, Gpt4_0125_Preview, Gpt4_1106_Preview,
+        Gpt3_5_Turbo_1106, Gpt3_5_Turbo_0125
     };
     
     /// <summary>
@@ -135,19 +148,22 @@ public static class ChatCompletionModels
     /// </summary>
     private static readonly Dictionary<string, int> MaxTokensLimits = new()
     {
-        { Gpt4Turbo, 4096 },
-        { Gpt4, 8192 },
-        { Gpt4_0613, 8192 },
-        { Gpt4_32k, 32_768 },
-        { Gpt4_32k_0613, 32_768 },
-        { Gpt3_5_Turbo, 4096 },
-        { Gpt3_5_Turbo_1106, 4096 },
-        { Gpt3_5_Turbo_16k, 16_385 },
-        { Gpt3_5_Turbo_0613, 4096 },
-        { Gpt3_5_Turbo_16k_0613, 16_385 },
-        { Gpt4_0314, 8192 },
-        { Gpt4_32k_0314, 32_768 },
-        { Gpt3_5_Turbo_0301, 4096 },
+        { Gpt4o, 128_000 },
+        { Gpt4o_2024_05_13, 128_000 },
+        { Gpt4o_Mini, 128_000 },
+        { Gpt4o_Mini_2024_07_18, 128_000 },
+        { Gpt4Turbo, 128_000 },
+        { Gpt4Turbo_2024_04_09, 128_000 },
+        { Gpt4TurboPreview, 128_000 },
+        { Gpt4_0125_Preview, 128_000 },
+        { Gpt4_1106_Preview, 128_000 },
+        { Gpt4, 8_192 },
+        { Gpt4_0613, 8_192 },
+        { Gpt4_0314, 8_192 },
+        { Gpt3_5_Turbo, 16_385 },
+        { Gpt3_5_Turbo_0125, 16_385 },
+        { Gpt3_5_Turbo_1106, 16_385 },
+        { Gpt3_5_Turbo_Instruct, 4_096 },
     };
     
     private static int _validateModelName = 0;

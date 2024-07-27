@@ -154,8 +154,11 @@ public static class OpenAiClientExtensions
             }
         }
 
-        if(!response.StartsWith('{') || !response.EndsWith('}'))
+        if (!response.StartsWith('{') || !response.EndsWith('}'))
         {
+            // Sometimes, weak LLMs return responses with extra text,
+            // like `Output: {"key": "value"}`.
+            // Try to handle such cases.
             var (openBracketIndex, closeBracketIndex) = FindFirstAndLastBracket(response);
             response = response[openBracketIndex..(closeBracketIndex + 1)];
         }
@@ -169,16 +172,17 @@ public static class OpenAiClientExtensions
         try
         {
             deserialized = JsonSerializer.Deserialize<TObject>(response, jsonDeserializerOptions);
-            if (deserialized is null)
-            {
-                throw new InvalidJsonException(
-                    $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response);
-            }
         }
-        catch (JsonException jsonException)
+        catch (JsonException exception)
         {
             throw new InvalidJsonException(
-                $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response, jsonException);
+                $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response, exception);
+        }
+
+        if (deserialized is null)
+        {
+            throw new InvalidJsonException(
+                $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response);
         }
 
         return deserialized;
@@ -186,13 +190,22 @@ public static class OpenAiClientExtensions
         static (int openBracketIndex, int closeBracketIndex) FindFirstAndLastBracket(string response)
         {
             ArgumentNullException.ThrowIfNull(response);
-            var openBracketIndex = response.IndexOf('{');
-            var closeBracketIndex = response.LastIndexOf('}');
-            if (openBracketIndex < 0 || closeBracketIndex < 0)
+            int openBracketIndex = response.IndexOf('{');
+            if (openBracketIndex < 0)
             {
-                throw new InvalidJsonException(
-                    $"Failed to deserialize response to {typeof(TObject)}. Response: {response}.", response);
+                string message = $"Failed to deserialize response to {typeof(TObject)}" +
+                                 $", opening bracket not found. Response: {response}.";
+                throw new InvalidJsonException(message, response);
             }
+
+            int closeBracketIndex = response.LastIndexOf('}');
+            if (closeBracketIndex < 0)
+            {
+                string message = $"Failed to deserialize response to {typeof(TObject)}" +
+                                 $", closing bracket not found. Response: {response}.";
+                throw new InvalidJsonException(message, response);
+            }
+
             return (openBracketIndex, closeBracketIndex);
         }
     }

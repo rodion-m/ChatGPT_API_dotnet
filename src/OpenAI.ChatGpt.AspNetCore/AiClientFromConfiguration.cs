@@ -26,7 +26,7 @@ internal class AiClientFromConfiguration : IAiClient, IOpenAiClient
         provider ??= OpenAiProvider;
         if (!Providers.Contains(provider))
         {
-            ThrowUnkownProviderException(provider);
+            ThrowUnknownProviderException(provider);
         }
         _client = provider switch
         {
@@ -38,7 +38,7 @@ internal class AiClientFromConfiguration : IAiClient, IOpenAiClient
     }
 
 
-    private static void ThrowUnkownProviderException(string provider)
+    private static void ThrowUnknownProviderException(string provider)
     {
         throw new ArgumentException($"Unknown AI provider: {provider}. " +
                                     $"Supported providers: {string.Join(", ", Providers)}");

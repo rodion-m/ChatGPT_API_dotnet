@@ -8,7 +8,7 @@ public class ChatGptTranslatorServiceTests : IClassFixture<OpenAiClientFixture>
 {
     private readonly IAiClient _client;
     
-    private const string GtpModel = ChatCompletionModels.Gpt4Turbo;
+    private const string GtpModel = ChatCompletionModels.Gpt4o;
 
     public ChatGptTranslatorServiceTests(OpenAiClientFixture fixture)
     {

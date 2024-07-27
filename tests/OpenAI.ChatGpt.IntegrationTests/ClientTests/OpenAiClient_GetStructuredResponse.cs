@@ -17,7 +17,8 @@ public class OpenAiClientGetStructuredResponseTests : IClassFixture<OpenAiClient
     [InlineData(ChatCompletionModels.Gpt3_5_Turbo)]
     [InlineData(ChatCompletionModels.Gpt4Turbo)]
     [InlineData(ChatCompletionModels.Gpt4)]
-    [InlineData(ChatCompletionModels.Gpt3_5_Turbo_1106)]
+    [InlineData(ChatCompletionModels.Gpt4o)]
+    [InlineData(ChatCompletionModels.Gpt4o_Mini)]
     public async void Get_simple_structured_response_from_ChatGPT(string model)
     {
         var message =
@@ -33,7 +34,7 @@ public class OpenAiClientGetStructuredResponseTests : IClassFixture<OpenAiClient
 
     [Theory]
     [InlineData(ChatCompletionModels.Gpt4Turbo)]
-    [InlineData(ChatCompletionModels.Gpt4)]
+    [InlineData(ChatCompletionModels.Gpt4o)]
     public async void Get_structured_response_with_ARRAY_from_ChatGPT(string model)
     {
         var message = Dialog
@@ -56,7 +57,7 @@ public class OpenAiClientGetStructuredResponseTests : IClassFixture<OpenAiClient
 
     [Theory]
     [InlineData(ChatCompletionModels.Gpt4Turbo)]
-    [InlineData(ChatCompletionModels.Gpt4)]
+    [InlineData(ChatCompletionModels.Gpt4o)]
     public async void Get_structured_response_with_ENUM_from_ChatGPT(string model)
     {
         var message = Dialog
@@ -69,7 +70,7 @@ public class OpenAiClientGetStructuredResponseTests : IClassFixture<OpenAiClient
 
     [Theory]
     [InlineData(ChatCompletionModels.Gpt4Turbo)]
-    [InlineData(ChatCompletionModels.Gpt4)]
+    [InlineData(ChatCompletionModels.Gpt4o)]
     public async void Get_structured_response_with_extra_data_from_ChatGPT(string model)
     {
         var message = Dialog

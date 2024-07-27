@@ -13,7 +13,7 @@ public class AzureOpenAiClientTests : IClassFixture<AzureOpenAiClientFixture>
         _client = fixture.Client;
     }
     
-    [Fact]
+    [Fact(Skip = "Deployment was changed, need to update it")]
     public async void Get_long_response_from_gpt4_Turbo_model()
     {
         string text = "Describe who are you in a very detailed way. At least 300 words.";

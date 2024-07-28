@@ -129,7 +129,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITimeProvider, TimeProviderUtc>();
         services.Add(new ServiceDescriptor(typeof(ChatGPTFactory), typeof(ChatGPTFactory), gptFactoryLifetime));
 
-        services.AddAiClient(configuration, credentialsConfigSectionPath, azureOpenAiCredentialsConfigSectionPath, openRouterCredentialsConfigSectionPath, validateAiClientProviderOnStart);
+        services.AddAiClient(configuration,
+            credentialsConfigSectionPath,
+            azureOpenAiCredentialsConfigSectionPath,
+            openRouterCredentialsConfigSectionPath,
+            validateAiClientProviderOnStart);
 
         return services;
     }

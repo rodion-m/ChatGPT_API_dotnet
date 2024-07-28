@@ -1,14 +1,16 @@
 [![example gif...](assets/chatgpt_console_spectre_example.gif)](samples/ChatGpt.SpectreConsoleExample/Program.cs)
 # ChatGPT integration for .NET (+DI)
 [![Nuget](https://img.shields.io/nuget/v/OpenAI.ChatGPT.EntityFrameworkCore)](https://www.nuget.org/packages/OpenAI.ChatGPT.EntityFrameworkCore/)[![.NET](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml) \
-OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core supporting. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.
+OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core support. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.
 
 ## 2023.11 UPD: GPT4Turbo and JSON mode support
 `StructuredResponse` module allows you to get structured responses from the API as C# object. See: [StructuredResponse](#structuredresponse) section.
 
 ## Content
 <!-- TOC -->
-* [ChatGPT integration for .NET](#chatgpt-integration-for-net)
+* [ChatGPT integration for .NET (+DI)](#chatgpt-integration-for-net-di)
+  * [2023.11 UPD: GPT4Turbo and JSON mode support](#202311-upd-gpt4turbo-and-json-mode-support)
+  * [Content](#content)
   * [Preparation](#preparation)
   * [Installation](#installation)
   * [Usage](#usage)

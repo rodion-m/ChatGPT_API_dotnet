@@ -3,13 +3,28 @@
 [![Nuget](https://img.shields.io/nuget/v/OpenAI.ChatGPT.EntityFrameworkCore)](https://www.nuget.org/packages/OpenAI.ChatGPT.EntityFrameworkCore/)[![.NET](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rodion-m/ChatGPT_API_dotnet/actions/workflows/dotnet.yml) \
 OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core support. It allows you to use the API in your .NET applications. Also, the client supports streaming responses (like ChatGPT) via async streams.
 
-## 2023.11 UPD: GPT4Turbo and JSON mode support
-`StructuredResponse` module allows you to get structured responses from the API as C# object. See: [StructuredResponse](#structuredresponse) section.
+## Changelog
+
+### 2024.8
+
+* Add OpenRouter and Azure OpenAI support
+* Add support for GPT-4-o, GPT-4-o-mini
+* Improve JSON mode support
+* BREAKING CHANGES: `AddChatGptEntityFrameworkIntegration` now requires `builder.Configuration` as a mandatory parameter.
+* Add a [setup example](https://github.com/buddy-ai-team/buddy_language_backend/blob/69ee02988878c89b897c293cc192c5ea8c65b888/src/infrastructure/BuddyLanguage.Infrastructure/BuddyLanguageDependencyInjection.cs#L65)
+
+### 2023.11
+
+* Add GPT-4-Turbo 
+* Add JSON mode support
+* `StructuredResponse` module allows you to get structured responses from the API as C# object. See: [StructuredResponse](#structuredresponse) section.
 
 ## Content
 <!-- TOC -->
 * [ChatGPT integration for .NET (+DI)](#chatgpt-integration-for-net-di)
-  * [2023.11 UPD: GPT4Turbo and JSON mode support](#202311-upd-gpt4turbo-and-json-mode-support)
+  * [Changelog](#changelog)
+    * [2024.8](#20248)
+    * [2023.11](#202311)
   * [Content](#content)
   * [Preparation](#preparation)
   * [Installation](#installation)
@@ -32,7 +47,7 @@ OpenAI Chat Completions API (ChatGPT) integration with DI and EF Core support. I
 <!-- TOC -->
 
 ## Preparation
-First, you need to create an OpenAI account and get an API key. You can do this at https://platform.openai.com/account/api-keys.
+First, you need to create an OpenAI account and get an API key (or OpenRouter or Azure OpenAI). You can do this at https://platform.openai.com/account/api-keys.
 
 ## Installation
 The easiest way to use ChatGPT service in your .NET project with DI and persistence (EF Core) supporting is to install the NuGet package [OpenAI.ChatGPT.EntityFrameworkCore](https://www.nuget.org/packages/OpenAI.ChatGPT.EntityFrameworkCore/):
@@ -42,12 +57,25 @@ Install-Package OpenAI.ChatGPT.EntityFrameworkCore
 If you don't want to use EF Core, you can install the package [OpenAI.ChatGPT.AspNetCore](https://www.nuget.org/packages/OpenAI.ChatGPT.AspNetCore/) and implement your own storage for chat history, using `IChatHistoryStorage` interface.
 
 ## Usage
+
+TL;DR: See [an example in a reference project](https://github.com/buddy-ai-team/buddy_language_backend/blob/69ee02988878c89b897c293cc192c5ea8c65b888/src/infrastructure/BuddyLanguage.Infrastructure/BuddyLanguageDependencyInjection.cs#L65).
+
 1. Set the OpenAI API key or even host (optional) in your project user secrets, or the `appsettings.json` file (not safe):
 ```json
 {
-  "OpenAICredentials": {
+  "AIProvider": "openai", // or openrouter or azure_openai
+  "OpenAICredentials": { //optional
     "ApiKey": "your-api-key-from-openai",
     "ApiHost": "https://api.openai.com/v1/"
+  },
+  "AzureOpenAICredentials": { //optional
+    "ApiKey": "your-api-key-from-azure-openai",
+    "ApiHost": "https://{your-host}.openai.azure.com/",
+    "DeploymentName": "gpt-4-turbo-preview"
+  },
+  "OpenRouterCredentials": { //optional
+    "ApiKey": "your-api-key-from-openrouter",
+    "ApiHost": "https://openrouter.ai/api/v1"
   }
 }
 ```
@@ -56,6 +84,7 @@ Also, you can specify OpenAI API key as environment variable `ASPNETCORE_OpenAIC
 2. Add ChatGPT integration with EF to your DI container:
 ```csharp
 builder.Services.AddChatGptEntityFrameworkIntegration(
+    builder.Configuration,
     options => options.UseSqlite("Data Source=chats.db"));
 ```
 Instead of `options.UseSqlite("Data Source=chats.db")` use your own db and connection string.

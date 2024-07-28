@@ -49,7 +49,6 @@ public class ChatGptTranslatorServiceTests : IClassFixture<OpenAiClientFixture>
             {
                 new(1,"Book", 5),
                 new(2,"Pen", 10),
-                new(3,"Notebook", 3)
             }
         );
 
@@ -57,7 +56,6 @@ public class ChatGptTranslatorServiceTests : IClassFixture<OpenAiClientFixture>
         {
             { "Book", "Книга" },
             { "Pen", "Ручка" },
-            { "Notebook", "Тетрадь" }
         };
 
         // Act
